@@ -37,18 +37,8 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .nav-link { border:0; background:none; padding:4px 0; color:#fff; font-size:clamp(13px,1vw,16px); font-weight:700; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; transition:color .35s ease; }
 .nav-link:hover,.nav-link:focus-visible { color:rgb(191,136,96); }
 
-.about-open { position:absolute; left:0; top:50%; transform:translateY(-50%); z-index:5; width:30px; height:56px; border:0; background:rgba(0,0,0,.6); color:#fff; font-size:13px; cursor:pointer; transition:background-color .3s ease; }
-.about-open:hover,.about-open:focus-visible { background:rgb(191,136,96); }
-
 /* About: transparent, same footprint (right sixth), text over the film */
-.aside { position:absolute; top:0; right:0; bottom:0; width:var(--aside-w); z-index:4; color:#fff; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(18px,1.8vw,40px); transition:opacity .45s ease, transform .6s var(--ease); }
-.home.about-collapsed .aside { opacity:0; transform:translateX(100%); pointer-events:none; }
-/* 3D divider: dark groove edge, bright ridge, soft shadow either side */
-.aside::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; transform:translateX(-50%); pointer-events:none;
-  background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
-  box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
-.about-close { position:absolute; left:0; top:50%; transform:translate(-50%,-50%); z-index:1; border:1px solid rgba(255,255,255,.7); background:rgba(0,0,0,.65); color:#fff; width:28px; height:28px; font-size:11px; cursor:pointer; transition:background-color .3s ease,border-color .3s ease; }
-.about-close:hover,.about-close:focus-visible { background:rgb(191,136,96); border-color:rgb(191,136,96); }
+.aside { position:absolute; top:0; right:0; bottom:0; width:var(--aside-w); z-index:4; color:#fff; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(18px,1.8vw,40px); }
 .aside-copy { text-shadow:0 1px 3px rgba(0,0,0,.75),0 0 14px rgba(0,0,0,.45); }
 .aside-copy h2 { font:400 clamp(19px,1.9vw,40px)/1.1 var(--font); margin:0 0 28px; letter-spacing:-.02em; }
 .aside-copy p { font-size:clamp(11px,.82vw,15px); line-height:1.75; letter-spacing:.015em; color:rgba(255,255,255,.88); max-width:30ch; }
@@ -103,14 +93,9 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 
 /* ---------- Responsive: home stays within one screen ---------- */
 @media(max-width:800px) {
-  /* About sits along the bottom; divider turns horizontal above the text */
+  /* About text sits along the bottom, over the film */
   .home { --aside-h:clamp(150px,21svh,200px); }
   .aside { top:auto; left:0; width:auto; height:var(--aside-h); padding:22px 7vw 18px; justify-content:flex-start; }
-  .home.about-collapsed .aside { transform:translateY(100%); }
-  .aside::before { left:0; right:0; top:0; bottom:auto; width:auto; height:4px; transform:translateY(-50%);
-    background:linear-gradient(180deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
-    box-shadow:0 -3px 8px rgba(0,0,0,.45),0 3px 8px rgba(0,0,0,.3); }
-  .about-close { left:auto; right:7vw; top:0; transform:translateY(-50%); }
   .aside-copy { margin:0; }
   .aside-copy h2 { font-size:clamp(20px,5.6vw,32px); margin-bottom:8px; }
   .aside-copy h2 br { display:none; }
@@ -120,8 +105,7 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
   .logo-placeholder { width:40px; }
   .logo-placeholder svg { width:39px; height:37px; }
   .logo-placeholder span { font-size:5px; }
-  .navigation { left:6%; bottom:calc(var(--aside-h) + 22px); transition:bottom .6s var(--ease); }
-  .home.about-collapsed .navigation { bottom:5%; }
+  .navigation { left:6%; bottom:calc(var(--aside-h) + 22px); }
   .gallery { grid-template-columns:1fr; }
 }
 @media(max-width:410px) { .topline { gap:5px; } .brand { font-size:17px; letter-spacing:.1em; } }

@@ -151,19 +151,6 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 filmModal.addEventListener('click', event => { if (event.target === filmModal) closeModal(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !filmModal.hidden) closeModal(); });
 
-// ---------- About Us collapse ----------
-const aboutOpen = document.getElementById('aboutOpen');
-const aboutClose = document.getElementById('aboutClose');
-
-function setAboutCollapsed(collapsed) {
-  home.classList.toggle('about-collapsed', collapsed);
-  aboutOpen.hidden = !collapsed;
-  aboutOpen.setAttribute('aria-expanded', String(!collapsed));
-  (collapsed ? aboutOpen : aboutClose).focus({ preventScroll: true });
-}
-aboutClose.addEventListener('click', () => setAboutCollapsed(true));
-aboutOpen.addEventListener('click', () => setAboutCollapsed(false));
-
 // ---------- Back to top (Works page) ----------
 const toTop = document.getElementById('toTop');
 const worksPage = document.getElementById('works');
