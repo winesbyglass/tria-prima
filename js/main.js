@@ -35,6 +35,7 @@ function revealPage(target) {
   updateWorksSnap();
   window.scrollTo({ top: 0, behavior: 'instant' });
   updateToTop();
+  if (target === 'works') fillRemainingSlides();
   // On the home page only one of film / slideshow runs, depending on the page-turn state.
   if (target === 'home' && !home.classList.contains('photo-mode')) playHero();
   else pauseHero();
@@ -524,30 +525,76 @@ const slideRequested = [];
 const worksOverlays = [...document.querySelectorAll('.works-back, .works-filter, .works-view')];
 let activeIndex = 0;
 
+function sampleSlideInk(i, img) {
+  const slide = slides[i];
+  const sb = slide.getBoundingClientRect();
+  if (!sb.width) return;
+  slidePixels[i] = coverPixels(img, img.naturalWidth, img.naturalHeight, sb.width, sb.height);
+  const title = relRect(slide.querySelector('.work-slide-title'), sb);
+  const sub = relRect(slide.querySelector('.work-slide-sub'), sb);
+  const text = { left: Math.min(title.left, sub.left), right: Math.max(title.right, sub.right), top: sub.top, bottom: title.bottom };
+  if (slidePixels[i]) slide.classList.toggle('ink-dark', isLightUnder(slidePixels[i], text));
+  if (i === activeIndex) updateWorksInk(i);
+}
+
+// Full-size pictures download two at a time; slides near the screen jump the queue.
+const fullQueue = [];
+let fullActive = 0;
+function pumpFull() {
+  while (fullActive < 2 && fullQueue.length) {
+    const i = fullQueue.shift();
+    fullActive++;
+    const img = new Image();
+    img.onload = () => { slides[i].style.backgroundImage = `url("${img.src}")`; };
+    const done = () => { fullActive--; pumpFull(); };
+    img.addEventListener('load', done, { once: true });
+    img.addEventListener('error', done, { once: true });
+    img.src = workImage(works[i], 'full');
+  }
+}
+function queueFull(i, urgent) {
+  const at = fullQueue.indexOf(i);
+  if (at >= 0) { if (!urgent) return; fullQueue.splice(at, 1); }
+  if (urgent) fullQueue.unshift(i); else fullQueue.push(i);
+  pumpFull();
+}
+
+// A slide shows its 800px picture straight away (small, fast), then swaps in the full size.
 function loadSlide(i) {
   if (slideRequested[i]) return;
   slideRequested[i] = true;
-  const slide = slides[i];
-  const img = new Image();
-  img.onload = () => {
-    slide.style.backgroundImage = `url("${img.src}")`;
-    const sb = slide.getBoundingClientRect();
-    if (!sb.width) return;
-    slidePixels[i] = coverPixels(img, img.naturalWidth, img.naturalHeight, sb.width, sb.height);
-    const title = relRect(slide.querySelector('.work-slide-title'), sb);
-    const sub = relRect(slide.querySelector('.work-slide-sub'), sb);
-    const text = { left: Math.min(title.left, sub.left), right: Math.max(title.right, sub.right), top: sub.top, bottom: title.bottom };
-    if (slidePixels[i]) slide.classList.toggle('ink-dark', isLightUnder(slidePixels[i], text));
-    if (i === activeIndex) updateWorksInk(i);
+  const mid = new Image();
+  mid.onload = () => {
+    if (!slides[i].style.backgroundImage) slides[i].style.backgroundImage = `url("${mid.src}")`;
+    sampleSlideInk(i, mid);
   };
-  img.src = workImage(works[i], 'full');
+  mid.src = workImage(works[i], 'mid');
+  queueFull(i, true);
 }
 
-// Two screens ahead and behind.
+// Slides within two screens load first ...
 const slideLoader = new IntersectionObserver(entries => {
   entries.forEach(entry => { if (entry.isIntersecting) loadSlide(Number(entry.target.dataset.index)); });
 }, { rootMargin: '200% 0px 200% 0px' });
 slides.forEach(slide => slideLoader.observe(slide));
+
+// ... and once the Works page has been opened, the rest follow in the background.
+let backgroundFillStarted = false;
+function fillRemainingSlides() {
+  if (backgroundFillStarted) return;
+  backgroundFillStarted = true;
+  setTimeout(() => works.forEach((_, i) => {
+    if (slideRequested[i]) return;
+    slideRequested[i] = true;
+    const mid = new Image();
+    mid.onload = () => {
+      if (!slides[i].style.backgroundImage) slides[i].style.backgroundImage = `url("${mid.src}")`;
+      sampleSlideInk(i, mid);
+    };
+    mid.src = workImage(works[i], 'mid');
+    queueFull(i, false);
+  }), 1500);
+}
 // The fixed labels (Back, filters, List/Grid) follow the slide on screen; on the grid they sit on black.
 function updateWorksInk(i) {
   activeIndex = i;
