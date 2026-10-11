@@ -60,6 +60,19 @@ function navigate(target, source, fromHistory = false) {
   if ((target === 'home' && !home.hidden) || (target !== 'home' && !document.getElementById(target).hidden)) return;
   navigating = true;
   if (!fromHistory) history.pushState({ page: target }, '', target === 'home' ? location.pathname : `#${target}`);
+  circleWipe(source, () => {
+    revealPage(target);
+    document.title = pageTitle(target);
+  }, () => {
+    navigating = false;
+    // Back pressed again mid-transition: catch up with where history now is.
+    const current = pageFromHash();
+    if (current !== target) navigate(current, null, true);
+  });
+}
+
+// Expanding circles from the clicked control; onCovered runs while the screen is covered.
+function circleWipe(source, onCovered, onDone) {
   const rect = source ? source.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
   transition.style.setProperty('--x', `${rect.left + rect.width / 2}px`);
   transition.style.setProperty('--y', `${rect.top + rect.height / 2}px`);
@@ -67,16 +80,10 @@ function navigate(target, source, fromHistory = false) {
   void transition.offsetWidth;
   transition.classList.add('running');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(() => {
-    revealPage(target);
-    document.title = pageTitle(target);
-  }, reduceMotion ? 0 : 850);
+  window.setTimeout(onCovered, reduceMotion ? 0 : 850);
   window.setTimeout(() => {
     transition.classList.remove('running');
-    navigating = false;
-    // Back pressed again mid-transition: catch up with where history now is.
-    const current = pageFromHash();
-    if (current !== target) navigate(current, null, true);
+    onDone();
   }, reduceMotion ? 25 : 1360);
 }
 
@@ -249,7 +256,11 @@ function updateWorksSnap() {
 }
 
 document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.filter)));
-document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+  if (navigating || b.dataset.view === currentView) return;
+  navigating = true;
+  circleWipe(b, () => setView(b.dataset.view), () => { navigating = false; });
+}));
 
 // ---------- Back to top (Works page) ----------
 const toTop = document.getElementById('toTop');
