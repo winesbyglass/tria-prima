@@ -31,6 +31,7 @@ function revealPage(target) {
     page.classList.toggle('active', active);
   });
   window.scrollTo({ top: 0, behavior: 'instant' });
+  updateToTop();
   if (target === 'home') playHero();
   else pauseHero();
 }
@@ -149,6 +150,29 @@ function closeModal() {
 document.getElementById('modalClose').addEventListener('click', closeModal);
 filmModal.addEventListener('click', event => { if (event.target === filmModal) closeModal(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !filmModal.hidden) closeModal(); });
+
+// ---------- About Us collapse ----------
+const aboutOpen = document.getElementById('aboutOpen');
+const aboutClose = document.getElementById('aboutClose');
+
+function setAboutCollapsed(collapsed) {
+  home.classList.toggle('about-collapsed', collapsed);
+  aboutOpen.hidden = !collapsed;
+  aboutOpen.setAttribute('aria-expanded', String(!collapsed));
+  (collapsed ? aboutOpen : aboutClose).focus({ preventScroll: true });
+}
+aboutClose.addEventListener('click', () => setAboutCollapsed(true));
+aboutOpen.addEventListener('click', () => setAboutCollapsed(false));
+
+// ---------- Back to top (Works page) ----------
+const toTop = document.getElementById('toTop');
+const worksPage = document.getElementById('works');
+
+function updateToTop() {
+  toTop.classList.toggle('visible', !worksPage.hidden && window.scrollY > 400);
+}
+window.addEventListener('scroll', updateToTop, { passive: true });
+toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
 // Initial page: honour a direct link such as …/tria-prima/#works.
 const initialPage = pageFromHash();
