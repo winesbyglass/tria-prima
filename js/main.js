@@ -275,8 +275,8 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; });
 }));
 
-// List <-> Grid morph: every visible work flies between its round strip thumbnail and its
-// grid square (circle <-> square), swapping the view underneath.
+// List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
+// swapping the view underneath.
 function morphView(view, onDone) {
   const toGrid = view === 'grid';
   const visible = works.map((_, i) => i).filter(i => !gridItems[i].hidden);
@@ -294,14 +294,14 @@ function morphView(view, onDone) {
   finals.forEach(node => { node.style.visibility = 'hidden'; });
 
   const layer = el('div', 'morph-layer');
-  const box = (r, round) => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, borderRadius: round ? '50%' : '0%' });
+  const box = r => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   const duration = 750;
   const stagger = 18;
   targets.forEach(([i, to], n) => {
     const flyer = el('span');
     flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
     layer.append(flyer);
-    flyer.animate([box(from.get(i), toGrid), box(to, !toGrid)],
+    flyer.animate([box(from.get(i)), box(to)],
       { duration, delay: n * stagger, easing: 'cubic-bezier(.62,0,.23,1)', fill: 'both' });
   });
   document.body.append(layer);
