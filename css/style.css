@@ -16,8 +16,8 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .app { min-height:100svh; overflow:hidden; }
 
 /* ---------- Home ---------- */
-/* Film fills everything except the About column, which takes one fifth of the width */
-.home { --aside-w:max(220px,20vw); display:grid; grid-template-columns:minmax(0,1fr) var(--aside-w); height:100svh; overflow:hidden; }
+/* Film fills everything except the About column, which takes one sixth of the width */
+.home { --aside-w:max(200px,16.667vw); display:grid; grid-template-columns:minmax(0,1fr) var(--aside-w); height:100svh; overflow:hidden; }
 .hero { position:relative; height:100%; isolation:isolate; background:#111315; overflow:hidden; }
 .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.29),transparent 33%,transparent 53%,rgba(0,0,0,.53)); }
 .hero-video { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; pointer-events:none; }
@@ -50,7 +50,7 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .aside-label,.aside-foot { font-size:10px; letter-spacing:.27em; }
 .aside-label { color:rgba(255,255,255,.8); }
 .aside-copy { margin:auto 0; }
-.aside-copy h2 { font:400 clamp(22px,2.3vw,46px)/1.1 var(--font); margin:0 0 28px; letter-spacing:-.02em; }
+.aside-copy h2 { font:400 clamp(19px,1.9vw,40px)/1.1 var(--font); margin:0 0 28px; letter-spacing:-.02em; }
 .aside-copy p { font-size:clamp(11px,.82vw,15px); line-height:1.75; letter-spacing:.015em; color:rgba(255,255,255,.72); max-width:30ch; }
 .aside-foot { text-align:center; color:rgba(255,255,255,.6); }
 .aside-foot::before { content:""; display:block; height:48px; width:1px; background:rgba(255,255,255,.4); margin:0 auto 20px; }

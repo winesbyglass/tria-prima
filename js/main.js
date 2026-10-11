@@ -35,11 +35,25 @@ function revealPage(target) {
   else pauseHero();
 }
 
-function navigate(target, source) {
-  if (navigating || !['home', 'works', 'process', 'contact'].includes(target)) return;
+const PAGES = ['home', 'works', 'process', 'contact'];
+
+function pageTitle(target) {
+  return `TRIA PRIMA — ${target === 'home' ? 'Film & Media' : target[0].toUpperCase() + target.slice(1)}`;
+}
+
+function pageFromHash() {
+  const hash = location.hash.slice(1);
+  return PAGES.includes(hash) ? hash : 'home';
+}
+
+// Each page gets its own history entry (#works etc.), so the browser Back button works.
+// fromHistory: triggered by Back/Forward, so don't push another entry.
+function navigate(target, source, fromHistory = false) {
+  if (navigating || !PAGES.includes(target)) return;
   if ((target === 'home' && !home.hidden) || (target !== 'home' && !document.getElementById(target).hidden)) return;
   navigating = true;
-  const rect = source.getBoundingClientRect();
+  if (!fromHistory) history.pushState({ page: target }, '', target === 'home' ? location.pathname : `#${target}`);
+  const rect = source ? source.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
   transition.style.setProperty('--x', `${rect.left + rect.width / 2}px`);
   transition.style.setProperty('--y', `${rect.top + rect.height / 2}px`);
   transition.classList.remove('running');
@@ -48,13 +62,21 @@ function navigate(target, source) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.setTimeout(() => {
     revealPage(target);
-    document.title = `TRIA PRIMA — ${target === 'home' ? 'Film & Media' : target[0].toUpperCase() + target.slice(1)}`;
+    document.title = pageTitle(target);
   }, reduceMotion ? 0 : 850);
   window.setTimeout(() => {
     transition.classList.remove('running');
     navigating = false;
+    // Back pressed again mid-transition: catch up with where history now is.
+    const current = pageFromHash();
+    if (current !== target) navigate(current, null, true);
   }, reduceMotion ? 25 : 1360);
 }
+
+window.addEventListener('popstate', () => {
+  if (!filmModal.hidden) closeModal();
+  navigate(pageFromHash(), null, true);
+});
 
 document.querySelectorAll('[data-target]').forEach(button => {
   button.addEventListener('click', () => navigate(button.dataset.target, button));
@@ -128,5 +150,8 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 filmModal.addEventListener('click', event => { if (event.target === filmModal) closeModal(); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !filmModal.hidden) closeModal(); });
 
-document.body.classList.add('on-home');
-playHero();
+// Initial page: honour a direct link such as …/tria-prima/#works.
+const initialPage = pageFromHash();
+history.replaceState({ page: initialPage }, '');
+revealPage(initialPage);
+document.title = pageTitle(initialPage);
