@@ -220,8 +220,10 @@ if (document.readyState === 'complete') setTimeout(preloadGrid, 800);
 else window.addEventListener('load', () => setTimeout(preloadGrid, 800), { once: true });
 workList.append(...slides);
 const stripTrack = el('div', 'strip-track');
+const stripWindow = el('div', 'strip-window');
 stripTrack.append(...thumbs);
-workStrip.append(stripTrack);
+stripWindow.append(stripTrack);
+workStrip.append(stripWindow);
 workGrid.append(...gridItems);
 document.getElementById('countMotion').textContent = `(${motionWorks.length})`;
 document.getElementById('countPhoto').textContent = `(${photoWorks.length})`;
@@ -230,8 +232,8 @@ function setActiveThumb(i) {
   thumbs.forEach((thumb, j) => thumb.classList.toggle('active', j === i));
   // Slide the track so the current thumbnail sits mid-screen, but never past either end.
   const thumb = thumbs[i];
-  const maxShift = Math.max(0, stripTrack.offsetHeight - workStrip.clientHeight);
-  const shift = Math.min(maxShift, Math.max(0, thumb.offsetTop + thumb.offsetHeight / 2 - workStrip.clientHeight / 2));
+  const maxShift = Math.max(0, stripTrack.offsetHeight - stripWindow.clientHeight);
+  const shift = Math.min(maxShift, Math.max(0, thumb.offsetTop + thumb.offsetHeight / 2 - stripWindow.clientHeight / 2));
   stripTrack.style.transform = `translateY(${-shift}px)`;
   updateWorksInk(i);
 }

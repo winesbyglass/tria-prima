@@ -97,11 +97,12 @@ html.works-open::-webkit-scrollbar { display:none; }
 .work-slide-cta { margin-top:22px; font-size:10px; letter-spacing:.2em; opacity:0; transition:opacity .4s ease; }
 .work-slide:hover .work-slide-cta, .work-slide:focus-visible .work-slide-cta { opacity:1; }
 
-/* Thumbnail strip on the right, follows the work on screen. Translucent grey panel with a gap
-   above and below, split from the work by a 3D vertical line. The track is slid with a
-   transform (from main.js) to keep the current thumbnail in view; thumbnails grow from their
-   centre and stay inside the panel. */
-.work-strip { position:fixed; top:clamp(16px,3vh,32px); right:0; bottom:clamp(16px,3vh,32px); width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(128,128,128,.35); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+/* Thumbnail strip on the right, follows the work on screen. One light-grey column top to
+   bottom, split from the work by a 3D vertical line; the thumbnails sit in a window inset
+   from its top and bottom. The track is slid with a transform (from main.js) to keep the
+   current thumbnail in view; thumbnails grow from their centre and stay inside. */
+.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(205,205,205,.85); padding:clamp(16px,3vh,32px) 0; }
+.strip-window { position:relative; height:100%; overflow:hidden; }
 .work-strip::before { content:""; position:absolute; top:0; bottom:0; left:0; width:4px; z-index:4; pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
   box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
