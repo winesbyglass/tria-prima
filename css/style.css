@@ -16,13 +16,13 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .app { min-height:100svh; overflow:hidden; }
 
 /* ---------- Home ---------- */
-/* Full-screen film behind everything; About panel floats over its right edge */
-.home { --aside-w:clamp(280px,25vw,460px); position:relative; height:100svh; overflow:hidden; }
-.hero { position:absolute; inset:0; isolation:isolate; background:#111315; overflow:hidden; }
+/* Film fills everything except the About column, which takes one fifth of the width */
+.home { --aside-w:max(220px,20vw); display:grid; grid-template-columns:minmax(0,1fr) var(--aside-w); height:100svh; overflow:hidden; }
+.hero { position:relative; height:100%; isolation:isolate; background:#111315; overflow:hidden; }
 .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.29),transparent 33%,transparent 53%,rgba(0,0,0,.53)); }
 .hero-video { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; pointer-events:none; }
 
-.topline { position:absolute; top:4.2%; left:4.2%; right:calc(var(--aside-w) + 3vw); display:grid; grid-template-columns:1fr auto 1fr; align-items:start; gap:15px; }
+.topline { position:absolute; top:4.2%; left:4.2%; right:4.2%; display:grid; grid-template-columns:1fr auto 1fr; align-items:start; gap:15px; }
 .logo-placeholder { width:64px; border:0; background:none; padding:0; color:white; cursor:pointer; text-align:center; }
 .logo-placeholder svg { width:57px; height:53px; display:block; }
 .logo-placeholder span { font-size:7px; letter-spacing:.14em; opacity:.66; white-space:nowrap; }
@@ -30,7 +30,7 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .featured-label { justify-self:end; font-size:10px; letter-spacing:.27em; padding-top:13px; white-space:nowrap; }
 .featured-label::after { content:""; display:inline-block; width:38px; height:1px; margin:0 0 3px 18px; background:rgba(255,255,255,.65); }
 
-.film-link { position:absolute; top:20%; bottom:29%; left:20%; right:calc(var(--aside-w) + 10%); border:0; background:transparent; color:var(--white); cursor:pointer; z-index:1; }
+.film-link { position:absolute; top:20%; bottom:29%; left:20%; right:20%; border:0; background:transparent; color:var(--white); cursor:pointer; z-index:1; }
 .film-link span { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); opacity:0; border:1px solid rgba(255,255,255,.9); border-radius:99px; padding:14px 23px; letter-spacing:.2em; font-size:10px; white-space:nowrap; transition:opacity .4s var(--ease); }
 .film-link:hover span, .film-link:focus-visible span { opacity:1; }
 
@@ -46,13 +46,14 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .nav-circle.contact { bottom:0; left:var(--s); z-index:3; }
 .nav-circle:hover,.nav-circle:focus-visible { background-color:var(--nav-hover); border-color:#fff; }
 
-.aside { position:absolute; top:0; right:0; bottom:0; width:var(--aside-w); z-index:4; color:#2d2c2a; background:rgba(233,230,223,.88); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); display:flex; flex-direction:column; justify-content:space-between; overflow:hidden; padding:clamp(38px,4.8vw,77px) clamp(27px,3vw,54px) 45px; }
+.aside { color:#fff; background:#000; display:flex; flex-direction:column; justify-content:space-between; height:100%; overflow:hidden; padding:clamp(30px,3.4vw,60px) clamp(18px,1.8vw,40px) 36px; }
 .aside-label,.aside-foot { font-size:10px; letter-spacing:.27em; }
+.aside-label { color:rgba(255,255,255,.8); }
 .aside-copy { margin:auto 0; }
-.aside-copy h2 { font:400 clamp(33px,3.2vw,63px)/1.09 var(--font); margin:0 0 43px; letter-spacing:-.025em; }
-.aside-copy p { font-size:clamp(13px,1vw,16px); line-height:1.85; letter-spacing:.015em; color:#66625e; max-width:30ch; }
-.aside-foot { text-align:center; color:#66625e; }
-.aside-foot::before { content:""; display:block; height:60px; width:1px; background:#8c8984; margin:0 auto 25px; }
+.aside-copy h2 { font:400 clamp(22px,2.3vw,46px)/1.1 var(--font); margin:0 0 28px; letter-spacing:-.02em; }
+.aside-copy p { font-size:clamp(11px,.82vw,15px); line-height:1.75; letter-spacing:.015em; color:rgba(255,255,255,.72); max-width:30ch; }
+.aside-foot { text-align:center; color:rgba(255,255,255,.6); }
+.aside-foot::before { content:""; display:block; height:48px; width:1px; background:rgba(255,255,255,.4); margin:0 auto 20px; }
 
 /* ---------- Inner pages ---------- */
 .page { min-height:100svh; padding:34px clamp(23px,5vw,90px) 80px; background:#111315; display:none; }
@@ -99,24 +100,24 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 
 /* ---------- Responsive: home stays within one screen ---------- */
 @media(max-width:800px) {
-  .home { --aside-h:clamp(200px,31svh,280px); }
-  .aside { top:auto; width:auto; left:0; height:var(--aside-h); padding:20px 7vw 18px; gap:10px; justify-content:flex-start; }
+  .home { display:flex; flex-direction:column; }
+  .hero { flex:1 1 auto; min-height:0; }
+  .aside { flex:0 0 auto; height:auto; padding:18px 7vw 16px; gap:8px; justify-content:flex-start; }
   .aside-label { display:none; }
   .aside-copy { margin:0; }
-  .aside-copy h2 { font-size:clamp(24px,6.6vw,38px); margin-bottom:10px; }
+  .aside-copy h2 { font-size:clamp(20px,5.6vw,32px); margin-bottom:8px; }
   .aside-copy h2 br { display:none; }
-  .aside-copy p { font-size:12px; line-height:1.6; max-width:none; margin:0; }
+  .aside-copy p { font-size:11px; line-height:1.55; max-width:none; margin:0; }
   .aside-foot { text-align:left; font-size:9px; margin-top:auto; }
   .aside-foot::before { display:none; }
   .topline { left:6%; right:6%; }
-  .film-link { right:20%; bottom:calc(var(--aside-h) + 40%); }
   .brand { font-size:clamp(17px,3.8vw,27px); }
   .featured-label { font-size:8px; }
   .featured-label::after { display:none; }
   .logo-placeholder { width:40px; }
   .logo-placeholder svg { width:39px; height:37px; }
   .logo-placeholder span { font-size:5px; }
-  .navigation { --d:clamp(58px,15vw,76px); left:5%; bottom:calc(var(--aside-h) + 20px); }
+  .navigation { --d:clamp(58px,15vw,76px); left:5%; bottom:5%; }
   .gallery { grid-template-columns:1fr; }
 }
 @media(max-width:410px) { .topline { gap:5px; } .brand { font-size:17px; letter-spacing:.1em; } .featured-label { font-size:7px; } }
