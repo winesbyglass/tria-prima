@@ -6,33 +6,20 @@ const transition = document.getElementById('transition');
 const heroVideo = document.getElementById('heroVideo');
 const filmModal = document.getElementById('filmModal');
 const modalFrame = document.getElementById('modalFrame');
-let heroPlayer = null;
 let navigating = false;
 
-// ---------- Hero background film (Vimeo background mode) ----------
-function initHeroVideo() {
-  const id = heroVideo.dataset.vimeoId;
-  if (!id) return;
-  const iframe = document.createElement('iframe');
-  iframe.src = `https://player.vimeo.com/video/${id}?background=1&autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&playsinline=1&dnt=1`;
-  iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
-  iframe.title = 'Featured Tria Prima film';
-  iframe.tabIndex = -1;
-  heroVideo.appendChild(iframe);
-
-  if (window.Vimeo && window.Vimeo.Player) {
-    heroPlayer = new window.Vimeo.Player(iframe);
-    const reveal = () => { heroVideo.dataset.loaded = 'true'; };
-    heroPlayer.on('play', reveal);
-    heroPlayer.on('timeupdate', reveal);
-  } else {
-    // API script blocked: reveal once the iframe has loaded.
-    iframe.addEventListener('load', () => { heroVideo.dataset.loaded = 'true'; });
-  }
+// ---------- Hero background film (muted MP4 autoplay) ----------
+function playHero() {
+  heroVideo.muted = true;
+  heroVideo.play().catch(() => {});
 }
+function pauseHero() { heroVideo.pause(); }
 
-function playHero() { if (heroPlayer) heroPlayer.play().catch(() => {}); }
-function pauseHero() { if (heroPlayer) heroPlayer.pause().catch(() => {}); }
+// Some browsers hold autoplay until the first interaction; retry then.
+['pointerdown', 'touchstart', 'keydown'].forEach(type => {
+  document.addEventListener(type, () => { if (!home.hidden && heroVideo.paused) playHero(); }, { once: true, passive: true });
+});
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !home.hidden) playHero(); });
 
 // ---------- Page navigation ----------
 function revealPage(target) {
@@ -77,14 +64,15 @@ document.querySelectorAll('[data-home]').forEach(button => {
 });
 
 // ---------- Project video modal ----------
-document.querySelectorAll('[data-vimeo]').forEach(button => {
+document.querySelectorAll('[data-video]').forEach(button => {
   button.addEventListener('click', () => {
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://player.vimeo.com/video/${button.dataset.vimeo}?autoplay=1&title=0&byline=0&portrait=0&color=000000&dnt=1`;
-    iframe.allow = 'autoplay; fullscreen; picture-in-picture';
-    iframe.allowFullscreen = true;
-    iframe.title = button.querySelector('.project-title').textContent;
-    modalFrame.replaceChildren(iframe);
+    const video = document.createElement('video');
+    video.src = button.dataset.video;
+    video.controls = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.title = button.querySelector('.project-title').textContent;
+    modalFrame.replaceChildren(video);
     filmModal.hidden = false;
     filmModal.classList.add('open');
   });
@@ -100,4 +88,4 @@ filmModal.addEventListener('click', event => { if (event.target === filmModal) c
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !filmModal.hidden) closeModal(); });
 
 document.body.classList.add('on-home');
-initHeroVideo();
+playHero();
