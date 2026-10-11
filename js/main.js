@@ -228,15 +228,35 @@ workGrid.append(...gridItems);
 document.getElementById('countMotion').textContent = `(${motionWorks.length})`;
 document.getElementById('countPhoto').textContent = `(${photoWorks.length})`;
 
+const stripMaxShift = () => Math.max(0, stripTrack.offsetHeight - stripWindow.clientHeight);
+const setStripShift = px => { stripTrack.style.transform = `translateY(${-Math.min(stripMaxShift(), Math.max(0, px))}px)`; };
+let stripHovered = false;
+
 function setActiveThumb(i) {
   thumbs.forEach((thumb, j) => thumb.classList.toggle('active', j === i));
+  updateWorksInk(i);
+  // While the pointer is browsing the strip it stays where the pointer put it.
+  if (stripHovered) return;
   // Slide the track so the current thumbnail sits mid-screen, but never past either end.
   const thumb = thumbs[i];
-  const maxShift = Math.max(0, stripTrack.offsetHeight - stripWindow.clientHeight);
-  const shift = Math.min(maxShift, Math.max(0, thumb.offsetTop + thumb.offsetHeight / 2 - stripWindow.clientHeight / 2));
-  stripTrack.style.transform = `translateY(${-shift}px)`;
-  updateWorksInk(i);
+  setStripShift(thumb.offsetTop + thumb.offsetHeight / 2 - stripWindow.clientHeight / 2);
 }
+
+// Pointer position over the strip scrolls it directly: top of the strip = first thumbnail,
+// bottom = last, so the whole list is reachable without paging through the works.
+workStrip.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'mouse') return;
+  stripHovered = true;
+  workStrip.classList.add('browsing');
+  const r = stripWindow.getBoundingClientRect();
+  const t = Math.min(1, Math.max(0, ((event.clientY - r.top) / r.height - 0.1) / 0.8));
+  setStripShift(t * stripMaxShift());
+});
+workStrip.addEventListener('pointerleave', () => {
+  stripHovered = false;
+  workStrip.classList.remove('browsing');
+  setActiveThumb(activeIndex);
+});
 
 // The work filling the screen drives the strip.
 const slideObserver = new IntersectionObserver(entries => {

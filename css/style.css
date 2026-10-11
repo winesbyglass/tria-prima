@@ -103,13 +103,15 @@ html.works-open::-webkit-scrollbar { display:none; }
    current thumbnail in view; thumbnails grow from their centre and stay inside. */
 .work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(205,205,205,.85); padding:clamp(16px,3vh,32px) 0; }
 .strip-window { position:relative; height:100%; overflow:hidden; }
+/* Follow the pointer quickly while it browses the strip */
+.work-strip.browsing .strip-track { transition:transform .2s ease-out; }
 .work-strip::before { content:""; position:absolute; top:0; bottom:0; left:0; width:4px; z-index:4; pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
   box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
 .strip-track { display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0 18px 4px; transition:transform .6s var(--ease); }
 .strip-thumb { position:relative; flex:none; width:58%; aspect-ratio:4/5; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; transition:transform .35s var(--ease),box-shadow .35s ease; }
 .strip-thumb.active { z-index:2; transform:scale(1.25); box-shadow:0 0 0 2px #fff,0 4px 10px rgba(0,0,0,.4); }
-.strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; transform:scale(1.5); box-shadow:0 0 0 2px rgb(191,136,96),0 6px 16px rgba(0,0,0,.7); }
+.strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; transform:scale(1.5); box-shadow:0 0 0 2px #fff,0 6px 16px rgba(0,0,0,.7); }
 
 /* Grid view: four per row, gutters around and between */
 /* Side gutters match, wide enough to clear the floating filter labels on the left */
