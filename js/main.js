@@ -168,7 +168,9 @@ aboutOpen.addEventListener('click', () => setAboutCollapsed(false));
 const toTop = document.getElementById('toTop');
 const worksPage = document.getElementById('works');
 
+// Only exists on the Works page; hidden everywhere else (home, Process, Contact).
 function updateToTop() {
+  toTop.hidden = worksPage.hidden;
   toTop.classList.toggle('visible', !worksPage.hidden && window.scrollY > 400);
 }
 window.addEventListener('scroll', updateToTop, { passive: true });
