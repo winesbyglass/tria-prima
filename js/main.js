@@ -309,6 +309,82 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
+// ---------- List view paging: one gesture = one work ----------
+// Wheel, trackpad swipe, keys and touch swipes each turn exactly one full-screen work.
+const PAGE_MS = 750;      // ignore further input while a turn is running
+const QUIET_MS = 160;     // a new wheel gesture needs this much quiet first (eats trackpad inertia)
+let pageLockUntil = 0;
+let lastWheelAt = 0;
+
+function listPaging() {
+  return !worksPage.hidden && currentView === 'list' && filmModal.hidden && !navigating;
+}
+
+function turnWork(step) {
+  const visible = slides.filter(s => !s.hidden);
+  if (!visible.length) return;
+  const tops = visible.map(s => s.getBoundingClientRect().top + window.scrollY);
+  // The work currently filling the screen is the one whose top is closest to the scroll position.
+  let at = 0;
+  tops.forEach((top, k) => { if (Math.abs(top - window.scrollY) < Math.abs(tops[at] - window.scrollY)) at = k; });
+  const next = Math.min(visible.length - 1, Math.max(0, at + step));
+  pageLockUntil = Date.now() + PAGE_MS;
+  if (next !== at) animateScroll(tops[next]);
+}
+
+// Our own eased scroll, with snapping paused so the browser's snap can't pull it back.
+function animateScroll(to) {
+  const from = window.scrollY;
+  const start = performance.now();
+  const ms = PAGE_MS - 100;
+  const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const root = document.documentElement;
+  root.classList.remove('works-snap');
+  root.style.scrollBehavior = 'auto';
+  const step = now => {
+    const t = Math.min(1, (now - start) / ms);
+    window.scrollTo(0, from + (to - from) * ease(t));
+    if (t < 1) requestAnimationFrame(step);
+    else { root.style.scrollBehavior = ''; updateWorksSnap(); }
+  };
+  requestAnimationFrame(step);
+}
+
+window.addEventListener('wheel', event => {
+  if (!listPaging() || event.ctrlKey) return;
+  event.preventDefault();
+  const now = Date.now();
+  const fresh = now - lastWheelAt > QUIET_MS;
+  lastWheelAt = now;
+  if (Math.abs(event.deltaY) < 2 || now < pageLockUntil || !fresh) return;
+  turnWork(event.deltaY > 0 ? 1 : -1);
+}, { passive: false });
+
+window.addEventListener('keydown', event => {
+  if (!listPaging() || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.closest && event.target.closest('input, textarea, select, [contenteditable]')) return;
+  const down = ['ArrowDown', 'PageDown'].includes(event.key) || (event.key === ' ' && !event.shiftKey);
+  const up = ['ArrowUp', 'PageUp'].includes(event.key) || (event.key === ' ' && event.shiftKey);
+  if (!down && !up) return;
+  event.preventDefault();
+  if (Date.now() < pageLockUntil) return;
+  turnWork(down ? 1 : -1);
+});
+
+let touchStartY = null;
+window.addEventListener('touchstart', event => {
+  if (listPaging() && event.touches.length === 1) touchStartY = event.touches[0].clientY;
+}, { passive: true });
+window.addEventListener('touchmove', event => {
+  if (listPaging() && touchStartY !== null) event.preventDefault();
+}, { passive: false });
+window.addEventListener('touchend', event => {
+  if (touchStartY === null) return;
+  const dy = touchStartY - event.changedTouches[0].clientY;
+  touchStartY = null;
+  if (!listPaging() || Math.abs(dy) < 40 || Date.now() < pageLockUntil) return;
+  turnWork(dy > 0 ? 1 : -1);
+});
 // List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
 // swapping the view underneath.
 function morphView(view, onDone) {
