@@ -199,15 +199,20 @@ works.forEach((work, i) => {
   gridItems.push(item);
 });
 workList.append(...slides);
-workStrip.append(...thumbs);
+const stripTrack = el('div', 'strip-track');
+stripTrack.append(...thumbs);
+workStrip.append(stripTrack);
 workGrid.append(...gridItems);
 document.getElementById('countMotion').textContent = `(${motionWorks.length})`;
 document.getElementById('countPhoto').textContent = `(${photoWorks.length})`;
 
 function setActiveThumb(i) {
   thumbs.forEach((thumb, j) => thumb.classList.toggle('active', j === i));
+  // Slide the track so the current thumbnail sits mid-screen, but never past either end.
   const thumb = thumbs[i];
-  workStrip.scrollTo({ top: thumb.offsetTop - workStrip.clientHeight / 2 + thumb.offsetHeight / 2, behavior: 'smooth' });
+  const maxShift = Math.max(0, stripTrack.offsetHeight - workStrip.clientHeight);
+  const shift = Math.min(maxShift, Math.max(0, thumb.offsetTop + thumb.offsetHeight / 2 - workStrip.clientHeight / 2));
+  stripTrack.style.transform = `translateY(${-shift}px)`;
 }
 
 // The work filling the screen drives the strip.
@@ -262,8 +267,8 @@ const splitToggle = document.getElementById('splitToggle');
 const photoStage = document.getElementById('photoStage');
 const aboutPanel = document.getElementById('about');
 const verticalTurn = window.matchMedia('(max-width: 800px)');
-const SLIDE_MS = 5000;
-const TURN_MS = 1100;
+const SLIDE_MS = 3000;
+const TURN_MS = 2000;
 let slideTimer = null;
 let slideOrder = [];
 let turning = false;
@@ -278,7 +283,7 @@ function nextPhoto() {
     const previous = photoStage.querySelector('img.shown');
     photoStage.append(img);
     requestAnimationFrame(() => img.classList.add('shown'));
-    if (previous) setTimeout(() => previous.remove(), 1300);
+    if (previous) setTimeout(() => previous.remove(), 900);
   });
 }
 
