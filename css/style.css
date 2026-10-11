@@ -95,8 +95,9 @@ html.works-snap { scroll-snap-type:y mandatory; }
 /* No page scrollbar on Works, so the thumbnail strip reaches the right edge */
 html.works-open { scrollbar-width:none; }
 html.works-open::-webkit-scrollbar { display:none; }
-/* Slides run full width under the translucent thumbnail column; text stays clear of it */
-.work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 calc(var(--strip-w) + 6vw) 0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
+/* Each work fills the screen except the thumbnail column; the two never overlap */
+.work-list { margin-right:var(--strip-w); }
+.work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
 .work-slide::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 22%),linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.05) 40%,rgba(0,0,0,.45)); }
 .work-slide > * { position:relative; }
 .work-slide-sub { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.6); }
@@ -105,22 +106,23 @@ html.works-open::-webkit-scrollbar { display:none; }
 .work-slide:hover .work-slide-cta, .work-slide:focus-visible .work-slide-cta { opacity:1; }
 
 /* Thumbnail strip: full height on the right, follows the work on screen */
-/* Translucent black column of round thumbnails, split from the work by a 3D vertical line. The track is
+/* White column of round thumbnails, split from the work by a 3D vertical line. The track is
    slid with a transform (from main.js) to keep the current thumbnail in view; thumbnails grow
    from their centre and stay inside the column. */
-.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(0,0,0,.55); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:#fff; }
 .work-strip::before { content:""; position:absolute; top:0; bottom:0; left:0; width:4px; z-index:4; pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
   box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
 .strip-track { display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0 18px 4px; transition:transform .6s var(--ease); }
-.strip-thumb { position:relative; flex:none; width:58%; aspect-ratio:1; border-radius:50%; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; opacity:.55; transition:transform .35s var(--ease),opacity .35s ease,box-shadow .35s ease; }
-.strip-thumb.active { z-index:2; opacity:1; transform:scale(1.25); box-shadow:0 0 0 2px #fff,0 4px 12px rgba(255,255,255,.18); }
+.strip-thumb { position:relative; flex:none; width:58%; aspect-ratio:1; border-radius:50%; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; opacity:.8; transition:transform .35s var(--ease),opacity .35s ease,box-shadow .35s ease; }
+.strip-thumb.active { z-index:2; opacity:1; transform:scale(1.25); box-shadow:0 0 0 2px #111,0 4px 10px rgba(0,0,0,.3); }
 .strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; opacity:1; transform:scale(1.5); box-shadow:0 0 0 2px rgb(191,136,96),0 6px 16px rgba(0,0,0,.7); }
 
 /* Grid view: four per row, gutters around and between */
 /* Side gutters match, wide enough to clear the floating filter labels on the left */
 .work-grid { --gutter:clamp(210px,13vw,260px); display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:90px var(--gutter) 80px; }
-.grid-item { position:relative; aspect-ratio:1/1; border:0; padding:0; overflow:hidden; cursor:pointer; background:#151515 center/cover no-repeat; color:#fff; text-align:left; }
+.grid-item { position:relative; aspect-ratio:1/1; border:0; padding:0; overflow:hidden; cursor:pointer; background:#151515 center/cover no-repeat; color:#fff; text-align:left; opacity:0; transition:opacity .5s ease; }
+.grid-item.loaded { opacity:1; }
 .grid-info { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; gap:10px; padding:16px; background:rgba(0,0,0,.72); opacity:0; transition:opacity .35s ease; }
 .grid-item:hover .grid-info, .grid-item:focus-visible .grid-info { opacity:1; }
 .grid-info-title { font:400 clamp(16px,1.3vw,22px)/1.15 var(--font); }
@@ -147,6 +149,10 @@ html.works-open::-webkit-scrollbar { display:none; }
 .transition.running .transition-circle:nth-child(2) { animation-delay:.13s; }
 .transition.running .transition-circle:nth-child(3) { animation-delay:.26s; }
 @keyframes circle-wipe { to { transform:translate(-50%,-50%) scale(3.2); } }
+
+/* List <-> Grid: each round strip thumbnail flies to (or back from) its grid square */
+.morph-layer { position:fixed; inset:0; z-index:30; pointer-events:none; overflow:hidden; }
+.morph-layer span { position:absolute; background:#111 center/cover no-repeat; box-shadow:0 8px 24px rgba(0,0,0,.45); }
 
 /* ---------- Video modal ---------- */
 .film-modal { position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:40; display:none; align-items:center; justify-content:center; padding:7vw; }
@@ -194,7 +200,7 @@ html.works-open::-webkit-scrollbar { display:none; }
   .works-page { --strip-w:56px; }
   .works-back { top:18px; right:calc(var(--strip-w) + 16px); }
   .works-filter { top:auto; bottom:64px; transform:none; }
-  .work-slide { padding:0 calc(var(--strip-w) + 5vw) 0 5vw; }
+  .work-slide { padding:0 5vw; }
   .work-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:70px 16px 120px; }
 }
 @media(max-width:410px) { .topline { gap:5px; } .brand { font-size:17px; letter-spacing:.1em; } }

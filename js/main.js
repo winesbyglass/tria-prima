@@ -205,6 +205,19 @@ works.forEach((work, i) => {
   item.addEventListener('click', () => openWork(work));
   gridItems.push(item);
 });
+
+// Grid images: preload once the page has settled, fade each square in as it arrives.
+function preloadGrid() {
+  works.forEach((work, i) => {
+    const img = new Image();
+    img.onload = img.onerror = () => gridItems[i].classList.add('loaded');
+    img.src = workImage(work, 'mid');
+  });
+  // Never leave a square invisible if a load event is missed.
+  setTimeout(() => gridItems.forEach(item => item.classList.add('loaded')), 4000);
+}
+if (document.readyState === 'complete') setTimeout(preloadGrid, 800);
+else window.addEventListener('load', () => setTimeout(preloadGrid, 800), { once: true });
 workList.append(...slides);
 const stripTrack = el('div', 'strip-track');
 stripTrack.append(...thumbs);
@@ -259,8 +272,48 @@ document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('clic
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
   if (navigating || b.dataset.view === currentView) return;
   navigating = true;
-  circleWipe(b, () => setView(b.dataset.view), () => { navigating = false; });
+  morphView(b.dataset.view, () => { navigating = false; });
 }));
+
+// List <-> Grid morph: every visible work flies between its round strip thumbnail and its
+// grid square (circle <-> square), swapping the view underneath.
+function morphView(view, onDone) {
+  const toGrid = view === 'grid';
+  const visible = works.map((_, i) => i).filter(i => !gridItems[i].hidden);
+  const rectOf = (i, grid) => (grid ? gridItems[i] : thumbs[i]).getBoundingClientRect();
+  const from = new Map(visible.map(i => [i, rectOf(i, !toGrid)]));
+
+  stripTrack.style.transition = 'none';
+  setView(view);
+  if (!toGrid) setActiveThumb(visible[0]);
+  void stripTrack.offsetHeight;
+
+  const onScreen = r => r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+  const targets = visible.map(i => [i, rectOf(i, toGrid)]).filter(([i, r]) => onScreen(r) || onScreen(from.get(i)));
+  const finals = targets.map(([i]) => (toGrid ? gridItems[i] : thumbs[i]));
+  finals.forEach(node => { node.style.visibility = 'hidden'; });
+
+  const layer = el('div', 'morph-layer');
+  const box = (r, round) => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px`, borderRadius: round ? '50%' : '0%' });
+  const duration = 750;
+  const stagger = 18;
+  targets.forEach(([i, to], n) => {
+    const flyer = el('span');
+    flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
+    layer.append(flyer);
+    flyer.animate([box(from.get(i), toGrid), box(to, !toGrid)],
+      { duration, delay: n * stagger, easing: 'cubic-bezier(.62,0,.23,1)', fill: 'both' });
+  });
+  document.body.append(layer);
+
+  // Timer rather than animation promises, which can stall in a background tab.
+  setTimeout(() => {
+    finals.forEach(node => { node.style.visibility = ''; });
+    layer.remove();
+    stripTrack.style.transition = '';
+    onDone();
+  }, duration + targets.length * stagger + 60);
+}
 
 // ---------- Back to top (Works page) ----------
 const toTop = document.getElementById('toTop');
