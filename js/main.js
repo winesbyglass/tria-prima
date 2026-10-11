@@ -117,7 +117,13 @@ function showEmbed(work, id) {
   modalFrame.replaceChildren(iframe);
 }
 
+// Clicks on works are ignored mid-transition and just after one, so a quick second click on
+// List/Grid or a filter can't fall through to the work that has just appeared underneath.
+let workClicksBlockedUntil = 0;
+const blockWorkClicks = ms => { workClicksBlockedUntil = Math.max(workClicksBlockedUntil, Date.now() + ms); };
+
 function openWork(work) {
+  if (navigating || Date.now() < workClicksBlockedUntil) return;
   const episodes = work.media.episodes || [];
   modalFrame.classList.toggle('is-photo', work.kind === 'photo');
   if (work.kind === 'photo') {
@@ -291,11 +297,15 @@ function updateWorksSnap() {
   document.documentElement.classList.toggle('works-open', !worksPage.hidden);
 }
 
-document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.filter)));
+document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => {
+  blockWorkClicks(400);
+  applyFilter(b.dataset.filter);
+}));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
+  blockWorkClicks(400);
   if (navigating || b.dataset.view === currentView) return;
   navigating = true;
-  morphView(b.dataset.view, () => { navigating = false; });
+  morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
 // List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
