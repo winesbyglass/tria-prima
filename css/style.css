@@ -89,19 +89,18 @@ html.works-snap { scroll-snap-type:y mandatory; }
 /* No page scrollbar on Works, so the thumbnail strip reaches the right edge */
 html.works-open { scrollbar-width:none; }
 html.works-open::-webkit-scrollbar { display:none; }
-/* Each work fills the screen except the thumbnail column; the two never overlap */
-.work-list { margin-right:var(--strip-w); }
-.work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
+/* Each work fills the whole screen; the thumbnail strip floats over its right edge */
+.work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 calc(var(--strip-w) + 6vw) 0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
 .work-slide-sub { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.6); }
 .work-slide-title { margin-top:12px; font:400 clamp(38px,5.4vw,88px)/1 var(--font); letter-spacing:-.02em; text-shadow:0 2px 16px rgba(0,0,0,.45); }
 .work-slide-cta { margin-top:22px; font-size:10px; letter-spacing:.2em; opacity:0; transition:opacity .4s ease; }
 .work-slide:hover .work-slide-cta, .work-slide:focus-visible .work-slide-cta { opacity:1; }
 
-/* Thumbnail strip on the right, follows the work on screen. One light-grey column top to
-   bottom, split from the work by a 3D vertical line; the thumbnails sit in a window inset
+/* Thumbnail strip on the right, follows the work on screen. A transparent column floating over
+   the work, marked off by a 3D vertical line; the thumbnails sit in a window inset
    from its top and bottom. The track is slid with a transform (from main.js) to keep the
    current thumbnail in view; thumbnails grow from their centre and stay inside. */
-.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(205,205,205,.85); padding:clamp(16px,3vh,32px) 0; }
+.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:transparent; padding:clamp(16px,3vh,32px) 0; }
 .strip-window { position:relative; height:100%; overflow:hidden; }
 /* Follow the pointer quickly while it browses the strip */
 .work-strip.browsing .strip-track { transition:transform .2s ease-out; }
@@ -207,7 +206,7 @@ html.works-open::-webkit-scrollbar { display:none; }
   .works-page { --strip-w:56px; }
   .works-back { top:18px; right:calc(var(--strip-w) + 16px); }
   .works-filter { top:auto; bottom:64px; transform:none; }
-  .work-slide { padding:0 5vw; }
+  .work-slide { padding:0 calc(var(--strip-w) + 5vw) 0 5vw; }
   .work-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:70px 16px 120px; }
 }
 @media(max-width:410px) { .topline { gap:5px; } .brand { font-size:17px; letter-spacing:.1em; } }
