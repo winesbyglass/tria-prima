@@ -38,11 +38,9 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
    s = .92d keeps a slight Venn overlap while each label stays clear of its neighbours. */
 .navigation { --d:clamp(58px,6.4vw,86px); --s:calc(var(--d) * .92); position:absolute; bottom:6%; left:4.5%; width:calc(var(--s) + var(--d)); height:calc(var(--s) * .866 + var(--d)); z-index:3; }
 .nav-circle { --nav-hover:rgb(191,136,96); position:absolute; width:var(--d); aspect-ratio:1; border:1.2px solid rgba(255,255,255,.9); border-radius:50%; color:white; display:flex; align-items:center; justify-content:center; font-size:calc(var(--d) * .125); font-weight:700; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; padding:0;
-  background-color:rgba(20,22,24,.18);
-  background-image:radial-gradient(circle at 32% 26%,rgba(255,255,255,.42),rgba(255,255,255,.1) 34%,rgba(255,255,255,0) 55%,rgba(0,0,0,.28) 100%);
-  box-shadow:0 10px 22px rgba(0,0,0,.4),inset -4px -7px 14px rgba(0,0,0,.32),inset 3px 4px 9px rgba(255,255,255,.28);
+  background-color:rgba(16,18,20,.04);
   transition:background-color .45s ease,border-color .45s ease; }
-.nav-circle span { pointer-events:none; text-shadow:0 1px 3px rgba(0,0,0,.55); }
+.nav-circle span { pointer-events:none; }
 .nav-circle.works { top:0; left:calc(var(--s) / 2); z-index:1; }
 .nav-circle.process { bottom:0; left:0; z-index:2; }
 .nav-circle.contact { bottom:0; left:var(--s); z-index:3; }
