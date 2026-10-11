@@ -47,5 +47,5 @@ const photoWorks = photoSeries.flatMap(series => [1, 2, 3, 4, 5].map(n => ({
 const works = [...motionWorks, ...photoWorks];
 
 function workImage(work, size) {
-  return `assets/works/${size}/${work.img}.jpg`;
+  return `assets/works/${size}/${work.img}.jpg?v=3`; // bump when the images are re-exported
 }

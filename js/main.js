@@ -180,7 +180,6 @@ const gridItems = [];
 works.forEach((work, i) => {
   const slide = el('button', 'work-slide');
   slide.type = 'button';
-  slide.style.backgroundImage = `url("${workImage(work, 'full')}")`;
   slide.append(el('span', 'work-slide-sub', workSub(work)), el('span', 'work-slide-title', work.title),
     el('span', 'work-slide-cta', work.kind === 'photo' ? 'VIEW PHOTO ↗' : 'PLAY FILM ↗'));
   slide.addEventListener('click', () => openWork(work));
@@ -508,28 +507,37 @@ function updateHomeInk() {
 }
 setInterval(updateHomeInk, 700);
 
-// Works list: each slide's picture is sampled once it has loaded.
+// Works list: full-size pictures load only as their slide comes near the screen (so the
+// thumbnails are not stuck behind 26 big downloads), then get sampled for text colour.
 const slidePixels = [];
+const slideRequested = [];
 const worksOverlays = [...document.querySelectorAll('.works-back, .works-filter, .works-view')];
 let activeIndex = 0;
 
-works.forEach((work, i) => {
+function loadSlide(i) {
+  if (slideRequested[i]) return;
+  slideRequested[i] = true;
+  const slide = slides[i];
   const img = new Image();
   img.onload = () => {
-    const w = slides[i].offsetWidth || innerWidth;
-    const h = slides[i].offsetHeight || innerHeight;
-    slidePixels[i] = coverPixels(img, img.naturalWidth, img.naturalHeight, w, h);
-    const slide = slides[i];
+    slide.style.backgroundImage = `url("${img.src}")`;
     const sb = slide.getBoundingClientRect();
+    if (!sb.width) return;
+    slidePixels[i] = coverPixels(img, img.naturalWidth, img.naturalHeight, sb.width, sb.height);
     const title = relRect(slide.querySelector('.work-slide-title'), sb);
     const sub = relRect(slide.querySelector('.work-slide-sub'), sb);
     const text = { left: Math.min(title.left, sub.left), right: Math.max(title.right, sub.right), top: sub.top, bottom: title.bottom };
-    if (slidePixels[i] && sb.width) slide.classList.toggle('ink-dark', isLightUnder(slidePixels[i], text));
+    if (slidePixels[i]) slide.classList.toggle('ink-dark', isLightUnder(slidePixels[i], text));
     if (i === activeIndex) updateWorksInk(i);
   };
-  img.src = workImage(work, 'full');
-});
+  img.src = workImage(works[i], 'full');
+}
 
+// Two screens ahead and behind.
+const slideLoader = new IntersectionObserver(entries => {
+  entries.forEach(entry => { if (entry.isIntersecting) loadSlide(Number(entry.target.dataset.index)); });
+}, { rootMargin: '200% 0px 200% 0px' });
+slides.forEach(slide => slideLoader.observe(slide));
 // The fixed labels (Back, filters, List/Grid) follow the slide on screen; on the grid they sit on black.
 function updateWorksInk(i) {
   activeIndex = i;
