@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/style.css?v=11">
 </head>
 <body>
   <main class="app">
@@ -16,6 +16,8 @@
         <video id="heroVideo" class="hero-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback" aria-hidden="true">
           <source src="assets/hero.mp4" type="video/mp4">
         </video>
+        <!-- Photo slideshow revealed by the page-turn divider; filled from the Photography works -->
+        <div class="photo-stage" id="photoStage" aria-hidden="true"></div>
         <div class="topline">
           <button class="logo-placeholder" type="button" aria-label="Tria Prima logo placeholder, return home" data-home>
             <svg viewBox="0 0 64 60" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><circle cx="32" cy="21" r="17"/><circle cx="20" cy="40" r="17"/><circle cx="44" cy="40" r="17"/></svg>
@@ -36,13 +38,28 @@
           <p>Tria Prima is a film and media production company. We craft compelling stories through authentic visuals, meaningful collaborations, and a passion for cinematic excellence.</p>
         </div>
       </aside>
+      <!-- 3D divider: click to turn the page between the film and the photo slideshow -->
+      <div class="split" id="split">
+        <button class="split-toggle" id="splitToggle" type="button" aria-label="Show photographs">◀</button>
+      </div>
     </section>
 
-    <section class="page" id="works" aria-labelledby="works-title" hidden>
-      <header class="page-header"><div class="page-brand">TRIA PRIMA</div><button class="back" type="button" data-home>← BACK TO HOME</button></header>
-      <p class="page-kicker">SELECTED FILMS / VIDEO GALLERY</p><h2 class="page-title" id="works-title">Works.</h2>
+    <section class="page works-page" id="works" aria-label="Works" hidden>
+      <h2 class="visually-hidden">Works</h2>
+      <button class="works-back" type="button" data-home>BACK TO MAIN</button>
+      <nav class="works-filter" aria-label="Filter works">
+        <button type="button" data-filter="all" class="active">ALL WORK</button>
+        <button type="button" data-filter="motion">MOTION <small id="countMotion"></small></button>
+        <button type="button" data-filter="photo">PHOTOGRAPHY <small id="countPhoto"></small></button>
+      </nav>
+      <div class="works-view" role="group" aria-label="View">
+        <button type="button" data-view="list" class="active">LIST</button>
+        <button type="button" data-view="grid">GRID</button>
+      </div>
       <!-- Filled from js/works.js -->
-      <div class="gallery" id="gallery" aria-label="Project gallery"></div>
+      <div class="work-list" id="workList"></div>
+      <div class="work-grid" id="workGrid" hidden></div>
+      <aside class="work-strip" id="workStrip" aria-label="All works"></aside>
     </section>
 
     <section class="page" id="process" aria-labelledby="process-title" hidden>
@@ -72,7 +89,7 @@
     </div>
   </div>
 
-  <script src="js/works.js?v=1"></script>
-  <script src="js/main.js?v=7"></script>
+  <script src="js/works.js?v=2"></script>
+  <script src="js/main.js?v=8"></script>
 </body>
 </html>
