@@ -19,7 +19,6 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 /* Full-screen film; the About text floats over its right sixth, behind a 3D divider line */
 .home { --aside-w:max(200px,16.667vw); position:relative; height:100svh; overflow:hidden; }
 .hero { position:absolute; inset:0; isolation:isolate; background:#111315; overflow:hidden; }
-.hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.29),transparent 33%,transparent 53%,rgba(0,0,0,.53)); }
 .hero-video { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; pointer-events:none; }
 
 .topline { position:absolute; top:4.2%; left:4.2%; right:4.2%; display:grid; grid-template-columns:1fr auto 1fr; align-items:start; gap:15px; }
@@ -93,25 +92,23 @@ html.works-open::-webkit-scrollbar { display:none; }
 /* Each work fills the screen except the thumbnail column; the two never overlap */
 .work-list { margin-right:var(--strip-w); }
 .work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
-.work-slide::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(0,0,0,.45),transparent 22%),linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.05) 40%,rgba(0,0,0,.45)); }
-.work-slide > * { position:relative; }
 .work-slide-sub { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.6); }
 .work-slide-title { margin-top:12px; font:400 clamp(38px,5.4vw,88px)/1 var(--font); letter-spacing:-.02em; text-shadow:0 2px 16px rgba(0,0,0,.45); }
 .work-slide-cta { margin-top:22px; font-size:10px; letter-spacing:.2em; opacity:0; transition:opacity .4s ease; }
 .work-slide:hover .work-slide-cta, .work-slide:focus-visible .work-slide-cta { opacity:1; }
 
-/* Thumbnail strip: full height on the right, follows the work on screen */
-/* White column of portrait thumbnails, split from the work by a 3D vertical line. The track is
-   slid with a transform (from main.js) to follow the scroll and keep the current thumbnail in
-   view; thumbnails grow from their centre and stay inside the column. */
-.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:#fff; }
+/* Thumbnail strip on the right, follows the work on screen. Translucent grey panel with a gap
+   above and below, split from the work by a 3D vertical line. The track is slid with a
+   transform (from main.js) to keep the current thumbnail in view; thumbnails grow from their
+   centre and stay inside the panel. */
+.work-strip { position:fixed; top:clamp(16px,3vh,32px); right:0; bottom:clamp(16px,3vh,32px); width:var(--strip-w); z-index:11; overflow:hidden; background:rgba(128,128,128,.35); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
 .work-strip::before { content:""; position:absolute; top:0; bottom:0; left:0; width:4px; z-index:4; pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
   box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
 .strip-track { display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0 18px 4px; transition:transform .6s var(--ease); }
-.strip-thumb { position:relative; flex:none; width:58%; aspect-ratio:4/5; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; opacity:.8; transition:transform .35s var(--ease),opacity .35s ease,box-shadow .35s ease; }
-.strip-thumb.active { z-index:2; opacity:1; transform:scale(1.25); box-shadow:0 0 0 2px #111,0 4px 10px rgba(0,0,0,.3); }
-.strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; opacity:1; transform:scale(1.5); box-shadow:0 0 0 2px rgb(191,136,96),0 6px 16px rgba(0,0,0,.7); }
+.strip-thumb { position:relative; flex:none; width:58%; aspect-ratio:4/5; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; transition:transform .35s var(--ease),box-shadow .35s ease; }
+.strip-thumb.active { z-index:2; transform:scale(1.25); box-shadow:0 0 0 2px #fff,0 4px 10px rgba(0,0,0,.4); }
+.strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; transform:scale(1.5); box-shadow:0 0 0 2px rgb(191,136,96),0 6px 16px rgba(0,0,0,.7); }
 
 /* Grid view: four per row, gutters around and between */
 /* Side gutters match, wide enough to clear the floating filter labels on the left */
@@ -133,6 +130,18 @@ html.works-open::-webkit-scrollbar { display:none; }
 
 .page-description { max-width:740px; color:#c5c0b9; font:clamp(23px,3vw,42px)/1.45 var(--font); }
 .email { color:white; font:clamp(24px,4.4vw,62px) var(--font); overflow-wrap:anywhere; text-decoration-thickness:1px; text-underline-offset:8px; }
+
+/* ---------- Text colour follows the picture behind it ----------
+   main.js samples the brightness under each text block and adds .ink-dark on light areas. */
+.topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-back, .works-filter button, .works-view button { transition:color .4s ease; }
+.topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .works-back.ink-dark { color:#111; }
+.aside.ink-dark .aside-copy p { color:rgba(0,0,0,.82); }
+.aside.ink-dark .aside-copy, .work-slide.ink-dark .work-slide-sub, .work-slide.ink-dark .work-slide-title, .works-back.ink-dark,
+.works-filter.ink-dark button, .works-view.ink-dark button { text-shadow:0 1px 3px rgba(255,255,255,.55); }
+.works-filter.ink-dark button, .works-view.ink-dark button { color:rgba(0,0,0,.5); }
+.works-filter.ink-dark button.active, .works-view.ink-dark button.active,
+.works-filter.ink-dark button:hover, .works-view.ink-dark button:hover { color:#111; }
+.navigation.ink-dark .nav-link:hover, .works-back.ink-dark:hover { color:rgb(191,136,96); }
 
 /* ---------- Circle-wipe transition ---------- */
 .transition { position:fixed; inset:0; pointer-events:none; z-index:30; overflow:hidden; visibility:hidden; }

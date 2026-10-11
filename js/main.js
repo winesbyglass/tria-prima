@@ -233,6 +233,7 @@ function setActiveThumb(i) {
   const maxShift = Math.max(0, stripTrack.offsetHeight - workStrip.clientHeight);
   const shift = Math.min(maxShift, Math.max(0, thumb.offsetTop + thumb.offsetHeight / 2 - workStrip.clientHeight / 2));
   stripTrack.style.transform = `translateY(${-shift}px)`;
+  updateWorksInk(i);
 }
 
 // The work filling the screen drives the strip.
@@ -260,6 +261,7 @@ function setView(view) {
   document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   updateWorksSnap();
   window.scrollTo({ top: 0, behavior: 'instant' });
+  updateWorksInk(activeIndex);
 }
 
 // Snap one work per screen, only while the list view is showing.
@@ -417,6 +419,104 @@ splitToggle.addEventListener('click', () => {
   else turnToPhotos();
 });
 
+// ---------- Text colour follows the picture behind it ----------
+// The picture is drawn "object-fit: cover" into a tiny canvas; each text block's area is
+// averaged and gets .ink-dark (black text) when the picture there is light.
+const inkCanvas = document.createElement('canvas');
+const inkCtx = inkCanvas.getContext('2d', { willReadFrequently: true });
+const LIGHT = 0.6;
+
+function coverPixels(source, natW, natH, boxW, boxH) {
+  if (!natW || !natH || !boxW || !boxH) return null;
+  const cw = 64;
+  const ch = Math.max(1, Math.round(cw * boxH / boxW));
+  inkCanvas.width = cw;
+  inkCanvas.height = ch;
+  const scale = Math.max(cw / natW, ch / natH);
+  try {
+    inkCtx.drawImage(source, (cw - natW * scale) / 2, (ch - natH * scale) / 2, natW * scale, natH * scale);
+    return { data: inkCtx.getImageData(0, 0, cw, ch).data, cw, ch, boxW, boxH };
+  } catch (e) {
+    return null; // e.g. a frame not ready yet
+  }
+}
+
+// rect: the text block, in the same coordinates as a box starting at (0, 0).
+function isLightUnder(px, rect) {
+  const x0 = Math.max(0, Math.floor(rect.left / px.boxW * px.cw));
+  const x1 = Math.min(px.cw, Math.ceil(rect.right / px.boxW * px.cw));
+  const y0 = Math.max(0, Math.floor(rect.top / px.boxH * px.ch));
+  const y1 = Math.min(px.ch, Math.ceil(rect.bottom / px.boxH * px.ch));
+  let sum = 0;
+  let n = 0;
+  for (let y = y0; y < y1; y++) {
+    for (let x = x0; x < x1; x++) {
+      const k = (y * px.cw + x) * 4;
+      sum += (0.2126 * px.data[k] + 0.7152 * px.data[k + 1] + 0.0722 * px.data[k + 2]) / 255;
+      n++;
+    }
+  }
+  return n > 0 && sum / n > LIGHT;
+}
+
+function relRect(el, box) {
+  const r = el.getBoundingClientRect();
+  return { left: r.left - box.left, right: r.right - box.left, top: r.top - box.top, bottom: r.bottom - box.top };
+}
+
+// Home: sample the film frame (or the photo on show) a few times a second.
+const homeInkTargets = [
+  [document.querySelector('.topline'), document.querySelector('.brand')],
+  [document.querySelector('.navigation'), document.querySelector('.navigation')],
+  [aboutPanel, aboutPanel.querySelector('.aside-copy')]
+];
+
+function updateHomeInk() {
+  if (home.hidden || home.classList.contains('flipping')) return;
+  const box = document.querySelector('.hero').getBoundingClientRect();
+  let px = null;
+  if (home.classList.contains('photo-mode')) {
+    const img = photoStage.querySelector('img.shown') || photoStage.querySelector('img');
+    if (img && img.complete) px = coverPixels(img, img.naturalWidth, img.naturalHeight, box.width, box.height);
+  } else if (heroVideo.readyState >= 2) {
+    px = coverPixels(heroVideo, heroVideo.videoWidth, heroVideo.videoHeight, box.width, box.height);
+  }
+  if (!px) return;
+  homeInkTargets.forEach(([target, area]) => target.classList.toggle('ink-dark', isLightUnder(px, relRect(area, box))));
+}
+setInterval(updateHomeInk, 700);
+
+// Works list: each slide's picture is sampled once it has loaded.
+const slidePixels = [];
+const worksOverlays = [...document.querySelectorAll('.works-back, .works-filter, .works-view')];
+let activeIndex = 0;
+
+works.forEach((work, i) => {
+  const img = new Image();
+  img.onload = () => {
+    const w = slides[i].offsetWidth || innerWidth;
+    const h = slides[i].offsetHeight || innerHeight;
+    slidePixels[i] = coverPixels(img, img.naturalWidth, img.naturalHeight, w, h);
+    const slide = slides[i];
+    const sb = slide.getBoundingClientRect();
+    const title = relRect(slide.querySelector('.work-slide-title'), sb);
+    const sub = relRect(slide.querySelector('.work-slide-sub'), sb);
+    const text = { left: Math.min(title.left, sub.left), right: Math.max(title.right, sub.right), top: sub.top, bottom: title.bottom };
+    if (slidePixels[i] && sb.width) slide.classList.toggle('ink-dark', isLightUnder(slidePixels[i], text));
+    if (i === activeIndex) updateWorksInk(i);
+  };
+  img.src = workImage(work, 'full');
+});
+
+// The fixed labels (Back, filters, List/Grid) follow the slide on screen; on the grid they sit on black.
+function updateWorksInk(i) {
+  activeIndex = i;
+  const px = currentView === 'list' ? slidePixels[i] : null;
+  worksOverlays.forEach(el => {
+    // The slide on screen starts at the top-left of the viewport.
+    el.classList.toggle('ink-dark', !!px && isLightUnder(px, el.getBoundingClientRect()));
+  });
+}
 // Initial page: honour a direct link such as …/tria-prima/#works.
 const initialPage = pageFromHash();
 history.replaceState({ page: initialPage }, '');
