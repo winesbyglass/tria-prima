@@ -140,7 +140,7 @@ html.works-open::-webkit-scrollbar { display:none; }
   background-position:var(--bx,0px) calc(var(--by,0px) - var(--k) * var(--sh,0px));
   backface-visibility:hidden; }
 .strip-thumb.active { z-index:2; scale:1.12; box-shadow:0 0 0 2px #fff,0 4px 10px rgba(0,0,0,.5); }
-.strip-thumb:hover, .strip-thumb:focus-visible, .strip-thumb.held { z-index:3; scale:1.3; box-shadow:0 0 0 2px #fff,0 6px 16px rgba(0,0,0,.7); }
+.strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; scale:1.3; box-shadow:0 0 0 2px #fff,0 6px 16px rgba(0,0,0,.7); }
 
 
 /* Grid view: four per row, gutters around and between */
