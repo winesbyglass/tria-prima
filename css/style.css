@@ -274,7 +274,9 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-gallery { display:flex; gap:12px; height:min(72vh,680px); margin:clamp(70px,11vh,120px) 0 0; padding:0 clamp(23px,5vw,90px); overflow-x:auto; scrollbar-width:none; }
 .project-gallery::-webkit-scrollbar { display:none; }
 .project-body > .project-gallery:first-child { margin-top:0; }
-.project-gallery + .project-film { margin-top:clamp(70px,11vh,120px); }
+/* Each part sits in a section of its own; on desktop every section fills a screen below the
+   fixed title and one wheel notch turns to the next */
+.project-section + .project-section { margin-top:clamp(70px,11vh,120px); }
 .gallery-item { position:relative; overflow:hidden; flex:0 0 clamp(60px,7.5vw,128px); height:100%; border:0; padding:0; border-radius:14px; color:#fff; text-align:left; background:#111 center/cover no-repeat; cursor:pointer;
   min-width:0; transition:flex-grow .75s var(--ease),flex-basis .75s var(--ease); }
 /* The open picture takes whatever width the strips leave, so a short row always fits */
@@ -306,6 +308,16 @@ html.works-open::-webkit-scrollbar { display:none; }
 .preview-item img { width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.82); transition:filter .3s ease,transform .5s var(--ease); }
 .preview-item:hover img, .preview-item:focus-visible img { filter:none; transform:scale(1.04); }
 .project-page .gallery-item.open { cursor:pointer; }
+.project-section > .project-gallery, .project-section > .project-film, .project-section > .project-info, .project-section > .project-previews { margin-top:0; }
+@media (min-width:801px) {
+  .project-page { padding-bottom:0; }
+  .project-body { padding-top:0; }
+  .project-section { display:flex; flex-direction:column; justify-content:center; min-height:100svh; box-sizing:border-box; padding:clamp(120px,16vh,160px) 0 clamp(28px,5vh,56px); }
+  .project-section + .project-section { margin-top:0; }
+  .project-section:last-child { padding-bottom:clamp(60px,10vh,120px); }
+  /* The film fits the screen height too */
+  .project-film { width:min(1180px,78vw,calc((100svh - 260px)*16/9)); }
+}
 
 /* Full-screen photo viewer */
 html.lightbox-open { overflow:hidden; }

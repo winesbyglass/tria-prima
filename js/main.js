@@ -342,7 +342,12 @@ function renderProject(work) {
     parts.push(previews);
   }
 
-  projectBody.replaceChildren(...parts);
+  // Each part is a section of its own: one wheel notch turns from one to the next.
+  projectBody.replaceChildren(...parts.map(part => {
+    const section = el('div', 'project-section');
+    section.append(part);
+    return section;
+  }));
 }
 
 // ---------- Full-screen photo viewer ----------
@@ -728,6 +733,57 @@ window.addEventListener('touchend', event => {
   touchStartY = null;
   if (!listPaging() || Math.abs(dy) < 40 || Date.now() < pageLockUntil) return;
   turnWork(dy > 0 ? 1 : -1);
+});
+// ---------- Project page paging: one gesture = one section ----------
+// Pictures -> film -> write-up (photo projects: pictures -> write-up -> previews). A section
+// taller than the screen scrolls normally until its end; the last one scrolls normally to the
+// bottom, and scrolling back up to a section's top turns to the one before. Desktop only.
+const projectPage = document.getElementById('project');
+
+function projectPaging() {
+  return !projectPage.hidden && !navigating && filmModal.hidden && lightbox.hidden && innerWidth > 800;
+}
+
+// Returns true when it turned (or is mid-turn), false to let the page scroll normally.
+function turnSection(step, fresh) {
+  const sections = [...projectBody.querySelectorAll('.project-section')];
+  if (!sections.length) return false;
+  const y = window.scrollY;
+  const tops = sections.map(s => s.getBoundingClientRect().top + y);
+  let at = 0;
+  tops.forEach((top, k) => { if (top <= y + 2) at = k; });
+  if (step > 0) {
+    const bottom = tops[at] + sections[at].offsetHeight;
+    if (at === sections.length - 1 || bottom > y + innerHeight + 2) return false;
+  } else if (y > tops[at] + 2 || at === 0) {
+    return false;
+  }
+  if (!fresh || Date.now() < pageLockUntil) return true;
+  const next = at + step;
+  // Going back to a tall section lands on its last screen, not its top.
+  const to = step > 0 ? tops[next] : Math.max(tops[next], tops[at] - innerHeight);
+  pageLockUntil = Date.now() + PAGE_MS;
+  animateScroll(to);
+  return true;
+}
+
+window.addEventListener('wheel', event => {
+  if (!projectPaging() || event.ctrlKey || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+  const now = Date.now();
+  const fresh = now - lastWheelAt > QUIET_MS;
+  lastWheelAt = now;
+  if (Date.now() < pageLockUntil || turnSection(event.deltaY > 0 ? 1 : -1, fresh)) event.preventDefault();
+}, { passive: false });
+
+window.addEventListener('keydown', event => {
+  if (!projectPaging() || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.target.closest && event.target.closest('input, textarea, select, [contenteditable]')) return;
+  // Space on a focused button presses it.
+  if (event.key === ' ' && event.target.closest && event.target.closest('button, a')) return;
+  const down = ['ArrowDown', 'PageDown'].includes(event.key) || (event.key === ' ' && !event.shiftKey);
+  const up = ['ArrowUp', 'PageUp'].includes(event.key) || (event.key === ' ' && event.shiftKey);
+  if (!down && !up) return;
+  if (Date.now() < pageLockUntil || turnSection(down ? 1 : -1, true)) event.preventDefault();
 });
 // List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
 // swapping the view underneath.
