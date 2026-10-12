@@ -870,6 +870,19 @@ splitToggle.addEventListener('click', () => {
   else turnToPhotos();
 });
 
+// ---------- Process: headings that open their details ----------
+// One open at a time; clicking the open one closes it. All closed at first.
+const accToggles = [...document.querySelectorAll('.acc-toggle')];
+accToggles.forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    const opening = toggle.getAttribute('aria-expanded') !== 'true';
+    accToggles.forEach(other => {
+      const open = opening && other === toggle;
+      other.setAttribute('aria-expanded', String(open));
+      document.getElementById(other.getAttribute('aria-controls')).classList.toggle('open', open);
+    });
+  });
+});
 // ---------- Contact: founder work photos, full screen ----------
 // Entering a founder's block (headshot + contact details) shows their work photo across the
 // whole screen; inside the block each real mouse movement then switches between the page and the
