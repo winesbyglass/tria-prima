@@ -489,7 +489,8 @@ else window.addEventListener('load', () => setTimeout(preloadGrid, 800), { once:
 workList.append(...slides);
 const stripTrack = el('div', 'strip-track');
 const stripWindow = el('div', 'strip-window');
-stripTrack.append(...thumbs);
+const stripHoles = el('div', 'strip-holes');
+stripTrack.append(stripHoles, ...thumbs);
 stripWindow.append(stripTrack);
 workStrip.append(stripWindow);
 workGrid.append(...gridItems);
@@ -581,6 +582,39 @@ const ROLL_R = 40;        // px, radius of the invisible axis
 const ROLL_T = 72;        // px from each edge where the film starts to wrap
 const ROLL_GONE = 2.2;    // radians: by here a slice has faded out behind the axis
 const rollState = new Map();
+const HOLE_PITCH = 14;    // px between sprocket holes
+let holeRows = [];
+
+// One row of holes per pitch down the whole track; rebuilt when the track's length changes
+// (filters hide frames).
+function buildHoles() {
+  const n = Math.ceil(stripTrack.offsetHeight / HOLE_PITCH);
+  if (n === holeRows.length) return;
+  holeRows = Array.from({ length: n }, (_, r) => {
+    const row = el('span', 'hole-row');
+    row.style.setProperty('--r', r);
+    return row;
+  });
+  stripHoles.replaceChildren(...holeRows);
+  rollState.clear();
+}
+
+// The holes wind round the axis exactly like the frames' slices.
+function curlHoles(trackY, winH) {
+  buildHoles();
+  holeRows.forEach((row, r) => {
+    const y = trackY + r * HOLE_PITCH + HOLE_PITCH / 2;
+    const p = rollAt(y, ROLL_T, 1) || rollAt(y, winH - ROLL_T, -1);
+    const key = p ? `${p.dy.toFixed(1)},${p.deg.toFixed(0)}` : 'flat';
+    if (rollState.get(row) === key) return;
+    rollState.set(row, key);
+    if (!p) { row.style.transform = ''; row.style.opacity = ''; row.style.visibility = ''; return; }
+    row.style.transform = `perspective(300px) translateY(${p.dy.toFixed(1)}px) translateZ(${p.z.toFixed(1)}px) rotateX(${p.deg.toFixed(1)}deg)`;
+    const shade = 1 - 0.65 * Math.min(1, p.theta / (Math.PI / 2));
+    row.style.opacity = (shade * Math.min(1, Math.max(0, (ROLL_GONE - p.theta) / 0.8))).toFixed(2);
+    row.style.visibility = p.theta >= ROLL_GONE ? 'hidden' : '';
+  });
+}
 
 function rollAt(y, edge, sign) {
   // y: point on the flat film; edge: tangent line; sign: +1 top (film leaves upward), -1 bottom.
@@ -621,7 +655,9 @@ function curlStrip() {
   // Positions from layout + the track's live (possibly mid-transition) offset, so the roll
   // itself never feeds back into the measurement.
   const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
+  curlHoles(trackY, winH);
   thumbs.forEach(thumb => {
+
     if (thumb.hidden) return;
     const top = trackY + thumb.offsetTop;
     const h = thumb.offsetHeight;

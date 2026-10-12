@@ -115,15 +115,17 @@ html.works-open::-webkit-scrollbar { display:none; }
    slid with a transform (from main.js) to keep the current frame in view. */
 .work-strip { --pad:clamp(16px,3vh,32px); --hole:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Crect x='1' y='3' width='6' height='8' rx='1.6' fill='%23d6d0c6'/%3E%3C/svg%3E");
   position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:transparent; padding:var(--pad) 0; }
-/* The sprocket holes fade where the film rolls away at either end */
-.strip-window { position:relative; height:100%; overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 72px,#000 calc(100% - 72px),transparent 100%);
-  mask-image:linear-gradient(180deg,transparent 0,#000 72px,#000 calc(100% - 72px),transparent 100%); }
+.strip-window { position:relative; height:100%; overflow:hidden; }
+
 /* Follow the pointer quickly while it browses the strip */
 .work-strip.browsing .strip-track { transition:transform .2s ease-out; }
-.strip-track { display:flex; flex-direction:column; align-items:center; gap:8px; padding:72px 0 72px 4px; /* room so the first and last frames can sit flat, clear of the roll-up */
-  background:var(--hole) left 3px top 0 / 8px 14px repeat-y, var(--hole) right 3px top 0 / 8px 14px repeat-y;
+.strip-track { position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:72px 0 72px 4px; /* room so the first and last frames can sit flat, clear of the roll-up */
   transition:transform .6s var(--ease); }
+/* Sprocket holes: one row per hole pitch (built in main.js), each rolled round the same axis
+   as the frames so the holes wind away with the film */
+.strip-holes { position:absolute; inset:0; pointer-events:none; }
+.hole-row { position:absolute; left:0; right:0; height:14px; top:calc(var(--r) * 14px);
+  background:var(--hole) left 3px top 0 / 8px 14px no-repeat, var(--hole) right 3px top 0 / 8px 14px no-repeat; backface-visibility:hidden; }
 /* Frames: a thin black frame line, with an 8px gap between frames */
 /* Each frame's picture is carried by horizontal slices (built in main.js). Near the top and
    bottom edges main.js lays every slice on an invisible axis so the frame bends round it;
