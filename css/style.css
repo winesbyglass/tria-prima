@@ -71,11 +71,12 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 
 /* ---------- Works ---------- */
 .works-page { --strip-w:clamp(64px,5.5vw,96px); padding:0; background:#000; color:#fff; }
-.works-back, .works-filter button, .works-view button { border:0; background:none; color:#fff; padding:0; font-size:11px; font-weight:700; letter-spacing:.14em; cursor:pointer; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.works-filter button, .works-view button { border:0; background:none; color:#fff; padding:0; font-size:11px; font-weight:700; letter-spacing:.14em; cursor:pointer; text-shadow:0 1px 3px rgba(0,0,0,.6); }
 /* Generous hit areas, and padded containers act as a no-click-through zone around the labels,
    so a slightly-off click never lands on the full-screen work underneath. */
-.works-back { position:fixed; top:16px; right:calc(var(--strip-w) + 14px); z-index:12; padding:10px 12px; transition:color .3s ease; }
-.works-back:hover,.works-back:focus-visible { color:rgb(191,136,96); }
+/* On Works the site bar floats over the full-screen work, left of the thumbnail strip */
+.works-page .site-bar { position:fixed; top:16px; left:clamp(18px,2vw,32px); right:calc(var(--strip-w) + 18px); z-index:12; padding:6px 0; }
+.works-page .site-brand, .works-page .site-nav button { text-shadow:0 1px 3px rgba(0,0,0,.6); }
 .works-filter { position:fixed; left:clamp(18px,2vw,32px); top:50%; transform:translateY(-50%); z-index:12; display:flex; flex-direction:column; align-items:flex-start; gap:0; padding:14px 20px 14px 14px; margin-left:-14px; }
 .works-view { position:fixed; left:clamp(18px,2vw,32px); bottom:clamp(18px,4vh,36px); z-index:12; display:flex; gap:6px; padding:14px 20px 14px 14px; margin:0 0 -14px -14px; }
 .works-filter button, .works-view button { display:flex; align-items:center; gap:7px; padding:5px 6px 5px 0; color:rgba(255,255,255,.5); transition:color .3s ease; }
@@ -146,9 +147,14 @@ html.works-open::-webkit-scrollbar { display:none; }
 .grid-credits { display:grid; grid-template-columns:auto 1fr; gap:3px 10px; margin:0; font-size:10px; line-height:1.35; }
 .grid-credits dt { color:rgba(255,255,255,.55); text-transform:lowercase; }
 .grid-credits dd { margin:0; }
-.page-header { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-.page-brand { font:24px var(--font); letter-spacing:.19em; }
-.back { border:1px solid #777; color:white; padding:13px 18px; background:transparent; cursor:pointer; letter-spacing:.12em; font-size:11px; }
+/* ---------- Site bar (every page except home; built in main.js) ----------
+   TRIA PRIMA at top left; HOME + page links packed together at top right. The current page
+   is white, the others dimmed like the Works filters. */
+.site-bar { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.site-brand { border:0; background:none; padding:0; color:#fff; font:24px var(--font); letter-spacing:.19em; cursor:pointer; transition:color .4s ease; }
+.site-nav { display:flex; align-items:center; gap:clamp(18px,2vw,30px); }
+.site-nav button { border:0; background:none; padding:8px 0; color:rgba(255,255,255,.5); font-size:11px; font-weight:700; letter-spacing:.14em; cursor:pointer; transition:color .3s ease; }
+.site-nav button.current, .site-nav button:hover, .site-nav button:focus-visible { color:#fff; }
 .page-kicker { margin:13vh 0 18px; font-size:11px; letter-spacing:.3em; color:#b8afa3; }
 .page-title { font:400 clamp(68px,12vw,175px)/.9 var(--font); margin:0 0 65px; }
 
@@ -157,15 +163,15 @@ html.works-open::-webkit-scrollbar { display:none; }
 
 /* ---------- Text colour follows the picture behind it ----------
    main.js samples the brightness under each text block and adds .ink-dark on light areas. */
-.topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-back, .works-filter button, .works-view button { transition:color .4s ease; }
-.topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .works-back.ink-dark { color:#111; }
+.topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
+.topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .site-brand.ink-dark { color:#111; }
 .aside.ink-dark .aside-copy p { color:rgba(0,0,0,.82); }
-.aside.ink-dark .aside-copy, .work-slide.ink-dark .work-slide-sub, .work-slide.ink-dark .work-slide-title, .works-back.ink-dark,
-.works-filter.ink-dark button, .works-view.ink-dark button { text-shadow:0 1px 3px rgba(255,255,255,.55); }
-.works-filter.ink-dark button, .works-view.ink-dark button { color:rgba(0,0,0,.5); }
-.works-filter.ink-dark button.active, .works-view.ink-dark button.active,
-.works-filter.ink-dark button:hover, .works-view.ink-dark button:hover { color:#111; }
-.navigation.ink-dark .nav-link:hover, .works-back.ink-dark:hover { color:rgb(191,136,96); }
+.aside.ink-dark .aside-copy, .work-slide.ink-dark .work-slide-sub, .work-slide.ink-dark .work-slide-title, .site-brand.ink-dark,
+.site-nav.ink-dark button, .works-filter.ink-dark button, .works-view.ink-dark button { text-shadow:0 1px 3px rgba(255,255,255,.55); }
+.site-nav.ink-dark button, .works-filter.ink-dark button, .works-view.ink-dark button { color:rgba(0,0,0,.5); }
+.site-nav.ink-dark button.current, .works-filter.ink-dark button.active, .works-view.ink-dark button.active,
+.site-nav.ink-dark button:hover, .works-filter.ink-dark button:hover, .works-view.ink-dark button:hover { color:#111; }
+.navigation.ink-dark .nav-link:hover { color:rgb(191,136,96); }
 
 /* ---------- Circle-wipe transition ---------- */
 .transition { position:fixed; inset:0; pointer-events:none; z-index:30; overflow:hidden; visibility:hidden; }
@@ -226,7 +232,10 @@ html.works-open::-webkit-scrollbar { display:none; }
   .home.photo-mode .split-toggle { transform:translateY(0) rotate(90deg); }
 
   .works-page { --strip-w:56px; }
-  .works-back { top:18px; right:calc(var(--strip-w) + 16px); }
+  .site-brand { font-size:16px; letter-spacing:.14em; }
+  .site-nav { gap:12px; }
+  .site-nav button { font-size:9px; letter-spacing:.1em; }
+  .works-page .site-bar { top:10px; right:calc(var(--strip-w) + 10px); }
   .works-filter { top:auto; bottom:64px; transform:none; }
   .work-slide { padding:0 calc(var(--strip-w) + 5vw) 0 5vw; }
   .work-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:70px 16px 120px; }

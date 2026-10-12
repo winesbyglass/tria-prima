@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=38">
+  <link rel="stylesheet" href="css/style.css?v=39">
 </head>
 <body>
   <main class="app">
@@ -44,9 +44,10 @@
       </div>
     </section>
 
+    <!-- Every .page section gets the site bar (TRIA PRIMA + HOME / page links) from main.js;
+         a new page only needs <section class="page" id="…" hidden> to join the navigation. -->
     <section class="page works-page" id="works" aria-label="Works" hidden>
       <h2 class="visually-hidden">Works</h2>
-      <button class="works-back" type="button" data-home>BACK TO MAIN</button>
       <nav class="works-filter" aria-label="Filter works">
         <button type="button" data-filter="all" class="active">ALL WORK</button>
         <button type="button" data-filter="motion">MOTION <small id="countMotion"></small></button>
@@ -63,13 +64,11 @@
     </section>
 
     <section class="page" id="process" aria-labelledby="process-title" hidden>
-      <header class="page-header"><div class="page-brand">TRIA PRIMA</div><button class="back" type="button" data-home>← BACK TO HOME</button></header>
       <p class="page-kicker">HOW WE CREATE</p><h2 class="page-title" id="process-title">Process.</h2>
       <p class="page-description">From the first idea to the final frame, we shape every story with intention, curiosity, and craft.</p>
     </section>
 
     <section class="page" id="contact" aria-labelledby="contact-title" hidden>
-      <header class="page-header"><div class="page-brand">TRIA PRIMA</div><button class="back" type="button" data-home>← BACK TO HOME</button></header>
       <p class="page-kicker">LET'S MAKE SOMETHING</p><h2 class="page-title" id="contact-title">Contact.</h2>
       <p class="page-description">Have a project in mind? We'd love to hear about it.</p>
       <a class="email" href="mailto:hello@example.com">hello@example.com</a>
@@ -90,6 +89,6 @@
   </div>
 
   <script src="js/works.js?v=5"></script>
-  <script src="js/main.js?v=35"></script>
+  <script src="js/main.js?v=36"></script>
 </body>
 </html>

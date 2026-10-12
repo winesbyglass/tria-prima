@@ -8,6 +8,36 @@ const filmModal = document.getElementById('filmModal');
 const modalFrame = document.getElementById('modalFrame');
 let navigating = false;
 
+// ---------- Site bar on every page except home ----------
+// TRIA PRIMA at top left (back to home) and HOME plus one link per .page at top right. Built
+// from the page sections themselves, so a page added later gets the same bar and is linked.
+const navPages = pages.map(page => page.id);
+pages.forEach(page => {
+  const bar = document.createElement('header');
+  bar.className = 'site-bar';
+  const brand = document.createElement('button');
+  brand.type = 'button';
+  brand.className = 'site-brand';
+  brand.textContent = 'TRIA PRIMA';
+  brand.setAttribute('aria-label', 'TRIA PRIMA, home');
+  brand.dataset.home = '';
+  const nav = document.createElement('nav');
+  nav.className = 'site-nav';
+  nav.setAttribute('aria-label', 'Site');
+  ['home', ...navPages].forEach(id => {
+    const link = document.createElement('button');
+    link.type = 'button';
+    link.textContent = id.toUpperCase();
+    if (id === 'home') link.dataset.home = '';
+    else link.dataset.target = id;
+    link.classList.toggle('current', id === page.id);
+    if (id === page.id) link.setAttribute('aria-current', 'page');
+    nav.append(link);
+  });
+  bar.append(brand, nav);
+  page.prepend(bar);
+});
+
 // ---------- Hero background film (muted MP4 autoplay) ----------
 function playHero() {
   heroVideo.muted = true;
@@ -43,7 +73,7 @@ function revealPage(target) {
   else stopSlideshow();
 }
 
-const PAGES = ['home', 'works', 'process', 'contact'];
+const PAGES = ['home', ...navPages];
 
 function pageTitle(target) {
   return `TRIA PRIMA — ${target === 'home' ? 'Film & Media' : target[0].toUpperCase() + target.slice(1)}`;
@@ -716,7 +746,7 @@ setInterval(updateHomeInk, 700);
 // thumbnails are not stuck behind 26 big downloads), then get sampled for text colour.
 const slidePixels = [];
 const slideRequested = [];
-const worksOverlays = [...document.querySelectorAll('.works-back, .works-filter, .works-view')];
+const worksOverlays = [...document.querySelectorAll('#works .site-brand, #works .site-nav, .works-filter, .works-view')];
 let activeIndex = 0;
 
 function sampleSlideInk(i, img) {
