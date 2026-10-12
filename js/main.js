@@ -309,9 +309,10 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
-// ---------- Film rolls: frames curl round the rolls at the top and bottom of the strip ----------
-workStrip.append(el('span', 'film-roll top'), el('span', 'film-roll bottom'));
-const CURL_MAX = 78;   // degrees at the very edge
+// ---------- Film curl: frames wind away and vanish at the top and bottom of the strip ----------
+// Moving to the next work runs the film upward, so frames wind out over the top; going back
+// runs it downward and they wind out at the bottom.
+const CURL_MAX = 88;   // degrees at the very edge: nearly edge-on
 const curlState = new Map();
 
 function curlStrip() {
@@ -322,9 +323,6 @@ function curlStrip() {
   // Frame positions from layout + the track's live (possibly mid-transition) offset, so the
   // curl itself never feeds back into the measurement.
   const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
-  // Turn the rolls with the film.
-  const spin = `${trackY.toFixed(1)}px`;
-  if (workStrip.style.getPropertyValue('--spin') !== spin) workStrip.style.setProperty('--spin', spin);
   const zone = Math.min(120, winH * 0.2);
   thumbs.forEach(thumb => {
     if (thumb.hidden) return;
@@ -334,14 +332,16 @@ function curlStrip() {
     let curl = 0;
     let origin = 'center';
     let k = 0;
-    if (top > 0) { k = Math.min(1, top); curl = -CURL_MAX * k * k; origin = 'top'; }               // hug the top roll
-    else if (bottom > 0) { k = Math.min(1, bottom); curl = CURL_MAX * k * k; origin = 'bottom'; } // hug the bottom roll
+    if (top > 0) { k = Math.min(1, top); curl = -CURL_MAX * k * k; origin = 'top'; }               // winds out over the top
+    else if (bottom > 0) { k = Math.min(1, bottom); curl = CURL_MAX * k * k; origin = 'bottom'; } // winds out at the bottom
     const key = `${curl.toFixed(1)}|${origin}`;
     if (curlState.get(thumb) === key) return;
     curlState.set(thumb, key);
     thumb.style.setProperty('--curl', `${curl.toFixed(1)}deg`);
     thumb.style.setProperty('--curl-origin', origin);
-    thumb.style.setProperty('--shade', (1 - 0.65 * k * k).toFixed(2));
+    thumb.style.setProperty('--shade', (1 - 0.8 * k * k).toFixed(2));
+    // Fade out over the last stretch so the frame is gone by the edge.
+    thumb.style.setProperty('--fade', Math.min(1, Math.max(0, (1 - k) / 0.35)).toFixed(2));
   });
 }
 requestAnimationFrame(curlStrip);
