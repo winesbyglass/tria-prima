@@ -186,10 +186,10 @@ html.works-open::-webkit-scrollbar { display:none; }
 .headshot-initials { font:clamp(34px,3.4vw,52px) var(--font); letter-spacing:.12em; color:rgba(255,255,255,.35); }
 .headshot-label { font-size:10px; font-weight:700; letter-spacing:.3em; color:rgba(255,255,255,.3); }
 .founder-info { margin-top:26px; text-align:center; }
-/* Full name on one line, at the size the surname used to have */
-.founder-name { margin:0; font:400 clamp(30px,3vw,46px)/1.05 var(--font); letter-spacing:.02em; text-transform:uppercase; }
-.founder-role { margin:18px 0 6px; font-size:13px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
-.founder-link { display:block; color:#fff; font-size:12px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
+/* The details use one format and size on the page and over the full-screen photo, so they never move */
+.founder-name { margin:0; font:400 clamp(22px,2.2vw,32px)/1.05 var(--font); letter-spacing:.02em; text-transform:uppercase; }
+.founder-role { margin:12px 0 6px; font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.founder-link { display:block; color:#fff; font-size:10px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
 
 /* Full-screen work photo (hovering a headshot; tap on touch) with both founders' details floating small on it */
@@ -203,16 +203,11 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-view-photo { position:absolute; inset:0; background:#111 center/cover no-repeat; }
 .founder-view-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
 .founder-view-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
-.founder-tag { position:absolute; bottom:clamp(50px,11vh,130px); width:40%; margin:0; cursor:pointer; opacity:.35; text-shadow:0 1px 5px rgba(0,0,0,.65); transition:opacity .4s ease; }
-.founder-tag.left { left:5%; }
-.founder-tag.right { right:5%; }
+/* Floating copies of the details, laid by main.js exactly over the ones on the page */
+.founder-tag { position:absolute; margin:0; cursor:pointer; opacity:.35; text-align:center; text-shadow:0 1px 5px rgba(0,0,0,.65); transition:opacity .4s ease; }
 .founder-tag.active { opacity:1; cursor:default; }
 .founder-tag:hover { opacity:.75; }
-.founder-tag.active:hover { opacity:1; }
-.founder-tag .founder-name { font-size:clamp(22px,2.2vw,32px); }
-.founder-tag .founder-role { margin-top:12px; font-size:11px; color:rgba(255,255,255,.75); }
-.founder-tag .founder-link { font-size:10px; }
-/* ---------- Project page (#work/<slug>) ----------
+.founder-tag.active:hover { opacity:1; }/* ---------- Project page (#work/<slug>) ----------
    Black page; title / director / year fixed at the top centre; the film framed with wide
    margins; a row of pictures, one open and the others folded into strips; then the write-up
    and credits. */
@@ -341,9 +336,6 @@ html.lightbox-open { overflow:hidden; }
   .project-info, .project-info.two-col { grid-template-columns:1fr; }
   .project-credits.long { columns:1; }
   .contact-top, .founders { grid-template-columns:1fr; }
-  .founder-tag { width:90%; left:5%; right:auto; }
-  .founder-tag.left { bottom:200px; }
-  .founder-tag.right { bottom:44px; left:5%; right:auto; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
   .lightbox-nav { top:auto; bottom:52px; translate:none; }

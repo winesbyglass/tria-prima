@@ -871,11 +871,11 @@ splitToggle.addEventListener('click', () => {
 });
 
 // ---------- Contact: founder work photos, full screen ----------
-// Hovering a founder's headshot shows their work photo across the whole screen with both
-// founders' details floating small on it, the other founder's dimmed. Any mouse movement then
-// returns to the page (after a short settle, ignoring tiny jitters); it shows again only once the
-// pointer has left that headshot and come back. Without a mouse (touch), a tap opens it instead,
-// and the dimmed details or × switch / close.
+// Hovering a founder's headshot or contact details shows their work photo across the whole
+// screen. Both founders' details stay exactly where they are on the page (same place, format and
+// size); the other founder's is dimmed. Any mouse movement then returns to the page (after a short
+// settle, ignoring tiny jitters); it shows again only once the pointer has left that founder and
+// come back. Without a mouse (touch), a tap opens it instead, and the dimmed details or × switch / close.
 const founderCards = [...document.querySelectorAll('.founder')];
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
@@ -889,7 +889,7 @@ founderClose.setAttribute('aria-label', 'Close');
 founderView.append(founderPhoto, founderClose);
 const founderTags = founderCards.map((card, k) => {
   const tag = card.querySelector('.founder-info').cloneNode(true);
-  tag.classList.add('founder-tag', k === 0 ? 'left' : 'right');
+  tag.classList.add('founder-tag');
   tag.addEventListener('click', event => { if (!event.target.closest('a')) showFounder(k); });
   founderView.append(tag);
   return tag;
@@ -904,7 +904,16 @@ function showFounder(k) {
   founderTags.forEach((tag, n) => tag.classList.toggle('active', n === k));
 }
 
+// Lay each floating copy of the details exactly over the founder's details on the page.
+function placeFounderTags() {
+  founderCards.forEach((card, k) => {
+    const r = card.querySelector('.founder-info').getBoundingClientRect();
+    Object.assign(founderTags[k].style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px` });
+  });
+}
+
 function openFounder(k, byHover = false) {
+  placeFounderTags();
   showFounder(k);
   // On hover the photo is only a picture: the pointer passes through to the founders below.
   founderView.classList.toggle('by-hover', byHover);
@@ -929,13 +938,13 @@ let hoverOpen = null;          // { x, y, at } while shown by hover
 let hoverSpent = -1;           // headshot already shown this visit; needs leave + re-enter
 
 founderCards.forEach((card, k) => {
-  const headshot = card.querySelector('.headshot');
-  headshot.addEventListener('pointerenter', event => {
+  // Hot area: the headshot and the contact details (the card holds just those two).
+  card.addEventListener('pointerenter', event => {
     if (event.pointerType !== 'mouse' || hoverSpent === k) return;
     openFounder(k, true);
     hoverOpen = { x: event.clientX, y: event.clientY, at: performance.now() };
   });
-  headshot.addEventListener('pointerleave', event => {
+  card.addEventListener('pointerleave', event => {
     if (event.pointerType === 'mouse' && hoverSpent === k) hoverSpent = -1;
   });
   // Touch: tap the card to open.
