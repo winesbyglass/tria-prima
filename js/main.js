@@ -206,8 +206,9 @@ function projectFrame(work, id) {
 }
 
 function renderProject(work) {
-  // Title, client (only when there is one), year.
-  projectHead.replaceChildren(...[work.title, work.client, work.year].filter(Boolean).map(text => el('span', '', text)));
+  // Title, client (only when there is one and it isn't the title again), year.
+  const sameAsTitle = work.client && work.client.trim().toLowerCase() === work.title.trim().toLowerCase();
+  projectHead.replaceChildren(...[work.title, sameAsTitle ? '' : work.client, work.year].filter(Boolean).map(text => el('span', '', text)));
   const isPhoto = work.kind === 'photo';
   const parts = [];
 
