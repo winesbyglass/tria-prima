@@ -502,12 +502,29 @@ document.getElementById('countPhoto').textContent = `(${photoWorks.length})`;
 const stripMaxShift = () => Math.max(0, stripTrack.offsetHeight - stripWindow.clientHeight);
 const setStripShift = px => { stripTrack.style.transform = `translateY(${-Math.min(stripMaxShift(), Math.max(0, px))}px)`; };
 let stripHovered = false;
+let stripWork = -1;       // the work the strip last showed as current
+let hoverThumb = null;    // the thumbnail under the pointer
+let heldThumb = null;     // left enlarged after the pointer leaves the strip
+let stripParked = false;  // the pointer left the strip: it stays put until the work changes
+
+function releaseHeld() {
+  if (heldThumb) heldThumb.classList.remove('held');
+  heldThumb = null;
+  stripParked = false;
+}
 
 function setActiveThumb(i) {
+  const changed = i !== stripWork;
+  stripWork = i;
   thumbs.forEach((thumb, j) => thumb.classList.toggle('active', j === i));
   updateWorksInk(i);
   // While the pointer is browsing the strip it stays where the pointer put it.
   if (stripHovered) return;
+  // A thumbnail held after the pointer left keeps the strip parked until the work changes.
+  if (stripParked) {
+    if (!changed) return;
+    releaseHeld();
+  }
   // Slide the track so the current thumbnail sits mid-screen, but never past either end.
   const thumb = thumbs[i];
   setStripShift(thumb.offsetTop + thumb.offsetHeight / 2 - stripWindow.clientHeight / 2);
@@ -523,10 +540,28 @@ workStrip.addEventListener('pointermove', event => {
   const t = Math.min(1, Math.max(0, ((event.clientY - r.top) / r.height - 0.1) / 0.8));
   setStripShift(t * stripMaxShift());
 });
-workStrip.addEventListener('pointerleave', () => {
+// Leaving the strip parks it where it is; the thumbnail last under the pointer stays enlarged
+// until the pointer comes back or another work comes up.
+workStrip.addEventListener('pointerenter', event => {
+  if (event.pointerType === 'mouse') releaseHeld();
+});
+workStrip.addEventListener('pointerleave', event => {
+  if (event.pointerType !== 'mouse') return;
   stripHovered = false;
   workStrip.classList.remove('browsing');
-  setActiveThumb(activeIndex);
+  stripParked = true;
+  if (hoverThumb) {
+    heldThumb = hoverThumb;
+    heldThumb.classList.add('held');
+  }
+  hoverThumb = null;
+});
+thumbs.forEach(thumb => {
+  thumb.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') hoverThumb = thumb; });
+  thumb.addEventListener('pointerleave', event => {
+    // Off to another part of the strip: no longer the one under the pointer.
+    if (hoverThumb === thumb && event.relatedTarget && workStrip.contains(event.relatedTarget)) hoverThumb = null;
+  });
 });
 
 // The work filling the screen drives the strip.
