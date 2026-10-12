@@ -74,7 +74,7 @@ function revealPage(target) {
   if (target === 'process') selectTab(0);
   // Contact never opens straight onto a founder's photo; other pages never show one.
   if (target === 'contact') armFounders();
-  else if (!founderView.hidden) closeFounder();
+  else if (founderOn >= 0) closeFounder();
   // On the home page only one of film / slideshow runs, depending on the page-turn state.
   if (target === 'home' && !home.classList.contains('photo-mode')) playHero();
   else pauseHero();
@@ -154,7 +154,7 @@ function letterboxWipe(route, onCovered, onDone) {
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
   if (!lightbox.hidden) closeLightbox();
-  if (!founderView.hidden) closeFounder();
+  if (founderOn >= 0) closeFounder();
   navigate(routeFromHash(), null, true);
 });
 
@@ -1014,149 +1014,75 @@ tabButtons.forEach((tab, k) => {
     selectTab(n);
     tabButtons[n].focus();
   });
-});// ---------- Contact: founder work photos, full screen ----------
-// Entering a founder's block (headshot + contact details) shows their work photo across the
-// whole screen, with that founder's details floating exactly where they are on the page (same
-// place, format and size). Nothing changes while the mouse moves; when it stops on the details
-// (their links work) the photo stays, stopping anywhere else (or a click outside the details)
-// returns to the page. Just passing over a
-// block doesn't open it. Without a mouse (touch), a tap opens it; × or a tap outside closes it.
+});
+// ---------- Contact: founder work photos, full screen ----------
+// As on accordion.net.au/contact: while the mouse is over a founder's block (headshot + contact
+// details) their work photo fades in across the whole screen behind the page (.4s); the rest of
+// the page fades away and that founder's details stay exactly where they are, so their links can
+// be used. Leaving the block fades everything back. Nothing covers the page, so the menu always
+// works. Without a mouse (touch), a tap opens it and a tap anywhere else closes it.
 const founderCards = [...document.querySelectorAll('.founder')];
 const contactPage = document.getElementById('contact');
-const founderView = el('div', 'founder-view');
-founderView.hidden = true;
-founderView.setAttribute('role', 'dialog');
-founderView.setAttribute('aria-modal', 'true');
-founderView.setAttribute('aria-label', 'Founders');
-const founderPhoto = el('div', 'founder-view-photo');
-const founderClose = el('button', 'lightbox-close', '×');
-founderClose.type = 'button';
-founderClose.setAttribute('aria-label', 'Close');
-founderView.append(founderPhoto, founderClose);
-const founderTags = founderCards.map((card, k) => {
-  const tag = card.querySelector('.founder-info').cloneNode(true);
-  tag.classList.add('founder-tag');
-  founderView.append(tag);
-  return tag;
+const founderBackdrop = el('div', 'founder-backdrop');
+founderBackdrop.setAttribute('aria-hidden', 'true');
+const founderPhotos = founderCards.map(card => {
+  const photo = el('div', 'founder-photo');
+  const work = card.dataset.work;
+  if (work) photo.style.backgroundImage = `url("${work}")`;
+  else {
+    photo.classList.add('placeholder');
+    photo.dataset.label = 'Work photo';
+  }
+  founderBackdrop.append(photo);
+  return photo;
 });
-document.body.append(founderView);
+contactPage.prepend(founderBackdrop);
+
+let founderOn = -1;     // founder whose photo is showing (-1: none)
+let founderSkip = -1;   // block the page appeared under: it waits for the mouse to leave first
+let lastPointer = null; // last mouse position, to know what the page appears under
 
 function showFounder(k) {
-  const work = founderCards[k].dataset.work;
-  founderPhoto.style.backgroundImage = work ? `url("${work}")` : '';
-  founderPhoto.classList.toggle('placeholder', !work);
-  founderPhoto.dataset.label = work ? '' : 'Work photo';
-  founderTags.forEach((tag, n) => tag.classList.toggle('active', n === k));
+  founderOn = k;
+  contactPage.classList.toggle('founder-on', k >= 0);
+  founderCards.forEach((card, n) => card.classList.toggle('on', n === k));
+  founderPhotos.forEach((photo, n) => photo.classList.toggle('on', n === k));
 }
-
-// Lay each floating copy of the details exactly over the founder's details on the page.
-function placeFounderTags() {
-  founderCards.forEach((card, k) => {
-    const r = card.querySelector('.founder-info').getBoundingClientRect();
-    Object.assign(founderTags[k].style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px` });
-  });
-}
-
-function openFounder(k, byHover = false) {
-  placeFounderTags();
-  showFounder(k);
-  // On hover the photo is only a picture: the pointer passes through to the founders below.
-  founderView.classList.toggle('by-hover', byHover);
-  if (!founderView.hidden) return;
-  founderView.hidden = false;
-  if (!byHover) {
-    document.documentElement.classList.add('lightbox-open');
-    founderClose.focus({ preventScroll: true });
-  }
-}
-
-function closeFounder() {
-  founderView.hidden = true;
-  founderView.classList.remove('by-hover');
-  document.documentElement.classList.remove('lightbox-open');
-}
-
-const HOVER_INTENT_MS = 150;   // the mouse must rest in a block this long to open it (passing over doesn't)
-const HOVER_REST_MS = 200;     // on the photo, the mouse counts as stopped after this long still
-
-let founderSkip = -1;   // block that won't open until the mouse has left it
-let founderOpen = -1;   // block whose photo is showing
-let founderRest = 0;
-let founderTimer = 0;
-let lastPointer = null; // last mouse position, to know what the page appears under
+const closeFounder = () => showFounder(-1);
 
 window.addEventListener('pointermove', event => {
   if (event.pointerType === 'mouse') lastPointer = { x: event.clientX, y: event.clientY };
 }, { passive: true });
 
-const founderUnder = (x, y) => {
-  const under = document.elementFromPoint(x, y);
-  const card = under && under.closest('.founder');
-  return card ? founderCards.indexOf(card) : -1;
-};
-
-// The Contact page appearing under a resting mouse is not "entering" a block: the block under
-// the pointer only opens once the mouse has left it and come back.
+// The Contact page appearing under a resting mouse is not "entering" a block.
 function armFounders() {
-  clearTimeout(founderTimer);
   closeFounder();
-  founderSkip = lastPointer ? founderUnder(lastPointer.x, lastPointer.y) : -1;
+  const under = lastPointer && document.elementFromPoint(lastPointer.x, lastPointer.y);
+  const card = under && under.closest('.founder');
+  founderSkip = card ? founderCards.indexOf(card) : -1;
 }
 
 founderCards.forEach((card, k) => {
-  // The block: headshot + contact details (the card holds just those two). Resting in it opens.
   card.addEventListener('pointerenter', event => {
-    if (event.pointerType !== 'mouse' || !founderView.hidden || founderSkip === k) return;
-    clearTimeout(founderTimer);
-    founderTimer = setTimeout(() => {
-      if (!founderView.hidden || contactPage.hidden) return;
-      founderOpen = k;
-      openFounder(k, true);
-
-    }, HOVER_INTENT_MS);
+    if (event.pointerType === 'mouse' && founderSkip !== k) showFounder(k);
   });
   card.addEventListener('pointerleave', event => {
     if (event.pointerType !== 'mouse') return;
-    // (The photo covering the block also counts as leaving it; only a real exit counts.)
-    if (founderView.hidden) {
-      clearTimeout(founderTimer);
-      if (founderSkip === k) founderSkip = -1;
-    }
+    if (founderSkip === k) founderSkip = -1;
+    if (founderOn === k) closeFounder();
   });
-  // Touch: tap the card to open.
-  card.addEventListener('click', event => {
-    if (event.target.closest('a') || !founderView.hidden) return;
-    founderOpen = k;
-    openFounder(k);
+  // Touch: a tap opens (links inside still work).
+  card.addEventListener('pointerup', event => {
+    if (event.pointerType === 'mouse' || event.target.closest('a')) return;
+    showFounder(k);
   });
 });
-
-// Back to the page from the photo; the block under the pointer then waits for a fresh entry.
-function leaveFounder(x, y) {
-  clearTimeout(founderRest);
-  closeFounder();
-  founderOpen = -1;
-  founderSkip = founderUnder(x, y);
-}
-
-// On the photo nothing changes while the mouse is moving; once it comes to rest, resting on the
-// details keeps the photo, resting anywhere else returns to the page.
-founderView.addEventListener('pointermove', event => {
-  if (event.pointerType !== 'mouse' || !founderView.classList.contains('by-hover')) return;
-  const x = event.clientX;
-  const y = event.clientY;
-  clearTimeout(founderRest);
-  founderRest = setTimeout(() => {
-    if (founderView.hidden) return;
-    const under = document.elementFromPoint(x, y);
-    if (!under || !under.closest('.founder-tag')) leaveFounder(x, y);
-  }, HOVER_REST_MS);
-});// A click outside the details also returns (touch, or a click before any movement).
-founderView.addEventListener('click', event => {
-  if (event.target.closest('.founder-tag')) return;
-  leaveFounder(event.clientX, event.clientY);
-});founderClose.addEventListener('click', closeFounder);
-document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
+// Touch: a tap outside the open founder's block closes it.
+document.addEventListener('pointerup', event => {
+  if (event.pointerType === 'mouse' || founderOn < 0) return;
+  if (!founderCards[founderOn].contains(event.target)) closeFounder();
+});
+document.addEventListener('keydown', event => { if (founderOn >= 0 && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
 // The picture is drawn "object-fit: cover" into a tiny canvas; each text block's area is
 // averaged and gets .ink-dark (black text) when the picture there is light.

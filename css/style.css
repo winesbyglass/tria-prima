@@ -241,19 +241,23 @@ html.works-open::-webkit-scrollbar { display:none; }
   .contact-page { min-height:100svh; padding-bottom:clamp(24px,4vh,48px); }
 }
 
-/* Full-screen work photo (entering a founder block; tap on touch) with both founders' details floating on it */.founder-view { position:fixed; inset:0; z-index:45; background:#000; cursor:pointer; }
-.founder-view[hidden] { display:none; }
-.founder-view:not([hidden]) { animation:founder-in .45s ease both; }
-@keyframes founder-in { from { opacity:0; } to { opacity:1; } }
-/* Opened by hover: just a picture, the pointer passes through to the founders underneath */
-.founder-view.by-hover .lightbox-close { display:none; }
-.founder-view-photo { position:absolute; inset:0; background:#111 center/cover no-repeat; }
-.founder-view-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
-.founder-view-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
-/* Floating copies of the details, laid by main.js exactly over the ones on the page */
-/* Only the shown founder's details appear over their photo */
-.founder-tag { position:absolute; margin:0; text-align:center; cursor:default; text-shadow:0 1px 5px rgba(0,0,0,.65); }
-.founder-tag:not(.active) { display:none; }/* ---------- Project page (#work/<slug>) ----------
+/* Full-screen work photo behind the page while the mouse is on a founder's block (tap on
+   touch), as on accordion.net.au/contact: .4s fades; the rest of the page steps away and that
+   founder's details stay where they are, over the photo */
+.contact-page { position:relative; --fade:cubic-bezier(.51,0,.08,1); }
+.contact-page > :not(.founder-backdrop) { position:relative; z-index:1; }
+.founder-backdrop { position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.founder-photo { position:absolute; inset:0; background:#111 center/cover no-repeat; opacity:0; scale:1.03; transition:opacity .4s var(--fade),scale .4s var(--fade); }
+.founder-photo.on { opacity:1; scale:1; }
+.founder-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
+.founder-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
+.contact-top, .founder, .headshot { transition:opacity .4s var(--fade),transform .4s var(--fade),visibility .4s; }
+.contact-page.founder-on .contact-top { opacity:0; transform:translateY(2em); visibility:hidden; }
+.contact-page.founder-on .founder:not(.on) { opacity:0; }
+.contact-page.founder-on .founder.on .headshot { opacity:0; }
+.founder-info { transition:text-shadow .4s ease; }
+.founder.on .founder-info { text-shadow:0 1px 5px rgba(0,0,0,.65); }
+/* ---------- Project page (#work/<slug>) ----------
    Black page; title / director / year fixed at the top centre; the film framed with wide
    margins; a row of pictures, one open and the others folded into strips; then the write-up
    and credits. */
