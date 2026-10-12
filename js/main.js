@@ -116,29 +116,36 @@ function navigate(route, source, fromHistory = false) {
   navigating = true;
   if (currentRoute === 'works' && pageOfRoute(route) === 'project') worksReturnScroll = window.scrollY;
   if (!fromHistory) history.pushState({ route }, '', route === 'home' ? location.pathname : `#${route}`);
-  circleWipe(source, () => showRoute(route), () => {
+  letterboxWipe(route, () => showRoute(route), () => {
     navigating = false;
     // Back pressed again mid-transition: catch up with where history now is.
     const current = routeFromHash();
     if (current !== route) navigate(current, null, true);
   });
 }
-// Expanding circles from the clicked control; onCovered runs while the screen is covered.
-function circleWipe(source, onCovered, onDone) {
-  const rect = source ? source.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
-  transition.style.setProperty('--x', `${rect.left + rect.width / 2}px`);
-  transition.style.setProperty('--y', `${rect.top + rect.height / 2}px`);
+// Widescreen letterbox: black bars close from top and bottom, the destination is named in the
+// slit, then they open. onCovered runs while the screen is shut.
+const transitionTitle = document.getElementById('transitionTitle');
+const LB_MS = 1150;
+
+function routeLabel(route) {
+  const work = workOfRoute(route);
+  if (work) return work.title;
+  return route === 'home' ? 'TRIA PRIMA' : route;
+}
+
+function letterboxWipe(route, onCovered, onDone) {
+  transitionTitle.textContent = routeLabel(route);
   transition.classList.remove('running');
   void transition.offsetWidth;
   transition.classList.add('running');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.setTimeout(onCovered, reduceMotion ? 0 : 850);
+  window.setTimeout(onCovered, reduceMotion ? 0 : LB_MS * 0.42);
   window.setTimeout(() => {
     transition.classList.remove('running');
     onDone();
-  }, reduceMotion ? 25 : 1360);
+  }, reduceMotion ? 25 : LB_MS + 30);
 }
-
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
   if (!lightbox.hidden) closeLightbox();
