@@ -737,7 +737,8 @@ window.addEventListener('touchend', event => {
 // ---------- Project page paging: one gesture = one section ----------
 // Pictures -> film -> write-up (photo projects: pictures -> write-up -> previews). A section
 // taller than the screen scrolls normally until its end; the last one scrolls normally to the
-// bottom, and scrolling back up to a section's top turns to the one before. Desktop only.
+// bottom, and scrolling back up to a section's top turns to the one before. Scrolling up on
+// the first screen does nothing. Desktop only.
 const projectPage = document.getElementById('project');
 
 function projectPaging() {
@@ -755,7 +756,14 @@ function turnSection(step, fresh) {
   if (step > 0) {
     const bottom = tops[at] + sections[at].offsetHeight;
     if (at === sections.length - 1 || bottom > y + innerHeight + 2) return false;
-  } else if (y > tops[at] + 2 || at === 0) {
+  } else if (at === 0) {
+    // The first screen never scrolls on its own: scrolling up there just settles at the top.
+    if (y > 2 && fresh && Date.now() >= pageLockUntil) {
+      pageLockUntil = Date.now() + PAGE_MS;
+      animateScroll(0);
+    }
+    return true;
+  } else if (y > tops[at] + 2) {
     return false;
   }
   if (!fresh || Date.now() < pageLockUntil) return true;
