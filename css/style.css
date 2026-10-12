@@ -217,8 +217,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 /* Headshots are always on show (4:5, half-length); the placeholder holds initials until a photo is dropped in */
 .headshot { width:min(calc((100vw - 2 * var(--pad) - 2 * var(--gap)) / 3.15), calc((100svh - 330px) * .8)); aspect-ratio:4/5; border:0; padding:0; border-radius:10px; overflow:hidden; cursor:pointer; color:#fff;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:linear-gradient(160deg,#2b2b2b,#141414); }
-.headshot img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .8s var(--ease); }
-.founder:hover .headshot img { transform:scale(1.03); }
+/* The headshot itself stays still on hover; hovering only brings up the work photo */
+.headshot img { width:100%; height:100%; object-fit:cover; display:block; }
 .headshot-initials { font:clamp(34px,3.4vw,52px) var(--font); letter-spacing:.12em; color:rgba(255,255,255,.35); }
 .headshot-label { font-size:10px; font-weight:700; letter-spacing:.3em; color:rgba(255,255,255,.3); }
 .founder-info { align-self:stretch; padding-top:18px; text-align:center; }
