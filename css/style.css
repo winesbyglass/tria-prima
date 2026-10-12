@@ -186,9 +186,9 @@ html.works-open::-webkit-scrollbar { display:none; }
 .headshot-initials { font:clamp(34px,3.4vw,52px) var(--font); letter-spacing:.12em; color:rgba(255,255,255,.35); }
 .headshot-label { font-size:10px; font-weight:700; letter-spacing:.3em; color:rgba(255,255,255,.3); }
 .founder-info { margin-top:26px; text-align:center; }
-.founder-first { margin:0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
-.founder-last { margin:2px 0 0; font:400 clamp(30px,3vw,46px)/1 var(--font); letter-spacing:.02em; text-transform:uppercase; }
-.founder-role { margin:18px 0 6px; font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
+/* Full name on one line, at the size the surname used to have */
+.founder-name { margin:0; font:400 clamp(30px,3vw,46px)/1.05 var(--font); letter-spacing:.02em; text-transform:uppercase; }
+.founder-role { margin:18px 0 6px; font-size:13px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
 .founder-link { display:block; color:#fff; font-size:12px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
 
@@ -209,9 +209,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-tag.active { opacity:1; cursor:default; }
 .founder-tag:hover { opacity:.75; }
 .founder-tag.active:hover { opacity:1; }
-.founder-tag .founder-first { font-size:10px; }
-.founder-tag .founder-last { font-size:clamp(22px,2.2vw,32px); }
-.founder-tag .founder-role { margin-top:12px; font-size:9px; color:rgba(255,255,255,.75); }
+.founder-tag .founder-name { font-size:clamp(22px,2.2vw,32px); }
+.founder-tag .founder-role { margin-top:12px; font-size:11px; color:rgba(255,255,255,.75); }
 .founder-tag .founder-link { font-size:10px; }
 /* ---------- Project page (#work/<slug>) ----------
    Black page; title / director / year fixed at the top centre; the film framed with wide
