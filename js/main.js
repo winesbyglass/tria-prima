@@ -70,6 +70,8 @@ function revealPage(target) {
   window.scrollTo({ top: 0, behavior: 'instant' });
   updateToTop();
   if (target === 'works') fillRemainingSlides();
+  // Process always opens on Production services.
+  if (target === 'process') selectTab(0);
   // On the home page only one of film / slideshow runs, depending on the page-turn state.
   if (target === 'home' && !home.classList.contains('photo-mode')) playHero();
   else pauseHero();

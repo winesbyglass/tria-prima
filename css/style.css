@@ -190,7 +190,7 @@ html.works-open::-webkit-scrollbar { display:none; }
 .process-panels { grid-column:1; grid-row:1; }
 .process-panel.active { animation:panelIn .6s var(--ease); }
 @keyframes panelIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
-.panel-heading { margin:0; padding:clamp(16px,2.6vh,26px) 0 clamp(10px,1.6vh,16px); font:400 clamp(26px,min(2.6vw,4.4vh),44px)/1.1 var(--font); }
+.panel-heading { margin:0; padding:clamp(16px,2.6vh,26px) 0 clamp(10px,1.6vh,16px); font:400 clamp(26px,min(2.6vw,4.4vh),44px)/1.1 var(--font); text-transform:uppercase; letter-spacing:.02em; }
 /* One item per row: number + title beside a larger text */
 .process-item { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:clamp(16px,2vw,36px); padding:clamp(12px,2.2vh,22px) 0; border-top:1px solid rgba(255,255,255,.1); }
 .panel-heading + .process-item { border-top:0; padding-top:4px; }
