@@ -309,11 +309,26 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
-// ---------- Film curl: frames wind away and vanish at the top and bottom of the strip ----------
-// Moving to the next work runs the film upward, so frames wind out over the top; going back
-// runs it downward and they wind out at the bottom.
-const CURL_MAX = 88;   // degrees at the very edge: nearly edge-on
-const curlState = new Map();
+// ---------- Film roll-up: frames wrap round an invisible axis at each end and vanish ----------
+// Moving to the next work runs the film upward, so frames roll away over the top; going back
+// runs it downward and they roll away at the bottom. Past the tangent point each frame is
+// laid on a cylinder of radius ROLL_R: it tips back, swings behind the axis (its back face is
+// hidden) and fades into the background.
+const ROLL_R = 30;        // px, radius of the invisible axis
+const ROLL_T = 72;        // px from each edge where the film starts to wrap
+const ROLL_GONE = 1.9;    // radians: by here the frame has faded out behind the axis
+const rollState = new Map();
+
+function rollFrame(cy, edge, sign) {
+  // cy: frame centre; edge: tangent line; sign: +1 top (film leaves upward), -1 bottom.
+  const s = sign * (edge - cy);              // arc length already wrapped
+  if (s <= 0) return null;
+  // Once gone, frames stay parked at that point rather than winding on round the axis.
+  const theta = Math.min(ROLL_GONE, s / ROLL_R); // radians round the axis
+  const y = edge - sign * ROLL_R * Math.sin(theta);
+  const z = -ROLL_R * (1 - Math.cos(theta));
+  return { dy: y - cy, z, deg: sign * theta * 180 / Math.PI, theta };
+}
 
 function curlStrip() {
   requestAnimationFrame(curlStrip);
@@ -321,27 +336,27 @@ function curlStrip() {
   const winH = stripWindow.clientHeight;
   if (!winH) return;
   // Frame positions from layout + the track's live (possibly mid-transition) offset, so the
-  // curl itself never feeds back into the measurement.
+  // roll itself never feeds back into the measurement.
   const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
-  const zone = Math.min(120, winH * 0.2);
   thumbs.forEach(thumb => {
     if (thumb.hidden) return;
     const cy = trackY + thumb.offsetTop + thumb.offsetHeight / 2;
-    const top = 1 - cy / zone;              // > 0 inside the top zone
-    const bottom = 1 - (winH - cy) / zone;  // > 0 inside the bottom zone
-    let curl = 0;
-    let origin = 'center';
-    let k = 0;
-    if (top > 0) { k = Math.min(1, top); curl = -CURL_MAX * k * k; origin = 'top'; }               // winds out over the top
-    else if (bottom > 0) { k = Math.min(1, bottom); curl = CURL_MAX * k * k; origin = 'bottom'; } // winds out at the bottom
-    const key = `${curl.toFixed(1)}|${origin}`;
-    if (curlState.get(thumb) === key) return;
-    curlState.set(thumb, key);
-    thumb.style.setProperty('--curl', `${curl.toFixed(1)}deg`);
-    thumb.style.setProperty('--curl-origin', origin);
-    thumb.style.setProperty('--shade', (1 - 0.8 * k * k).toFixed(2));
-    // Fade out over the last stretch so the frame is gone by the edge.
-    thumb.style.setProperty('--fade', Math.min(1, Math.max(0, (1 - k) / 0.35)).toFixed(2));
+    const r = rollFrame(cy, ROLL_T, 1) || rollFrame(cy, winH - ROLL_T, -1);
+    const key = r ? `${r.dy.toFixed(1)}|${r.deg.toFixed(1)}` : 'flat';
+    if (rollState.get(thumb) === key) return;
+    rollState.set(thumb, key);
+    if (!r) {
+      thumb.style.transform = '';
+      thumb.style.filter = '';
+      thumb.style.opacity = '';
+      thumb.style.visibility = '';
+      return;
+    }
+    thumb.style.transform = `perspective(260px) translateY(${r.dy.toFixed(1)}px) translateZ(${r.z.toFixed(1)}px) rotateX(${r.deg.toFixed(1)}deg)`;
+    thumb.style.filter = `brightness(${(1 - 0.7 * Math.min(1, r.theta / (Math.PI / 2))).toFixed(2)})`;
+    thumb.style.opacity = Math.min(1, Math.max(0, (ROLL_GONE - r.theta) / 0.7)).toFixed(2);
+    // Rolled-away frames must not catch hover or clicks.
+    thumb.style.visibility = r.theta >= ROLL_GONE ? 'hidden' : '';
   });
 }
 requestAnimationFrame(curlStrip);
@@ -455,6 +470,7 @@ function morphView(view, onDone) {
   // Timer rather than animation promises, which can stall in a background tab.
   setTimeout(() => {
     finals.forEach(node => { node.style.visibility = ''; });
+    rollState.clear(); // let the roll-up re-apply its own visibility
     layer.remove();
     stripTrack.style.transition = '';
     onDone();
