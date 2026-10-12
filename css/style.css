@@ -242,7 +242,7 @@ html.works-open::-webkit-scrollbar { display:none; }
 }
 
 /* Full-screen work photo behind the page while the mouse is on a founder's block (tap on
-   touch), as on accordion.net.au/contact: .4s fades; the rest of the page steps away and that
+   touch), as on accordion.net.au/contact: .4s fades; the rest of the page fades out in place and that
    founder's details stay where they are, over the photo */
 .contact-page { position:relative; --fade:cubic-bezier(.51,0,.08,1); }
 .contact-page > :not(.founder-backdrop) { position:relative; z-index:1; }
@@ -251,8 +251,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-photo.on { opacity:1; scale:1; }
 .founder-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
 .founder-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
-.contact-top, .founder, .headshot { transition:opacity .4s var(--fade),transform .4s var(--fade),visibility .4s; }
-.contact-page.founder-on .contact-top { opacity:0; transform:translateY(2em); visibility:hidden; }
+.contact-top, .founder, .headshot { transition:opacity .4s var(--fade),visibility .4s; }
+.contact-page.founder-on .contact-top { opacity:0; visibility:hidden; }
 .contact-page.founder-on .founder:not(.on) { opacity:0; }
 .contact-page.founder-on .founder.on .headshot { opacity:0; }
 .founder-info { transition:text-shadow .4s ease; }
