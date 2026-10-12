@@ -2,6 +2,7 @@
 
 const home = document.getElementById('home');
 const pages = [...document.querySelectorAll('.page')];
+const transition = document.getElementById('transition');
 const heroVideo = document.getElementById('heroVideo');
 const filmModal = document.getElementById('filmModal');
 const modalFrame = document.getElementById('modalFrame');
@@ -60,7 +61,10 @@ function navigate(target, source, fromHistory = false) {
   if ((target === 'home' && !home.hidden) || (target !== 'home' && !document.getElementById(target).hidden)) return;
   navigating = true;
   if (!fromHistory) history.pushState({ page: target }, '', target === 'home' ? location.pathname : `#${target}`);
-  reelWipe(target, () => {
+  circleWipe(source, () => {
+    revealPage(target);
+    document.title = pageTitle(target);
+  }, () => {
     navigating = false;
     // Back pressed again mid-transition: catch up with where history now is.
     const current = pageFromHash();
@@ -68,97 +72,22 @@ function navigate(target, source, fromHistory = false) {
   });
 }
 
-// ---------- Page change: a film reel unrolls the new page ----------
-// A black reel turns at the right edge and a strip of film runs across the screen. Opening a
-// page, the film runs right to left and the new page is revealed behind it; returning home,
-// it winds back left to right and home is revealed. The old page is held as a fixed layer
-// and clipped back as the film passes.
-const REEL_MS = 1500;
-const reelLayer = el('div', 'reel-wipe');
-reelLayer.hidden = true;
-reelLayer.setAttribute('aria-hidden', 'true');
-reelLayer.innerHTML = `
-  <div class="film-band"></div>
-  <svg class="reel" viewBox="-100 -100 200 200">
-    <defs>
-      <mask id="reelHoles">
-        <rect x="-100" y="-100" width="200" height="200" fill="#fff"/>
-        ${[0, 60, 120, 180, 240, 300].map(a => `<circle cx="${(58 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(58 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="21" fill="#000"/>`).join('')}
-        ${[0, 72, 144, 216, 288].map(a => `<circle cx="${(16 * Math.cos(a * Math.PI / 180)).toFixed(1)}" cy="${(16 * Math.sin(a * Math.PI / 180)).toFixed(1)}" r="3.6" fill="#000"/>`).join('')}
-        <circle r="6" fill="#000"/>
-      </mask>
-      <linearGradient id="reelShine" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#8a8a8a"/><stop offset=".45" stop-color="#2a2a2a"/><stop offset="1" stop-color="#5a5a5a"/>
-      </linearGradient>
-    </defs>
-    <g class="reel-spin">
-      <circle r="97" fill="#0c0c0c" mask="url(#reelHoles)" stroke="url(#reelShine)" stroke-width="3"/>
-      <circle r="84" fill="none" stroke="#1c1c1c" stroke-width="6" mask="url(#reelHoles)"/>
-      <circle r="30" fill="none" stroke="#333" stroke-width="3"/>
-      <circle r="10" fill="none" stroke="#444" stroke-width="2"/>
-    </g>
-  </svg>`;
-document.body.append(reelLayer);
-const filmBand = reelLayer.querySelector('.film-band');
-
-function currentSection() {
-  return home.hidden ? pages.find(page => !page.hidden) : home;
+// Expanding circles from the clicked control; onCovered runs while the screen is covered.
+function circleWipe(source, onCovered, onDone) {
+  const rect = source ? source.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
+  transition.style.setProperty('--x', `${rect.left + rect.width / 2}px`);
+  transition.style.setProperty('--y', `${rect.top + rect.height / 2}px`);
+  transition.classList.remove('running');
+  void transition.offsetWidth;
+  transition.classList.add('running');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.setTimeout(onCovered, reduceMotion ? 0 : 850);
+  window.setTimeout(() => {
+    transition.classList.remove('running');
+    onDone();
+  }, reduceMotion ? 25 : 1360);
 }
 
-function reelWipe(target, onDone) {
-  const leaving = currentSection();
-  const entering = target === 'home' ? home : document.getElementById(target);
-  const forward = target !== 'home';
-  const finishSwap = () => { revealPage(target); document.title = pageTitle(target); };
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !leaving) {
-    finishSwap();
-    onDone();
-    return;
-  }
-  // Hold the old page where it is, on top, then switch the real page underneath.
-  const scroll = window.scrollY;
-  finishSwap();
-  leaving.hidden = false;
-  leaving.classList.add('reel-leaving');
-  leaving.style.top = `${-scroll}px`;
-  entering.style.animation = 'none';
-  reelLayer.classList.toggle('rewind', !forward);
-  reelLayer.hidden = false;
-
-  const W = innerWidth;
-  const bandW = filmBand.offsetWidth;
-  const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const start = performance.now();
-  let finished = false;
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    leaving.classList.remove('reel-leaving');
-    leaving.style.top = '';
-    leaving.style.clipPath = '';
-    leaving.hidden = true;
-    entering.style.animation = '';
-    reelLayer.hidden = true;
-    reelLayer.style.opacity = '';
-    onDone();
-  };
-  const step = now => {
-    if (finished) return;
-    const t = (now - start) / REEL_MS;
-    // Reel fades in, film sweeps across, reel fades out.
-    const p = ease(Math.min(1, Math.max(0, (t - 0.1) / 0.78)));
-    reelLayer.style.opacity = Math.min(1, t / 0.1, (1 - t) / 0.12).toFixed(3);
-    const front = forward ? W * (1 - p) : W * p;
-    filmBand.style.transform = `translateX(${(front - bandW / 2).toFixed(1)}px)`;
-    // Opening: the old page keeps what is left of the film; returning: what is right of it.
-    leaving.style.clipPath = forward ? `inset(0 ${(W - front).toFixed(1)}px 0 0)` : `inset(0 0 0 ${front.toFixed(1)}px)`;
-    if (t >= 1) finish();
-    else requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-  // Backstop in case animation frames are held back (e.g. a background tab).
-  setTimeout(finish, REEL_MS + 400);
-}
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
   navigate(pageFromHash(), null, true);
