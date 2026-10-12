@@ -163,24 +163,51 @@ html.works-open::-webkit-scrollbar { display:none; }
 
 .page-description { max-width:740px; color:#c5c0b9; font:clamp(23px,3vw,42px)/1.45 var(--font); }
 .email { color:white; font:clamp(24px,4.4vw,62px) var(--font); overflow-wrap:anywhere; text-decoration-thickness:1px; text-underline-offset:8px; }
-/* ---------- Contact ---------- */
-.contact-intro { max-width:820px; margin:0 0 clamp(60px,9vh,100px); font:clamp(18px,1.6vw,24px)/1.6 var(--font); color:rgba(255,255,255,.85); }
-.founders { display:grid; grid-template-columns:repeat(2,minmax(0,360px)); gap:clamp(30px,5vw,80px); }
+/* ---------- Contact ----------
+   Big slogan left, company / location / socials right; below, the two founders side by side.
+   Clicking a founder opens their work photo full screen with both founders' details on it. */
+.contact-top { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:clamp(30px,5vw,90px); margin-top:clamp(70px,12vh,130px); align-items:start; }
+.contact-slogan { margin:0; font:800 clamp(48px,6.6vw,118px)/.92 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
+.contact-intro { max-width:34em; margin:0 0 28px; font:clamp(17px,1.45vw,22px)/1.5 var(--font); color:rgba(255,255,255,.88); }
+.contact-location { margin:0 0 20px; font:clamp(20px,1.8vw,28px) var(--font); letter-spacing:.06em; text-transform:uppercase; }
+.contact-general { margin:0 0 30px; font-size:14px; line-height:1.6; color:rgba(255,255,255,.7); }
+.contact-general a { color:#fff; text-underline-offset:4px; }
+.socials { display:flex; gap:24px; }
+.socials a { color:#fff; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; text-decoration:underline; text-underline-offset:5px; transition:color .3s ease; }
+.socials a:hover, .socials a:focus-visible { color:rgb(191,136,96); }
+
+.founders { display:grid; grid-template-columns:1fr 1fr; gap:clamp(24px,4vw,60px); margin-top:clamp(80px,14vh,150px); }
+.founder { display:flex; flex-direction:column; align-items:center; cursor:pointer; }
 /* Headshots are always on show (4:5, half-length); the placeholder holds initials until a photo is dropped in */
-.headshot { aspect-ratio:4/5; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
-  background:linear-gradient(160deg,#2b2b2b,#141414); border:1px solid rgba(255,255,255,.08); }
-.headshot img { width:100%; height:100%; object-fit:cover; display:block; }
+.headshot { width:min(100%,440px); aspect-ratio:4/5; border:0; padding:0; border-radius:10px; overflow:hidden; cursor:pointer; color:#fff;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:linear-gradient(160deg,#2b2b2b,#141414); }
+.headshot img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .8s var(--ease); }
+.founder:hover .headshot img { transform:scale(1.03); }
 .headshot-initials { font:clamp(34px,3.4vw,52px) var(--font); letter-spacing:.12em; color:rgba(255,255,255,.35); }
 .headshot-label { font-size:10px; font-weight:700; letter-spacing:.3em; color:rgba(255,255,255,.3); }
-.founder-name { margin:22px 0 6px; font:400 clamp(22px,2vw,30px)/1.2 var(--font); }
-.founder-role { margin:0 0 16px; font-size:11px; font-weight:700; letter-spacing:.14em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.55); }
-.founder-link { display:block; width:fit-content; color:#fff; font-size:14px; line-height:1.9; text-decoration:none; transition:color .3s ease; }
+.founder-info { margin-top:26px; text-align:center; }
+.founder-first { margin:0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+.founder-last { margin:2px 0 0; font:400 clamp(30px,3vw,46px)/1 var(--font); letter-spacing:.02em; text-transform:uppercase; }
+.founder-role { margin:18px 0 6px; font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
+.founder-link { display:block; color:#fff; font-size:12px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
-.contact-general { margin-top:clamp(70px,11vh,120px); }
-.socials { display:flex; gap:28px; margin-top:34px; }
-.socials a { color:rgba(255,255,255,.6); font-size:11px; font-weight:700; letter-spacing:.16em; text-decoration:none; transition:color .3s ease; }
-.socials a:hover, .socials a:focus-visible { color:#fff; }
 
+/* Full-screen work photo with both founders' details floating small on it */
+.founder-view { position:fixed; inset:0; z-index:45; background:#000; }
+.founder-view[hidden] { display:none; }
+.founder-view-photo { position:absolute; inset:0; background:#111 center/cover no-repeat; }
+.founder-view-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
+.founder-view-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
+.founder-tag { position:absolute; bottom:clamp(50px,11vh,130px); width:40%; margin:0; cursor:pointer; opacity:.35; text-shadow:0 1px 5px rgba(0,0,0,.65); transition:opacity .4s ease; }
+.founder-tag.left { left:5%; }
+.founder-tag.right { right:5%; }
+.founder-tag.active { opacity:1; cursor:default; }
+.founder-tag:hover { opacity:.75; }
+.founder-tag.active:hover { opacity:1; }
+.founder-tag .founder-first { font-size:10px; }
+.founder-tag .founder-last { font-size:clamp(22px,2.2vw,32px); }
+.founder-tag .founder-role { margin-top:12px; font-size:9px; color:rgba(255,255,255,.75); }
+.founder-tag .founder-link { font-size:10px; }
 /* ---------- Project page (#work/<slug>) ----------
    Black page; title / director / year fixed at the top centre; the film framed with wide
    margins; a row of pictures, one open and the others folded into strips; then the write-up
@@ -309,7 +336,10 @@ html.lightbox-open { overflow:hidden; }
   .gallery-item.open { flex:1 1 0%; }
   .project-info, .project-info.two-col { grid-template-columns:1fr; }
   .project-credits.long { columns:1; }
-  .founders { grid-template-columns:1fr; max-width:420px; }
+  .contact-top, .founders { grid-template-columns:1fr; }
+  .founder-tag { width:90%; left:5%; right:auto; }
+  .founder-tag.left { bottom:200px; }
+  .founder-tag.right { bottom:44px; left:5%; right:auto; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
   .lightbox-nav { top:auto; bottom:52px; translate:none; }

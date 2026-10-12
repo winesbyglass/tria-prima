@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=50">
+  <link rel="stylesheet" href="css/style.css?v=51">
 </head>
 <body>
   <main class="app">
@@ -68,38 +68,46 @@
       <p class="page-description">From the first idea to the final frame, we shape every story with intention, curiosity, and craft.</p>
     </section>
 
-    <section class="page" id="contact" aria-labelledby="contact-title" hidden>
-      <p class="page-kicker">LET'S MAKE SOMETHING</p><h2 class="page-title" id="contact-title">Contact.</h2>
-      <!-- Placeholder copy -->
-      <p class="contact-intro">Tria Prima is a New York-based film and media production company specializing in end-to-end project development and post-production services. We also aim to host monthly short film screenings and workshops in collaboration with local community organizations. Through these initiatives, we hope to support emerging filmmakers, encourage creative collaboration, and build an active filmmaking community locally and online.</p>
-
-      <!-- Founders. Headshots are always shown (no hover). To use a real photo, replace the
-           .headshot placeholder's contents with <img src="assets/team/....jpg" alt="Name">. -->
-      <div class="founders">
-        <article class="founder">
-          <div class="headshot"><img src="assets/team/haohao-qiaoshi-liu.jpg" alt="Portrait of Haohao Qiaoshi Liu"></div>
-          <h3 class="founder-name">Haohao Qiaoshi Liu</h3>
-          <p class="founder-role">Founder &amp; Head of Production</p>
-          <a class="founder-link" href="mailto:haohao@example.com">haohao@example.com</a>
-          <a class="founder-link" href="tel:+10000000000">+1 (000) 000-0000</a>
-        </article>
-        <article class="founder">
-          <div class="headshot" role="img" aria-label="Photo of Jalsa Amidah Drinkard (placeholder)"><span class="headshot-initials">JAD</span><span class="headshot-label">PHOTO</span></div>
-          <h3 class="founder-name">Jalsa Amidah Drinkard</h3>
-          <p class="founder-role">Founder &amp; Head of Strategy and Partnerships</p>
-          <a class="founder-link" href="mailto:jalsa@example.com">jalsa@example.com</a>
-          <a class="founder-link" href="tel:+10000000000">+1 (000) 000-0000</a>
-        </article>
+    <section class="page contact-page" id="contact" aria-labelledby="contact-title" hidden>
+      <div class="contact-top">
+        <!-- Placeholder slogan -->
+        <h2 class="contact-slogan" id="contact-title">Let's make something</h2>
+        <div class="contact-about">
+          <!-- Placeholder copy -->
+          <p class="contact-intro">Tria Prima is a New York-based film and media production company specializing in end-to-end project development and post-production services. We also aim to host monthly short film screenings and workshops in collaboration with local community organizations. Through these initiatives, we hope to support emerging filmmakers, encourage creative collaboration, and build an active filmmaking community locally and online.</p>
+          <p class="contact-location">New York, USA</p>
+          <p class="contact-general">Have a project in mind? We'd love to hear about it. <a href="mailto:hello@example.com">hello@example.com</a></p>
+          <!-- Placeholder profiles -->
+          <nav class="socials" aria-label="Social">
+            <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+            <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a>
+          </nav>
+        </div>
       </div>
 
-      <div class="contact-general">
-        <p class="page-description">Have a project in mind? We'd love to hear about it.</p>
-        <a class="email" href="mailto:hello@example.com">hello@example.com</a>
-        <!-- Placeholder profiles -->
-        <nav class="socials" aria-label="Social">
-          <a href="https://www.instagram.com/" target="_blank" rel="noopener">INSTAGRAM ↗</a>
-          <a href="https://www.linkedin.com/" target="_blank" rel="noopener">LINKEDIN ↗</a>
-        </nav>
+      <!-- Founders. Clicking a photo or its details shows that founder's work photo full screen
+           (data-work; falls back to a placeholder). Placeholders: Jalsa's photos, all emails/phones. -->
+      <div class="founders">
+        <article class="founder" data-work="assets/team/haohao-qiaoshi-liu-work.jpg">
+          <button class="headshot" type="button" aria-label="Haohao Qiaoshi Liu, full-screen photo"><img src="assets/team/haohao-qiaoshi-liu.jpg" alt=""></button>
+          <div class="founder-info">
+            <p class="founder-first">Haohao Qiaoshi</p>
+            <h3 class="founder-last">Liu</h3>
+            <p class="founder-role">Founder &amp; Head of Production</p>
+            <a class="founder-link" href="mailto:haohao@example.com">haohao@example.com</a>
+            <a class="founder-link" href="tel:+10000000000">+1 (000) 000-0000</a>
+          </div>
+        </article>
+        <article class="founder" data-work="">
+          <button class="headshot" type="button" aria-label="Jalsa Amidah Drinkard, full-screen photo"><span class="headshot-initials">JAD</span><span class="headshot-label">PHOTO</span></button>
+          <div class="founder-info">
+            <p class="founder-first">Jalsa Amidah</p>
+            <h3 class="founder-last">Drinkard</h3>
+            <p class="founder-role">Founder &amp; Head of Strategy and Partnerships</p>
+            <a class="founder-link" href="mailto:jalsa@example.com">jalsa@example.com</a>
+            <a class="founder-link" href="tel:+10000000000">+1 (000) 000-0000</a>
+          </div>
+        </article>
       </div>
     </section>
 
@@ -126,6 +134,6 @@
   </div>
 
   <script src="js/works.js?v=8"></script>
-  <script src="js/main.js?v=42"></script>
+  <script src="js/main.js?v=43"></script>
 </body>
 </html>

@@ -149,6 +149,7 @@ function letterboxWipe(route, onCovered, onDone) {
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
   if (!lightbox.hidden) closeLightbox();
+  if (!founderView.hidden) closeFounder();
   navigate(routeFromHash(), null, true);
 });
 
@@ -869,6 +870,55 @@ splitToggle.addEventListener('click', () => {
   else turnToPhotos();
 });
 
+// ---------- Contact: founder work photos, full screen ----------
+// Clicking a founder's photo or details shows their work photo across the whole screen with
+// both founders' details floating small on it; the other founder's details are dimmed and
+// switch the photo when clicked.
+const founderCards = [...document.querySelectorAll('.founder')];
+const founderView = el('div', 'founder-view');
+founderView.hidden = true;
+founderView.setAttribute('role', 'dialog');
+founderView.setAttribute('aria-modal', 'true');
+founderView.setAttribute('aria-label', 'Founders');
+const founderPhoto = el('div', 'founder-view-photo');
+const founderClose = el('button', 'lightbox-close', '×');
+founderClose.type = 'button';
+founderClose.setAttribute('aria-label', 'Close');
+founderView.append(founderPhoto, founderClose);
+const founderTags = founderCards.map((card, k) => {
+  const tag = card.querySelector('.founder-info').cloneNode(true);
+  tag.classList.add('founder-tag', k === 0 ? 'left' : 'right');
+  tag.addEventListener('click', event => { if (!event.target.closest('a')) showFounder(k); });
+  founderView.append(tag);
+  return tag;
+});
+document.body.append(founderView);
+
+function showFounder(k) {
+  const work = founderCards[k].dataset.work;
+  founderPhoto.style.backgroundImage = work ? `url("${work}")` : '';
+  founderPhoto.classList.toggle('placeholder', !work);
+  founderPhoto.dataset.label = work ? '' : 'Work photo';
+  founderTags.forEach((tag, n) => tag.classList.toggle('active', n === k));
+}
+
+function openFounder(k) {
+  showFounder(k);
+  founderView.hidden = false;
+  document.documentElement.classList.add('lightbox-open');
+  founderClose.focus({ preventScroll: true });
+}
+
+function closeFounder() {
+  founderView.hidden = true;
+  document.documentElement.classList.remove('lightbox-open');
+}
+
+founderCards.forEach((card, k) => {
+  card.addEventListener('click', event => { if (!event.target.closest('a')) openFounder(k); });
+});
+founderClose.addEventListener('click', closeFounder);
+document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
 // The picture is drawn "object-fit: cover" into a tiny canvas; each text block's area is
 // averaged and gets .ink-dark (black text) when the picture there is light.
