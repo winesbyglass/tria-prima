@@ -188,9 +188,9 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-body > .project-gallery:first-child { margin-top:0; }
 .project-gallery + .project-film { margin-top:clamp(70px,11vh,120px); }
 .gallery-item { position:relative; overflow:hidden; flex:0 0 clamp(60px,7.5vw,128px); height:100%; border:0; padding:0; border-radius:14px; color:#fff; text-align:left; background:#111 center/cover no-repeat; cursor:pointer;
-  filter:brightness(.6); transition:flex-basis .75s var(--ease),filter .45s ease; }
-.gallery-item:hover { filter:brightness(.85); }
-.gallery-item.open { flex-basis:min(60vw,1000px); filter:none; cursor:default; }
+  min-width:0; transition:flex-grow .75s var(--ease),flex-basis .75s var(--ease); }
+/* The open picture takes whatever width the strips leave, so a short row always fits */
+.gallery-item.open { flex:1 1 0%; cursor:default; }
 /* Client / role on each still of a video project, shown while it is the open one */
 .gallery-caption { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:60px 9% 30px; pointer-events:none;
   background:linear-gradient(180deg,transparent,rgba(0,0,0,.5)); opacity:0; transition:opacity .45s ease; }
@@ -285,7 +285,7 @@ html.lightbox-open { overflow:hidden; }
   .project-film, .project-info { width:auto; margin-left:16px; margin-right:16px; }
   .project-gallery { height:56vh; padding:0 16px; gap:8px; }
   .gallery-item { flex-basis:44px; border-radius:10px; }
-  .gallery-item.open { flex-basis:74vw; }
+  .gallery-item.open { flex:1 1 0%; }
   .project-info, .project-info.two-col { grid-template-columns:1fr; }
   .project-credits.long { columns:1; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }

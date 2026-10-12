@@ -198,13 +198,15 @@ function projectFrame(work, id) {
 }
 
 function renderProject(work) {
-  projectHead.replaceChildren(el('span', '', work.title), el('span', '', work.director), el('span', '', work.year));
+  // Title, client (only when there is one), year.
+  projectHead.replaceChildren(...[work.title, work.client, work.year].filter(Boolean).map(text => el('span', '', text)));
   const isPhoto = work.kind === 'photo';
   const parts = [];
 
   // Pictures first: one open, the rest folded strips. On video projects every still carries
   // the client and role, shown while it is the open one.
-  const pictures = isPhoto ? work.photos : (work.stills || []);
+  // Photo projects fold just their first five photographs; the previews below show them all.
+  const pictures = isPhoto ? work.photos.slice(0, 5) : (work.stills || []);
   if (pictures.length) {
     const gallery = el('section', 'project-gallery');
     gallery.setAttribute('aria-label', isPhoto ? 'Photographs' : 'Stills');
@@ -215,16 +217,20 @@ function renderProject(work) {
       item.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}`);
       if (!isPhoto) {
         const caption = el('span', 'gallery-caption');
-        const client = el('span', 'gallery-fact');
-        client.append(el('small', '', 'Client :'), el('span', '', work.client || '[CLIENT]'));
+        // Client only when the project has one.
+        if (work.client) {
+          const client = el('span', 'gallery-fact');
+          client.append(el('small', '', 'Client :'), el('span', '', work.client));
+          caption.append(client);
+        }
         const role = el('span', 'gallery-fact');
         role.append(el('small', '', 'Role :'), el('span', '', work.role || '[ROLE]'));
-        caption.append(client, role);
+        caption.append(role);
         item.append(caption);
       }
       item.addEventListener('click', () => {
         // Photo projects: clicking the open picture shows it full screen.
-        if (isPhoto && item.classList.contains('open')) { openLightbox(pictures, k, work.title); return; }
+        if (isPhoto && item.classList.contains('open')) { openLightbox(work.photos, k, work.title); return; }
         gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
       });
       gallery.append(item);
@@ -309,19 +315,19 @@ function renderProject(work) {
   // Photo projects: every photograph as a small preview; each opens full screen.
   if (isPhoto) {
     const previews = el('section', 'project-previews');
-    previews.append(el('h3', '', `All photographs (${pictures.length})`));
+    previews.append(el('h3', '', `All photographs (${work.photos.length})`));
     const grid = el('div', 'preview-grid');
-    pictures.forEach((img, k) => {
+    work.photos.forEach((img, k) => {
       const b = el('button', 'preview-item');
       b.type = 'button';
-      b.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}, full screen`);
+      b.setAttribute('aria-label', `${work.title} ${k + 1} / ${work.photos.length}, full screen`);
       const pic = el('img');
       pic.src = workImage({ img }, 'full');
       pic.alt = '';
       pic.loading = 'lazy';
       pic.decoding = 'async';
       b.append(pic);
-      b.addEventListener('click', () => openLightbox(pictures, k, work.title));
+      b.addEventListener('click', () => openLightbox(work.photos, k, work.title));
       grid.append(b);
     });
     previews.append(grid);
