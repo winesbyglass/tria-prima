@@ -206,6 +206,24 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
 
 /* Full-screen work photo (hovering a headshot; tap on touch) with both founders' details floating small on it */
+/* Desktop: the whole Contact page fits one screen. Type and headshots are sized off the
+   viewport height as well as its width; the founders sit at the bottom. */
+@media (min-width:801px) {
+  .contact-page { --shot-h:clamp(150px,28vh,360px); display:flex; flex-direction:column; min-height:100svh; padding-bottom:clamp(24px,4vh,48px); }
+  .contact-page.active { display:flex; }
+  .contact-top { margin-top:clamp(30px,6vh,70px); }
+  .contact-slogan { font-size:clamp(44px,min(5.4vw,9.5vh),104px); }
+  .contact-intro { margin-bottom:16px; font-size:clamp(14px,min(1.15vw,2.1vh),19px); }
+  .contact-location { margin-bottom:10px; font-size:clamp(16px,min(1.5vw,2.8vh),24px); }
+  .contact-general { margin-bottom:16px; font-size:13px; }
+  .founders { margin-top:auto; padding-top:clamp(24px,5vh,60px); }
+  /* Block: as wide as the photo or the one-line name, whichever is wider; photo centred in it */
+  .founder { width:max-content; max-width:100%; }
+  .founder .headshot { width:calc(var(--shot-h) * .8); align-self:center; }
+  .founder-name { white-space:nowrap; }
+  .founder-info { padding-top:16px; }
+  .founder-role { margin-top:10px; }
+}
 .founder-view { position:fixed; inset:0; z-index:45; background:#000; }
 .founder-view[hidden] { display:none; }
 .founder-view:not([hidden]) { animation:founder-in .45s ease both; }
