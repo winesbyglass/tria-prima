@@ -322,6 +322,9 @@ function curlStrip() {
   // Frame positions from layout + the track's live (possibly mid-transition) offset, so the
   // curl itself never feeds back into the measurement.
   const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
+  // Turn the rolls with the film.
+  const spin = `${trackY.toFixed(1)}px`;
+  if (workStrip.style.getPropertyValue('--spin') !== spin) workStrip.style.setProperty('--spin', spin);
   const zone = Math.min(120, winH * 0.2);
   thumbs.forEach(thumb => {
     if (thumb.hidden) return;

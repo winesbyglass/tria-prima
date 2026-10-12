@@ -103,15 +103,15 @@ html.works-open::-webkit-scrollbar { display:none; }
    sprocket holes down both edges that travels with the frames. Marked off from the work by a
    3D vertical line; the frames sit in a window inset from its top and bottom. The track is
    slid with a transform (from main.js) to keep the current frame in view. */
-.work-strip { position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:transparent; padding:clamp(16px,3vh,32px) 0; }
+.work-strip { --pad:clamp(16px,3vh,32px); --hole:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Crect x='1' y='3' width='6' height='8' rx='1.6' fill='%23d6d0c6'/%3E%3C/svg%3E");
+  position:fixed; top:0; right:0; bottom:0; width:var(--strip-w); z-index:11; overflow:hidden; background:transparent; padding:var(--pad) 0; }
 .strip-window { position:relative; height:100%; overflow:hidden; }
 /* Follow the pointer quickly while it browses the strip */
 .work-strip.browsing .strip-track { transition:transform .2s ease-out; }
 .work-strip::before { content:""; position:absolute; top:0; bottom:0; left:0; width:4px; z-index:4; pointer-events:none;
   background:linear-gradient(90deg,rgba(0,0,0,.7) 0,rgba(0,0,0,.7) 25%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.35) 75%,rgba(0,0,0,.4) 100%);
   box-shadow:-3px 0 8px rgba(0,0,0,.45),3px 0 8px rgba(0,0,0,.3); }
-.strip-track { --hole:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='14'%3E%3Crect x='1' y='3' width='6' height='8' rx='1.6' fill='%23d6d0c6'/%3E%3C/svg%3E");
-  display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 0 18px 4px;
+.strip-track { display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 0 18px 4px;
   background:var(--hole) left 3px top 0 / 8px 14px repeat-y, var(--hole) right 3px top 0 / 8px 14px repeat-y;
   transition:transform .6s var(--ease); }
 /* Frames: a thin black frame line, with an 8px gap between frames */
@@ -123,16 +123,20 @@ html.works-open::-webkit-scrollbar { display:none; }
 .strip-thumb.active { z-index:2; scale:1.12; box-shadow:0 0 0 2px #fff,0 4px 10px rgba(0,0,0,.5); }
 .strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; scale:1.3; box-shadow:0 0 0 2px #fff,0 6px 16px rgba(0,0,0,.7); }
 
-/* Film rolls: a shaded cylinder across the top and bottom of the strip that the film winds onto */
-.film-roll { position:absolute; left:4px; right:0; height:26px; z-index:5; pointer-events:none; border-radius:13px / 9px;
-  background:linear-gradient(180deg,#050403 0%,#2b2620 22%,#8a8379 48%,#3a342d 70%,#070605 100%);
-  box-shadow:0 2px 6px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.12); }
-.film-roll.top { top:calc(clamp(16px,3vh,32px) - 14px); }
-.film-roll.bottom { bottom:calc(clamp(16px,3vh,32px) - 14px); }
-/* Sprocket marks only at the two edges of the roll, like the holes on the film */
-.film-roll::before, .film-roll::after { content:""; position:absolute; top:50%; width:8px; height:4px; margin-top:-2px; border-radius:2px; background:rgba(214,208,198,.7); }
-.film-roll::before { left:3px; }
-.film-roll::after { right:3px; }
+/* Film rolls: a shaded cylinder filling the space above and below the frames (and tucking a
+   little over them). Its wound film - ridges and sprocket holes - slides with the track via
+   --spin (set from main.js), so the rolls turn as the film moves. The shading layer on top
+   stays still, which is what makes it read as a turning cylinder. */
+.film-roll { position:absolute; left:4px; right:0; height:calc(var(--pad) + 12px); z-index:5; pointer-events:none; border-radius:6px;
+  background:
+    linear-gradient(180deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.4) 24%,rgba(255,255,255,.14) 48%,rgba(0,0,0,.4) 74%,rgba(0,0,0,.92) 100%),
+    var(--hole) left 3px top var(--spin,0px) / 8px 14px repeat-y,
+    var(--hole) right 3px top var(--spin,0px) / 8px 14px repeat-y,
+    repeating-linear-gradient(180deg,transparent 0 9px,rgba(0,0,0,.5) 9px 10px,rgba(255,255,255,.1) 10px 11px,transparent 11px 14px) 0 var(--spin,0px) / 100% 14px,
+    #3a332b;
+  box-shadow:0 2px 6px rgba(0,0,0,.6); }
+.film-roll.top { top:0; }
+.film-roll.bottom { bottom:0; }
 
 /* Grid view: four per row, gutters around and between */
 /* Side gutters match, wide enough to clear the floating filter labels on the left */
