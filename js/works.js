@@ -38,11 +38,18 @@ const photoSeries = [
   { title: 'Sciences Po Year 2', type: '35mm Series', year: '2023', prefix: '11', credits: [['Photographer', DIRECTOR]] }
 ];
 
-// Each photograph is its own item (one per screen in the list view).
-const photoWorks = photoSeries.flatMap(series => [1, 2, 3, 4, 5].map(n => ({
-  title: series.title, type: series.type, year: series.year, credits: series.credits,
-  number: `${String(n).padStart(2, '0')} / 05`, img: `${series.prefix}-0${n}`, media: { type: 'photo' }, kind: 'photo'
-})));
+// One Works item per photography project, shown by its first photograph; the project's
+// photographs are browsed in the viewer.
+const photoWorks = photoSeries.map(series => {
+  const photos = [1, 2, 3, 4, 5].map(n => `${series.prefix}-0${n}`);
+  return {
+    title: series.title, type: series.type, year: series.year, credits: series.credits,
+    img: photos[0], photos, media: { type: 'photo' }, kind: 'photo'
+  };
+});
+
+// Every individual photograph (the home page slideshow draws from these).
+const allPhotos = photoWorks.flatMap(project => project.photos.map(img => ({ img })));
 
 const works = [...motionWorks, ...photoWorks];
 

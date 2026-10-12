@@ -194,33 +194,51 @@ function showEmbed(work, id) {
 let workClicksBlockedUntil = 0;
 const blockWorkClicks = ms => { workClicksBlockedUntil = Math.max(workClicksBlockedUntil, Date.now() + ms); };
 
+function showPhoto(work, n) {
+  const img = document.createElement('img');
+  img.src = workImage({ img: work.photos[n] }, 'full');
+  img.alt = `${work.title} ${String(n + 1).padStart(2, '0')} / ${String(work.photos.length).padStart(2, '0')}`;
+  modalFrame.replaceChildren(img);
+}
+
+// Steps the open viewer (photo project or video series) to its next / previous part.
+let modalStep = null;
+
 function openWork(work) {
   if (navigating || Date.now() < workClicksBlockedUntil) return;
-  const episodes = work.media.episodes || [];
-  modalFrame.classList.toggle('is-photo', work.kind === 'photo');
-  if (work.kind === 'photo') {
-    const img = document.createElement('img');
-    img.src = workImage(work, 'full');
-    img.alt = `${work.title} ${work.number}`;
-    modalFrame.replaceChildren(img);
-  } else {
-    showEmbed(work, episodes.length ? episodes[0].id : work.media.id);
-  }
-  modalEpisodes.replaceChildren(...episodes.map((episode, i) => {
+  const isPhoto = work.kind === 'photo';
+  // A video series has episodes; a photography project has its photographs.
+  const parts = isPhoto
+    ? work.photos.map((_, n) => ({ label: String(n + 1).padStart(2, '0'), show: () => showPhoto(work, n) }))
+    : (work.media.episodes || []).map(episode => ({ label: episode.label, show: () => showEmbed(work, episode.id) }));
+  modalFrame.classList.toggle('is-photo', isPhoto);
+  const buttons = parts.map(part => {
     const button = document.createElement('button');
     button.type = 'button';
-    button.textContent = episode.label;
-    button.classList.toggle('active', i === 0);
-    button.addEventListener('click', () => {
-      showEmbed(work, episode.id);
-      modalEpisodes.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === button));
-    });
+    button.textContent = part.label;
     return button;
-  }));
-  modalEpisodes.hidden = !episodes.length;
+  });
+  let current = 0;
+  const select = n => {
+    current = n;
+    parts[n].show();
+    buttons.forEach((b, k) => b.classList.toggle('active', k === n));
+  };
+  buttons.forEach((button, n) => button.addEventListener('click', () => select(n)));
+  modalEpisodes.replaceChildren(...buttons);
+  modalEpisodes.hidden = !parts.length;
+  if (parts.length) select(0);
+  else showEmbed(work, work.media.id);
+  modalStep = parts.length > 1 ? step => select((current + step + parts.length) % parts.length) : null;
   filmModal.hidden = false;
   filmModal.classList.add('open');
 }
+
+document.addEventListener('keydown', event => {
+  if (filmModal.hidden || !modalStep) return;
+  if (event.key === 'ArrowRight') modalStep(1);
+  else if (event.key === 'ArrowLeft') modalStep(-1);
+});
 
 function closeModal() {
   modalFrame.replaceChildren();
@@ -248,7 +266,7 @@ function el(tag, className, text) {
 }
 
 function workSub(work) {
-  return work.kind === 'photo' ? `${work.type} · ${work.number}` : `${work.client || work.type} · ${work.year}`;
+  return work.kind === 'photo' ? `${work.type} · ${work.year} · ${work.photos.length} photos` : `${work.client || work.type} · ${work.year}`;
 }
 
 const slides = [];
@@ -260,7 +278,7 @@ works.forEach((work, i) => {
   const slide = el('button', 'work-slide');
   slide.type = 'button';
   slide.append(el('span', 'work-slide-sub', workSub(work)), el('span', 'work-slide-title', work.title),
-    el('span', 'work-slide-cta', work.kind === 'photo' ? 'VIEW PHOTO ↗' : 'PLAY FILM ↗'));
+    el('span', 'work-slide-cta', work.kind === 'photo' ? 'VIEW PROJECT ↗' : 'PLAY FILM ↗'));
   slide.addEventListener('click', () => openWork(work));
   slide.dataset.index = i;
   slides.push(slide);
@@ -278,7 +296,7 @@ works.forEach((work, i) => {
     slice.style.setProperty('--k', k);
     thumb.append(slice);
   }
-  thumb.setAttribute('aria-label', `${work.title}${work.number ? ` ${work.number}` : ''}`);
+  thumb.setAttribute('aria-label', work.title);
   thumb.addEventListener('click', () => slide.scrollIntoView({ behavior: 'smooth' }));
   thumbs.push(thumb);
 
@@ -619,8 +637,8 @@ let slideOrder = [];
 let turning = false;
 
 function nextPhoto() {
-  if (!slideOrder.length) slideOrder = photoWorks.map((_, i) => i).sort(() => Math.random() - 0.5);
-  const work = photoWorks[slideOrder.pop()];
+  if (!slideOrder.length) slideOrder = allPhotos.map((_, i) => i).sort(() => Math.random() - 0.5);
+  const work = allPhotos[slideOrder.pop()];
   const img = new Image();
   img.alt = '';
   img.src = workImage(work, 'full');
