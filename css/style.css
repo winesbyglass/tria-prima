@@ -172,19 +172,20 @@ html.works-open::-webkit-scrollbar { display:none; }
 .process-summary { max-width:34em; margin:0; font-size:clamp(14px,min(1.05vw,1.9vh),17px); line-height:1.65; color:rgba(255,255,255,.72); }
 .process-statement { margin:clamp(28px,5vh,56px) 0 0; font:400 clamp(24px,min(2.4vw,4vh),40px)/1.2 var(--font); letter-spacing:-.01em; }
 
-/* Segmented switch: a frosted pill with a white thumb that slides under the chosen button */
-.process-tabs { position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; padding:5px; border:1px solid rgba(255,255,255,.2); border-radius:999px;
-  background:rgba(255,255,255,.05); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); box-shadow:inset 0 1px 0 rgba(255,255,255,.08); }
-.tab-glow { position:absolute; top:5px; bottom:5px; left:5px; width:calc((100% - 10px)/2); border-radius:999px; background:#fff;
-  box-shadow:0 6px 22px rgba(255,255,255,.18), 0 0 0 1px rgba(255,255,255,.6); transition:transform .5s var(--ease); }
-.process-tabs[data-at="1"] .tab-glow { transform:translateX(100%); }
-.process-tab { position:relative; z-index:1; padding:clamp(11px,1.6vh,15px) clamp(18px,2vw,32px); border:0; border-radius:999px; background:none; color:rgba(255,255,255,.7); cursor:pointer;
-  font:600 clamp(12px,.85vw,14px)/1 var(--font); letter-spacing:.14em; text-transform:uppercase; white-space:nowrap; transition:color .4s ease; }
+/* Segmented switch: a slim upright pill on the right edge of the column, a white thumb slides
+   under the chosen label */
+.process-side { display:grid; grid-template-columns:minmax(0,1fr) auto; column-gap:clamp(14px,1.6vw,26px); align-items:start; }
+.process-tabs { position:relative; grid-column:2; grid-row:1; display:grid; grid-auto-rows:1fr; padding:3px; border:1px solid rgba(255,255,255,.2); border-radius:999px;
+  background:rgba(255,255,255,.05); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+.tab-glow { position:absolute; left:3px; right:3px; top:3px; height:calc((100% - 6px)/2); border-radius:999px; background:#fff;
+  box-shadow:0 0 14px rgba(255,255,255,.18); transition:transform .5s var(--ease); }
+.process-tabs[data-at="1"] .tab-glow { transform:translateY(100%); }
+.process-tab { position:relative; z-index:1; padding:9px 5px; border:0; border-radius:999px; background:none; color:rgba(255,255,255,.6); cursor:pointer;
+  writing-mode:vertical-rl; font:600 9px/1 var(--font); letter-spacing:.12em; text-transform:uppercase; white-space:nowrap; transition:color .4s ease; }
 .process-tab:hover { color:#fff; }
 .process-tab.active { color:#111315; }
-.process-tab:focus-visible { outline:1px solid rgb(191,136,96); outline-offset:3px; }
-
-.process-panels { margin-top:clamp(18px,3.2vh,34px); border-top:1px solid rgba(255,255,255,.18); }
+.process-tab:focus-visible { outline:1px solid rgb(191,136,96); outline-offset:2px; }
+.process-panels { grid-column:1; grid-row:1; border-top:1px solid rgba(255,255,255,.18); }
 .process-panel.active { animation:panelIn .6s var(--ease); }
 @keyframes panelIn { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 .panel-heading { margin:0; padding:clamp(16px,2.6vh,26px) 0 clamp(10px,1.6vh,16px); font:400 clamp(26px,min(2.6vw,4.4vh),44px)/1.1 var(--font); }
@@ -386,9 +387,11 @@ html.lightbox-open { overflow:hidden; }
   .process-layout { grid-template-columns:1fr; gap:48px; }
   .process-item { grid-template-columns:1fr; gap:8px; }
   .process-item .process-text { grid-column:1; grid-row:auto; }
-  .process-tabs { display:grid; width:100%; }
-  .process-tabs { grid-auto-columns:minmax(0,1fr); }
-  .process-tab { padding:12px 6px; font-size:11px; letter-spacing:.06em; white-space:normal; }
+  .process-side { display:block; }
+  .process-tabs { display:inline-grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); grid-auto-rows:auto; margin-bottom:16px; }
+  .tab-glow { top:3px; bottom:3px; height:auto; right:auto; width:calc((100% - 6px)/2); }
+  .process-tabs[data-at="1"] .tab-glow { transform:translateX(100%); }
+  .process-tab { writing-mode:horizontal-tb; padding:8px 12px; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
   .lightbox-nav { top:auto; bottom:52px; translate:none; }
