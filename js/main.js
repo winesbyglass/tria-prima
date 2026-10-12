@@ -1017,8 +1017,9 @@ tabButtons.forEach((tab, k) => {
 });// ---------- Contact: founder work photos, full screen ----------
 // Entering a founder's block (headshot + contact details) shows their work photo across the
 // whole screen, with that founder's details floating exactly where they are on the page (same
-// place, format and size). The photo stays while the mouse is on the details (their links work);
-// moving anywhere else, or clicking outside the details, returns to the page. Just passing over a
+// place, format and size). Nothing changes while the mouse moves; when it stops on the details
+// (their links work) the photo stays, stopping anywhere else (or a click outside the details)
+// returns to the page. Just passing over a
 // block doesn't open it. Without a mouse (touch), a tap opens it; × or a tap outside closes it.
 const founderCards = [...document.querySelectorAll('.founder')];
 const contactPage = document.getElementById('contact');
@@ -1076,11 +1077,11 @@ function closeFounder() {
 }
 
 const HOVER_INTENT_MS = 150;   // the mouse must rest in a block this long to open it (passing over doesn't)
-const HOVER_SETTLE_MS = 300;   // after opening, ignore small movements inside the block this long
-const HOVER_JITTER_PX = 8;     // ...and movements smaller than this
+const HOVER_REST_MS = 200;     // on the photo, the mouse counts as stopped after this long still
+
 let founderSkip = -1;   // block that won't open until the mouse has left it
 let founderOpen = -1;   // block whose photo is showing
-let founderMark = null; // { x, y, at } where the photo opened
+let founderRest = 0;
 let founderTimer = 0;
 let lastPointer = null; // last mouse position, to know what the page appears under
 
@@ -1111,8 +1112,7 @@ founderCards.forEach((card, k) => {
       if (!founderView.hidden || contactPage.hidden) return;
       founderOpen = k;
       openFounder(k, true);
-      const at = lastPointer || { x: event.clientX, y: event.clientY };
-      founderMark = { x: at.x, y: at.y, at: performance.now() };
+
     }, HOVER_INTENT_MS);
   });
   card.addEventListener('pointerleave', event => {
@@ -1133,26 +1133,25 @@ founderCards.forEach((card, k) => {
 
 // Back to the page from the photo; the block under the pointer then waits for a fresh entry.
 function leaveFounder(x, y) {
+  clearTimeout(founderRest);
   closeFounder();
-  founderMark = null;
   founderOpen = -1;
   founderSkip = founderUnder(x, y);
 }
 
-// On the photo the mouse may rest on the details; moving anywhere else returns to the page
-// (straight away once it is outside the block).
+// On the photo nothing changes while the mouse is moving; once it comes to rest, resting on the
+// details keeps the photo, resting anywhere else returns to the page.
 founderView.addEventListener('pointermove', event => {
   if (event.pointerType !== 'mouse' || !founderView.classList.contains('by-hover')) return;
-  if (event.target.closest('.founder-tag')) return;
-  const r = founderOpen >= 0 ? founderCards[founderOpen].getBoundingClientRect() : null;
-  const inBlock = r && event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
-  if (inBlock && founderMark) {
-    const moved = Math.hypot(event.clientX - founderMark.x, event.clientY - founderMark.y);
-    if (performance.now() - founderMark.at < HOVER_SETTLE_MS || moved < HOVER_JITTER_PX) return;
-  }
-  leaveFounder(event.clientX, event.clientY);
-});
-// A click outside the details also returns (touch, or a click before any movement).
+  const x = event.clientX;
+  const y = event.clientY;
+  clearTimeout(founderRest);
+  founderRest = setTimeout(() => {
+    if (founderView.hidden) return;
+    const under = document.elementFromPoint(x, y);
+    if (!under || !under.closest('.founder-tag')) leaveFounder(x, y);
+  }, HOVER_REST_MS);
+});// A click outside the details also returns (touch, or a click before any movement).
 founderView.addEventListener('click', event => {
   if (event.target.closest('.founder-tag')) return;
   leaveFounder(event.clientX, event.clientY);
