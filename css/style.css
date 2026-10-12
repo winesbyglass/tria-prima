@@ -118,11 +118,18 @@ html.works-open::-webkit-scrollbar { display:none; }
   background:var(--hole) left 3px top 0 / 8px 14px repeat-y, var(--hole) right 3px top 0 / 8px 14px repeat-y;
   transition:transform .6s var(--ease); }
 /* Frames: a thin black frame line, with an 8px gap between frames */
-/* Near the top and bottom edges main.js sets each frame's transform / filter / opacity every
-   frame to roll it round an invisible axis; its back face is hidden once it has swung behind.
-   Enlarging uses the separate `scale` property so it can ease without lagging the roll. */
-.strip-thumb { position:relative; flex:none; width:60%; aspect-ratio:4/5; border:0; padding:0; cursor:pointer; background:#222 center/cover no-repeat; box-shadow:0 0 0 1px #000;
-  backface-visibility:hidden; transition:scale .35s var(--ease),box-shadow .35s ease; }
+/* Each frame's picture is carried by horizontal slices (built in main.js). Near the top and
+   bottom edges main.js lays every slice on an invisible axis so the frame bends round it;
+   a slice's back face is hidden once it has swung behind. The frame line is dropped while
+   bending. Enlarging uses the separate `scale` property so it eases without lagging the roll. */
+.strip-thumb { position:relative; flex:none; width:60%; aspect-ratio:4/5; border:0; padding:0; cursor:pointer; background:transparent; box-shadow:0 0 0 1px #000;
+  perspective:300px; transition:scale .35s var(--ease),box-shadow .35s ease; }
+.strip-thumb.rolling { box-shadow:none; }
+.strip-slice { position:absolute; left:0; right:0; top:calc(var(--k) * 100% / 8); height:calc(100% / 8 + .5px); pointer-events:none;
+  /* "cover" crop worked out in main.js (--bw/--bh size, --bx/--by offset, --sh slice height) */
+  background:#222 var(--img) no-repeat; background-size:var(--bw,100%) var(--bh,800%);
+  background-position:var(--bx,0px) calc(var(--by,0px) - var(--k) * var(--sh,0px));
+  backface-visibility:hidden; }
 .strip-thumb.active { z-index:2; scale:1.12; box-shadow:0 0 0 2px #fff,0 4px 10px rgba(0,0,0,.5); }
 .strip-thumb:hover, .strip-thumb:focus-visible { z-index:3; scale:1.3; box-shadow:0 0 0 2px #fff,0 6px 16px rgba(0,0,0,.7); }
 

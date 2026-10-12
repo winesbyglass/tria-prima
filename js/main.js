@@ -182,6 +182,7 @@ function workSub(work) {
 
 const slides = [];
 const thumbs = [];
+const SLICES = 8;   // horizontal slices per strip thumbnail (for the curved roll-up)
 const gridItems = [];
 
 works.forEach((work, i) => {
@@ -195,7 +196,17 @@ works.forEach((work, i) => {
 
   const thumb = el('button', 'strip-thumb');
   thumb.type = 'button';
-  thumb.style.backgroundImage = `url("${workImage(work, 'thumb')}")`;
+  // The picture is carried by horizontal slices so the frame can bend round the roll-up axis.
+  // Absolute URL: a url() passed through a custom property resolves against the stylesheet.
+  thumb.style.setProperty('--img', `url("${new URL(workImage(work, 'thumb'), location.href).href}")`);
+  const probe = new Image();
+  probe.onload = () => { thumb.dataset.iw = probe.naturalWidth; thumb.dataset.ih = probe.naturalHeight; };
+  probe.src = workImage(work, 'thumb');
+  for (let k = 0; k < SLICES; k++) {
+    const slice = el('span', 'strip-slice');
+    slice.style.setProperty('--k', k);
+    thumb.append(slice);
+  }
   thumb.setAttribute('aria-label', `${work.title}${work.number ? ` ${work.number}` : ''}`);
   thumb.addEventListener('click', () => slide.scrollIntoView({ behavior: 'smooth' }));
   thumbs.push(thumb);
@@ -309,25 +320,46 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
-// ---------- Film roll-up: frames wrap round an invisible axis at each end and vanish ----------
+// ---------- Film roll-up: frames bend round an invisible axis at each end and vanish ----------
 // Moving to the next work runs the film upward, so frames roll away over the top; going back
-// runs it downward and they roll away at the bottom. Past the tangent point each frame is
-// laid on a cylinder of radius ROLL_R: it tips back, swings behind the axis (its back face is
-// hidden) and fades into the background.
-const ROLL_R = 30;        // px, radius of the invisible axis
+// runs it downward and they roll away at the bottom. Each thumbnail is made of horizontal
+// slices; past the tangent line every slice is laid on a cylinder of radius ROLL_R by its own
+// arc length, so the frame curves smoothly over the axis instead of flipping as a whole. A
+// slice that has swung behind the axis shows its (hidden) back face, then fades away.
+const ROLL_R = 40;        // px, radius of the invisible axis
 const ROLL_T = 72;        // px from each edge where the film starts to wrap
-const ROLL_GONE = 1.9;    // radians: by here the frame has faded out behind the axis
+const ROLL_GONE = 2.2;    // radians: by here a slice has faded out behind the axis
 const rollState = new Map();
 
-function rollFrame(cy, edge, sign) {
-  // cy: frame centre; edge: tangent line; sign: +1 top (film leaves upward), -1 bottom.
-  const s = sign * (edge - cy);              // arc length already wrapped
+function rollAt(y, edge, sign) {
+  // y: point on the flat film; edge: tangent line; sign: +1 top (film leaves upward), -1 bottom.
+  const s = sign * (edge - y);                 // arc length already wrapped
   if (s <= 0) return null;
-  // Once gone, frames stay parked at that point rather than winding on round the axis.
-  const theta = Math.min(ROLL_GONE, s / ROLL_R); // radians round the axis
-  const y = edge - sign * ROLL_R * Math.sin(theta);
-  const z = -ROLL_R * (1 - Math.cos(theta));
-  return { dy: y - cy, z, deg: sign * theta * 180 / Math.PI, theta };
+  const theta = Math.min(ROLL_GONE, s / ROLL_R); // parked once gone, never winds on
+  return {
+    dy: edge - sign * ROLL_R * Math.sin(theta) - y,
+    z: -ROLL_R * (1 - Math.cos(theta)),
+    deg: sign * theta * 180 / Math.PI,
+    theta
+  };
+}
+
+// "cover" crop for a thumbnail's slices, so the sliced frame looks exactly like one picture.
+function fitSlices(thumb) {
+  const w = thumb.offsetWidth;
+  const h = thumb.offsetHeight;
+  const iw = Number(thumb.dataset.iw);
+  const ih = Number(thumb.dataset.ih);
+  if (!w || !h || !iw || !ih || thumb.dataset.fit === `${w}x${h}`) return;
+  thumb.dataset.fit = `${w}x${h}`;
+  const scale = Math.max(w / iw, h / ih);
+  const bw = iw * scale;
+  const bh = ih * scale;
+  thumb.style.setProperty('--bw', `${bw.toFixed(2)}px`);
+  thumb.style.setProperty('--bh', `${bh.toFixed(2)}px`);
+  thumb.style.setProperty('--bx', `${((w - bw) / 2).toFixed(2)}px`);
+  thumb.style.setProperty('--by', `${((h - bh) / 2).toFixed(2)}px`);
+  thumb.style.setProperty('--sh', `${(h / SLICES).toFixed(3)}px`);
 }
 
 function curlStrip() {
@@ -335,32 +367,48 @@ function curlStrip() {
   if (worksPage.hidden || currentView !== 'list') return;
   const winH = stripWindow.clientHeight;
   if (!winH) return;
-  // Frame positions from layout + the track's live (possibly mid-transition) offset, so the
-  // roll itself never feeds back into the measurement.
+  // Positions from layout + the track's live (possibly mid-transition) offset, so the roll
+  // itself never feeds back into the measurement.
   const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
   thumbs.forEach(thumb => {
     if (thumb.hidden) return;
-    const cy = trackY + thumb.offsetTop + thumb.offsetHeight / 2;
-    const r = rollFrame(cy, ROLL_T, 1) || rollFrame(cy, winH - ROLL_T, -1);
-    const key = r ? `${r.dy.toFixed(1)}|${r.deg.toFixed(1)}` : 'flat';
-    if (rollState.get(thumb) === key) return;
-    rollState.set(thumb, key);
-    if (!r) {
-      thumb.style.transform = '';
-      thumb.style.filter = '';
-      thumb.style.opacity = '';
+    const top = trackY + thumb.offsetTop;
+    const h = thumb.offsetHeight;
+    fitSlices(thumb);
+    const flat = top >= ROLL_T && top + h <= winH - ROLL_T;
+    if (flat) {
+      if (rollState.get(thumb) === 'flat') return;
+      rollState.set(thumb, 'flat');
+      thumb.classList.remove('rolling');
       thumb.style.visibility = '';
+      thumb.querySelectorAll('.strip-slice').forEach(slice => { slice.style.cssText = `--k:${slice.style.getPropertyValue('--k')}`; });
       return;
     }
-    thumb.style.transform = `perspective(260px) translateY(${r.dy.toFixed(1)}px) translateZ(${r.z.toFixed(1)}px) rotateX(${r.deg.toFixed(1)}deg)`;
-    thumb.style.filter = `brightness(${(1 - 0.7 * Math.min(1, r.theta / (Math.PI / 2))).toFixed(2)})`;
-    thumb.style.opacity = Math.min(1, Math.max(0, (ROLL_GONE - r.theta) / 0.7)).toFixed(2);
-    // Rolled-away frames must not catch hover or clicks.
-    thumb.style.visibility = r.theta >= ROLL_GONE ? 'hidden' : '';
+    const sh = h / SLICES;
+    const parts = [];
+    let gone = 0;
+    for (let k = 0; k < SLICES; k++) {
+      const y = top + (k + 0.5) * sh;
+      parts.push(rollAt(y, ROLL_T, 1) || rollAt(y, winH - ROLL_T, -1));
+      if (parts[k] && parts[k].theta >= ROLL_GONE) gone++;
+    }
+    const key = parts.map(p => (p ? `${p.dy.toFixed(1)},${p.deg.toFixed(0)}` : '-')).join('|');
+    if (rollState.get(thumb) === key) return;
+    rollState.set(thumb, key);
+    thumb.classList.add('rolling');
+    // Fully rolled away: stop it catching hover or clicks.
+    thumb.style.visibility = gone === SLICES ? 'hidden' : '';
+    thumb.querySelectorAll('.strip-slice').forEach((slice, k) => {
+      const p = parts[k];
+      if (!p) { slice.style.transform = ''; slice.style.filter = ''; slice.style.opacity = ''; slice.style.visibility = ''; return; }
+      slice.style.transform = `translateY(${p.dy.toFixed(1)}px) translateZ(${p.z.toFixed(1)}px) rotateX(${p.deg.toFixed(1)}deg)`;
+      slice.style.filter = `brightness(${(1 - 0.65 * Math.min(1, p.theta / (Math.PI / 2))).toFixed(2)})`;
+      slice.style.opacity = Math.min(1, Math.max(0, (ROLL_GONE - p.theta) / 0.8)).toFixed(2);
+      slice.style.visibility = p.theta >= ROLL_GONE ? 'hidden' : '';
+    });
   });
 }
-requestAnimationFrame(curlStrip);
-// ---------- List view paging: one gesture = one work ----------
+requestAnimationFrame(curlStrip);// ---------- List view paging: one gesture = one work ----------
 // Wheel, trackpad swipe, keys and touch swipes each turn exactly one full-screen work.
 const PAGE_MS = 750;      // ignore further input while a turn is running
 const QUIET_MS = 160;     // a new wheel gesture needs this much quiet first (eats trackpad inertia)
