@@ -871,9 +871,10 @@ splitToggle.addEventListener('click', () => {
 });
 
 // ---------- Contact: founder work photos, full screen ----------
-// Clicking a founder's photo or details shows their work photo across the whole screen with
-// both founders' details floating small on it; the other founder's details are dimmed and
-// switch the photo when clicked.
+// Hovering a founder (photo or details) shows their work photo across the whole screen with
+// both founders' details floating small on it, the other founder's dimmed. Moving to the other
+// founder switches the photo; leaving the founders closes it. Without a mouse (touch), a tap
+// opens it instead, and the dimmed details or × switch / close.
 const founderCards = [...document.querySelectorAll('.founder')];
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
@@ -902,20 +903,35 @@ function showFounder(k) {
   founderTags.forEach((tag, n) => tag.classList.toggle('active', n === k));
 }
 
-function openFounder(k) {
+function openFounder(k, byHover = false) {
   showFounder(k);
+  // On hover the photo is only a picture: the pointer passes through to the founders below.
+  founderView.classList.toggle('by-hover', byHover);
+  if (!founderView.hidden) return;
   founderView.hidden = false;
-  document.documentElement.classList.add('lightbox-open');
-  founderClose.focus({ preventScroll: true });
+  if (!byHover) {
+    document.documentElement.classList.add('lightbox-open');
+    founderClose.focus({ preventScroll: true });
+  }
 }
 
 function closeFounder() {
   founderView.hidden = true;
+  founderView.classList.remove('by-hover');
   document.documentElement.classList.remove('lightbox-open');
 }
 
+const foundersArea = document.querySelector('.founders');
 founderCards.forEach((card, k) => {
-  card.addEventListener('click', event => { if (!event.target.closest('a')) openFounder(k); });
+  card.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') openFounder(k, true); });
+  // Touch: tap to open.
+  card.addEventListener('click', event => {
+    if (event.target.closest('a') || founderView.classList.contains('by-hover')) return;
+    openFounder(k);
+  });
+});
+foundersArea.addEventListener('pointerleave', event => {
+  if (event.pointerType === 'mouse' && founderView.classList.contains('by-hover')) closeFounder();
 });
 founderClose.addEventListener('click', closeFounder);
 document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
