@@ -150,9 +150,6 @@ html.works-open::-webkit-scrollbar { display:none; }
 .grid-item:hover .grid-info, .grid-item:focus-visible .grid-info { opacity:1; }
 .grid-info-title { font:400 clamp(16px,1.3vw,22px)/1.15 var(--font); }
 .grid-info-sub { font-size:9px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.75); }
-.grid-credits { display:grid; grid-template-columns:auto 1fr; gap:3px 10px; margin:0; font-size:10px; line-height:1.35; }
-.grid-credits dt { color:rgba(255,255,255,.55); text-transform:lowercase; }
-.grid-credits dd { margin:0; }
 /* ---------- Site bar (every page except home; built in main.js) ----------
    TRIA PRIMA at top left; HOME + page links packed together at top right. The current page
    is white, the others dimmed like the Works filters. */
@@ -209,10 +206,33 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-col h3 { margin:0 0 14px; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); }
 .project-col h3 ~ h3 { margin-top:30px; }
 .project-credits.long { columns:2; column-gap:28px; }
-.credit { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:10px; margin-bottom:7px; break-inside:avoid; font-size:12.5px; line-height:1.4; }
+.credit { display:grid; grid-template-columns:minmax(0,8.5em) minmax(0,1fr); gap:14px; margin-bottom:8px; break-inside:avoid; font-size:12.5px; line-height:1.4; }
 .credit-role { color:rgba(255,255,255,.55); }
 .project-list { margin:0; padding:0; list-style:none; font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.85); }
-.project-list a { color:#fff; text-underline-offset:4px; }/* ---------- Text colour follows the picture behind it ----------
+.project-list a { color:#fff; text-underline-offset:4px; }
+/* Photo projects: every photograph as a small preview under the write-up */
+.project-previews { width:min(1320px,86vw); margin:clamp(60px,9vh,100px) auto 0; }
+.project-previews h3 { margin:0 0 16px; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+.preview-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; }
+.preview-item { aspect-ratio:1; border:0; padding:0; border-radius:8px; overflow:hidden; background:#111; cursor:zoom-in; }
+.preview-item img { width:100%; height:100%; object-fit:cover; display:block; filter:brightness(.82); transition:filter .3s ease,transform .5s var(--ease); }
+.preview-item:hover img, .preview-item:focus-visible img { filter:none; transform:scale(1.04); }
+.project-page .gallery-item.open { cursor:pointer; }
+
+/* Full-screen photo viewer */
+html.lightbox-open { overflow:hidden; }
+.lightbox { position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.96); }
+.lightbox[hidden] { display:none; }
+.lightbox-img { max-width:calc(100vw - 180px); max-height:calc(100vh - 120px); object-fit:contain; display:block; border-radius:6px; }
+.lightbox-nav { position:absolute; top:50%; translate:0 -50%; display:grid; place-items:center; width:48px; height:48px; padding:0; border-radius:50%;
+  border:1px solid rgba(255,255,255,.7); background:rgba(20,20,20,.35); color:#fff; cursor:pointer; transition:background-color .3s ease,color .3s ease,scale .3s var(--ease); }
+.lightbox-nav svg { width:18px; height:18px; }
+.lightbox-nav.prev { left:clamp(14px,3vw,40px); }
+.lightbox-nav.next { right:clamp(14px,3vw,40px); }
+.lightbox-nav.next svg { transform:rotate(180deg); }
+.lightbox-nav:hover, .lightbox-nav:focus-visible { background:#fff; color:#111; scale:1.08; }
+.lightbox-close { position:absolute; top:18px; right:24px; border:0; background:none; color:#fff; font-size:34px; line-height:1; cursor:pointer; }
+.lightbox-count { position:absolute; bottom:20px; left:0; right:0; margin:0; text-align:center; font-size:11px; font-weight:700; letter-spacing:.2em; color:rgba(255,255,255,.7); }/* ---------- Text colour follows the picture behind it ----------
    main.js samples the brightness under each text block and adds .ink-dark on light areas. */
 .topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
 .topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .site-brand.ink-dark { color:#111; }
@@ -268,6 +288,9 @@ html.works-open::-webkit-scrollbar { display:none; }
   .gallery-item.open { flex-basis:74vw; }
   .project-info, .project-info.two-col { grid-template-columns:1fr; }
   .project-credits.long { columns:1; }
+  .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+  .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
+  .lightbox-nav { top:auto; bottom:52px; translate:none; }
   .gallery-caption { padding:40px 18px 18px; gap:14px; }
   .gallery-fact { font-size:12px; gap:8px; }  /* About text sits along the bottom, over the film */
   .home { --aside-h:clamp(150px,21svh,200px); }

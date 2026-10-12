@@ -141,6 +141,7 @@ function circleWipe(source, onCovered, onDone) {
 
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
+  if (!lightbox.hidden) closeLightbox();
   navigate(routeFromHash(), null, true);
 });
 
@@ -222,11 +223,20 @@ function renderProject(work) {
         item.append(caption);
       }
       item.addEventListener('click', () => {
+        // Photo projects: clicking the open picture shows it full screen.
+        if (isPhoto && item.classList.contains('open')) { openLightbox(pictures, k, work.title); return; }
         gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
-        // Keep the opened picture in view when the row is wider than the screen.
-        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 380);
       });
       gallery.append(item);
+    });
+    // A long row follows the pointer: left edge = first picture, right edge = last.
+    gallery.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse') return;
+      const overflow = gallery.scrollWidth - gallery.clientWidth;
+      if (overflow <= 0) return;
+      const r = gallery.getBoundingClientRect();
+      const t = Math.min(1, Math.max(0, ((event.clientX - r.left) / r.width - 0.1) / 0.8));
+      gallery.scrollLeft = t * overflow;
     });
     parts.push(gallery);
   }
@@ -296,8 +306,83 @@ function renderProject(work) {
   info.classList.toggle('two-col', !extras.childElementCount);
   parts.push(info);
 
+  // Photo projects: every photograph as a small preview; each opens full screen.
+  if (isPhoto) {
+    const previews = el('section', 'project-previews');
+    previews.append(el('h3', '', `All photographs (${pictures.length})`));
+    const grid = el('div', 'preview-grid');
+    pictures.forEach((img, k) => {
+      const b = el('button', 'preview-item');
+      b.type = 'button';
+      b.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}, full screen`);
+      const pic = el('img');
+      pic.src = workImage({ img }, 'full');
+      pic.alt = '';
+      pic.loading = 'lazy';
+      pic.decoding = 'async';
+      b.append(pic);
+      b.addEventListener('click', () => openLightbox(pictures, k, work.title));
+      grid.append(b);
+    });
+    previews.append(grid);
+    parts.push(previews);
+  }
+
   projectBody.replaceChildren(...parts);
 }
+
+// ---------- Full-screen photo viewer ----------
+const lightbox = el('div', 'lightbox');
+lightbox.hidden = true;
+lightbox.setAttribute('role', 'dialog');
+lightbox.setAttribute('aria-modal', 'true');
+const chevron = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>';
+lightbox.innerHTML = `
+  <img class="lightbox-img" alt="">
+  <button class="lightbox-nav prev" type="button" aria-label="Previous photograph">${chevron}</button>
+  <button class="lightbox-nav next" type="button" aria-label="Next photograph">${chevron}</button>
+  <button class="lightbox-close" type="button" aria-label="Close">×</button>
+  <p class="lightbox-count"></p>`;
+document.body.append(lightbox);
+const lightboxImg = lightbox.querySelector('.lightbox-img');
+const lightboxCount = lightbox.querySelector('.lightbox-count');
+let lightboxSet = [];
+let lightboxAt = 0;
+let lightboxTitle = '';
+
+function showLightbox(n) {
+  lightboxAt = (n + lightboxSet.length) % lightboxSet.length;
+  lightboxImg.src = workImage({ img: lightboxSet[lightboxAt] }, 'full');
+  lightboxImg.alt = `${lightboxTitle} ${lightboxAt + 1} / ${lightboxSet.length}`;
+  lightboxCount.textContent = `${String(lightboxAt + 1).padStart(2, '0')} / ${String(lightboxSet.length).padStart(2, '0')}`;
+}
+
+function openLightbox(set, n, title) {
+  lightboxSet = set;
+  lightboxTitle = title;
+  lightbox.setAttribute('aria-label', title);
+  showLightbox(n);
+  lightbox.hidden = false;
+  document.documentElement.classList.add('lightbox-open');
+  lightbox.querySelector('.lightbox-close').focus({ preventScroll: true });
+}
+
+function closeLightbox() {
+  lightbox.hidden = true;
+  lightboxImg.removeAttribute('src');
+  document.documentElement.classList.remove('lightbox-open');
+}
+
+lightbox.querySelector('.prev').addEventListener('click', () => showLightbox(lightboxAt - 1));
+lightbox.querySelector('.next').addEventListener('click', () => showLightbox(lightboxAt + 1));
+lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', event => {
+  if (lightbox.hidden) return;
+  if (event.key === 'Escape') closeLightbox();
+  else if (event.key === 'ArrowLeft') showLightbox(lightboxAt - 1);
+  else if (event.key === 'ArrowRight') showLightbox(lightboxAt + 1);
+});
 
 function closeModal() {
   modalFrame.replaceChildren();
@@ -363,9 +448,7 @@ works.forEach((work, i) => {
   item.type = 'button';
   item.style.backgroundImage = `url("${workImage(work, 'mid')}")`;
   const info = el('span', 'grid-info');
-  const credits = el('dl', 'grid-credits');
-  work.credits.slice(0, 6).forEach(([role, name]) => credits.append(el('dt', '', role), el('dd', '', name)));
-  info.append(el('span', 'grid-info-sub', workSub(work)), el('span', 'grid-info-title', work.title), credits);
+  info.append(el('span', 'grid-info-sub', workSub(work)), el('span', 'grid-info-title', work.title));
   item.append(info);
   item.addEventListener('click', () => openProject(work, item));
   gridItems.push(item);
