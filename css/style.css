@@ -166,6 +166,39 @@ html.works-open::-webkit-scrollbar { display:none; }
 .page-description { max-width:740px; color:#c5c0b9; font:clamp(23px,3vw,42px)/1.45 var(--font); }
 .email { color:white; font:clamp(24px,4.4vw,62px) var(--font); overflow-wrap:anywhere; text-decoration-thickness:1px; text-underline-offset:8px; }
 
+/* ---------- Project page (#work/<slug>) ----------
+   Black page; title / director / year fixed at the top centre; the film framed with wide
+   margins; a row of pictures, one open and the others folded into strips; then the write-up
+   and credits. */
+.project-page { padding:0 0 140px; background:#000; color:#fff; }
+.project-page .site-bar { position:fixed; top:34px; left:clamp(23px,5vw,90px); right:clamp(23px,5vw,90px); z-index:20; }
+.project-head { position:fixed; top:30px; left:50%; transform:translateX(-50%); z-index:20; display:flex; flex-direction:column; align-items:center; gap:4px; max-width:36vw;
+  font-size:11px; letter-spacing:.12em; line-height:1.35; text-transform:uppercase; text-align:center; pointer-events:none; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.project-body { padding-top:clamp(120px,16vh,160px); }
+.project-film { width:min(1180px,78vw); margin:0 auto; }
+.project-frame { aspect-ratio:16/9; border-radius:14px; overflow:hidden; background:#0b0b0b; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+.project-frame iframe { width:100%; height:100%; border:0; display:block; }
+.project-episodes { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:20px; }
+.project-episodes button { border:1px solid rgba(255,255,255,.4); background:transparent; color:rgba(255,255,255,.7); padding:9px 15px; font-size:10px; font-weight:700; letter-spacing:.16em; cursor:pointer; transition:background-color .3s ease,color .3s ease,border-color .3s ease; }
+.project-episodes button.active, .project-episodes button:hover { background:#fff; color:#111; border-color:#fff; }
+/* Pictures: the open one is wide, the others fold into strips; the row scrolls sideways if long */
+.project-gallery { display:flex; gap:12px; height:min(72vh,680px); margin:clamp(70px,11vh,120px) 0 0; padding:0 clamp(23px,5vw,90px); overflow-x:auto; scrollbar-width:none; }
+.project-gallery::-webkit-scrollbar { display:none; }
+.project-body > .project-gallery:first-child { margin-top:0; }
+.gallery-item { flex:0 0 clamp(60px,7.5vw,128px); height:100%; border:0; padding:0; border-radius:14px; background:#111 center/cover no-repeat; cursor:pointer;
+  filter:brightness(.6); transition:flex-basis .75s var(--ease),filter .45s ease; }
+.gallery-item:hover { filter:brightness(.85); }
+.gallery-item.open { flex-basis:min(60vw,1000px); filter:none; cursor:default; }
+.project-info { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(30px,6vw,110px); width:min(1180px,78vw); margin:clamp(70px,11vh,120px) auto 0; }
+.project-meta { margin:0 0 22px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+.project-desc { margin:0 0 18px; font:clamp(18px,1.55vw,24px)/1.55 var(--font); color:rgba(255,255,255,.9); }
+.project-side h3 { margin:0 0 14px; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+.project-side h3 ~ h3 { margin-top:36px; }
+.project-credits { display:grid; grid-template-columns:auto 1fr; gap:6px 18px; margin:0; font-size:13px; line-height:1.45; }
+.project-credits dt { color:rgba(255,255,255,.55); }
+.project-credits dd { margin:0; }
+.project-list { margin:0; padding:0; list-style:none; font-size:13px; line-height:1.75; color:rgba(255,255,255,.85); }
+.project-list a { color:#fff; text-underline-offset:4px; }
 /* ---------- Text colour follows the picture behind it ----------
    main.js samples the brightness under each text block and adds .ink-dark on light areas. */
 .topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
@@ -213,7 +246,14 @@ html.works-open::-webkit-scrollbar { display:none; }
 
 /* ---------- Responsive: home stays within one screen ---------- */
 @media(max-width:800px) {
-  /* About text sits along the bottom, over the film */
+  .project-page .site-bar { top:18px; left:16px; right:16px; }
+  .project-head { top:56px; max-width:80vw; font-size:9px; }
+  .project-body { padding-top:118px; }
+  .project-film, .project-info { width:auto; margin-left:16px; margin-right:16px; }
+  .project-gallery { height:56vh; padding:0 16px; gap:8px; }
+  .gallery-item { flex-basis:44px; border-radius:10px; }
+  .gallery-item.open { flex-basis:74vw; }
+  .project-info { grid-template-columns:1fr; }  /* About text sits along the bottom, over the film */
   .home { --aside-h:clamp(150px,21svh,200px); }
   .aside { top:auto; left:0; width:auto; height:var(--aside-h); padding:22px 7vw 18px; justify-content:flex-start; }
   .aside-copy { margin:0; }

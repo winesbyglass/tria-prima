@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=41">
+  <link rel="stylesheet" href="css/style.css?v=42">
 </head>
 <body>
   <main class="app">
@@ -73,6 +73,13 @@
       <p class="page-description">Have a project in mind? We'd love to hear about it.</p>
       <a class="email" href="mailto:hello@example.com">hello@example.com</a>
     </section>
+
+    <!-- One page for every Works project, filled from js/works.js (#work/<slug>).
+         data-nav="none": not a link of its own; data-nav-current: which link is lit. -->
+    <section class="page project-page" id="project" data-nav="none" data-nav-current="works" aria-label="Project" hidden>
+      <header class="project-head" id="projectHead"></header>
+      <div class="project-body" id="projectBody"></div>
+    </section>
   </main>
 
   <!-- Outside .page so position:fixed isn't trapped by the page's enter animation transform -->
@@ -88,7 +95,7 @@
     </div>
   </div>
 
-  <script src="js/works.js?v=5"></script>
-  <script src="js/main.js?v=37"></script>
+  <script src="js/works.js?v=6"></script>
+  <script src="js/main.js?v=38"></script>
 </body>
 </html>

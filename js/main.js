@@ -11,8 +11,10 @@ let navigating = false;
 // ---------- Site bar on every page except home ----------
 // TRIA PRIMA at top left (back to home) and HOME plus one link per .page at top right. Built
 // from the page sections themselves, so a page added later gets the same bar and is linked.
-const navPages = pages.map(page => page.id);
+// data-nav="none" keeps a page out of the links; data-nav-current names the link it lights.
+const navPages = pages.filter(page => page.dataset.nav !== 'none').map(page => page.id);
 pages.forEach(page => {
+  const lit = page.dataset.navCurrent || page.id;
   const bar = document.createElement('header');
   bar.className = 'site-bar';
   const brand = document.createElement('button');
@@ -30,8 +32,8 @@ pages.forEach(page => {
     link.textContent = id.toUpperCase();
     if (id === 'home') link.dataset.home = '';
     else link.dataset.target = id;
-    link.classList.toggle('current', id === page.id);
-    if (id === page.id) link.setAttribute('aria-current', 'page');
+    link.classList.toggle('current', id === lit);
+    if (id === lit) link.setAttribute('aria-current', 'page');
     nav.append(link);
   });
   bar.append(brand, nav);
@@ -62,6 +64,8 @@ function revealPage(target) {
     page.hidden = !active;
     page.classList.toggle('active', active);
   });
+  // Leaving a project page stops its film.
+  if (target !== 'project') projectBody.replaceChildren();
   updateWorksSnap();
   window.scrollTo({ top: 0, behavior: 'instant' });
   updateToTop();
@@ -75,33 +79,50 @@ function revealPage(target) {
 
 const PAGES = ['home', ...navPages];
 
-function pageTitle(target) {
-  return `TRIA PRIMA — ${target === 'home' ? 'Film & Media' : target[0].toUpperCase() + target.slice(1)}`;
+// Routes: a page id (home, works, process, contact) or "work/<slug>" for a project page.
+const pageOfRoute = route => (route.startsWith('work/') ? 'project' : route);
+const workOfRoute = route => works.find(work => `work/${work.slug}` === route);
+let currentRoute = null;
+let worksReturnScroll = null;   // where to put the Works list back after visiting a project
+
+function routeTitle(route) {
+  const work = workOfRoute(route);
+  if (work) return `TRIA PRIMA — ${work.title}`;
+  return `TRIA PRIMA — ${route === 'home' ? 'Film & Media' : route[0].toUpperCase() + route.slice(1)}`;
 }
 
-function pageFromHash() {
-  const hash = location.hash.slice(1);
+function routeFromHash() {
+  const hash = decodeURIComponent(location.hash.slice(1));
+  if (workOfRoute(hash)) return hash;
   return PAGES.includes(hash) ? hash : 'home';
 }
 
-// Each page gets its own history entry (#works etc.), so the browser Back button works.
-// fromHistory: triggered by Back/Forward, so don't push another entry.
-function navigate(target, source, fromHistory = false) {
-  if (navigating || !PAGES.includes(target)) return;
-  if ((target === 'home' && !home.hidden) || (target !== 'home' && !document.getElementById(target).hidden)) return;
-  navigating = true;
-  if (!fromHistory) history.pushState({ page: target }, '', target === 'home' ? location.pathname : `#${target}`);
-  circleWipe(source, () => {
-    revealPage(target);
-    document.title = pageTitle(target);
-  }, () => {
-    navigating = false;
-    // Back pressed again mid-transition: catch up with where history now is.
-    const current = pageFromHash();
-    if (current !== target) navigate(current, null, true);
-  });
+function showRoute(route) {
+  const page = pageOfRoute(route);
+  if (page === 'project') renderProject(workOfRoute(route));
+  revealPage(page);
+  if (page === 'works' && worksReturnScroll !== null) {
+    window.scrollTo({ top: worksReturnScroll, behavior: 'instant' });
+    worksReturnScroll = null;
+  }
+  currentRoute = route;
+  document.title = routeTitle(route);
 }
 
+// Each page and project gets its own history entry (#works, #work/early-years ...), so the
+// browser Back button works. fromHistory: triggered by Back/Forward, so don't push an entry.
+function navigate(route, source, fromHistory = false) {
+  if (navigating || (!PAGES.includes(route) && !workOfRoute(route)) || route === currentRoute) return;
+  navigating = true;
+  if (currentRoute === 'works' && pageOfRoute(route) === 'project') worksReturnScroll = window.scrollY;
+  if (!fromHistory) history.pushState({ route }, '', route === 'home' ? location.pathname : `#${route}`);
+  circleWipe(source, () => showRoute(route), () => {
+    navigating = false;
+    // Back pressed again mid-transition: catch up with where history now is.
+    const current = routeFromHash();
+    if (current !== route) navigate(current, null, true);
+  });
+}
 // Expanding circles from the clicked control; onCovered runs while the screen is covered.
 function circleWipe(source, onCovered, onDone) {
   const rect = source ? source.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 2, width: 0, height: 0 };
@@ -120,7 +141,7 @@ function circleWipe(source, onCovered, onDone) {
 
 window.addEventListener('popstate', () => {
   if (!filmModal.hidden) closeModal();
-  navigate(pageFromHash(), null, true);
+  navigate(routeFromHash(), null, true);
 });
 
 document.querySelectorAll('[data-target]').forEach(button => {
@@ -134,9 +155,10 @@ document.querySelectorAll('[data-home]').forEach(button => {
 // ---------- Work modal (film embed or photograph) ----------
 const modalEpisodes = document.getElementById('modalEpisodes');
 
-function embedUrl(media, id) {
-  if (media.type === 'vimeo') return `https://player.vimeo.com/video/${id}?autoplay=1&title=0&byline=0&portrait=0&color=000000`;
-  return `https://www.youtube.com/embed/${id}?rel=0&autoplay=1${media.start ? `&start=${media.start}` : ''}`;
+function embedUrl(media, id, autoplay = true) {
+  const auto = autoplay ? 1 : 0;
+  if (media.type === 'vimeo') return `https://player.vimeo.com/video/${id}?autoplay=${auto}&title=0&byline=0&portrait=0&color=000000`;
+  return `https://www.youtube.com/embed/${id}?rel=0&autoplay=${auto}${media.start ? `&start=${media.start}` : ''}`;
 }
 
 function showEmbed(work, id) {
@@ -153,51 +175,104 @@ function showEmbed(work, id) {
 let workClicksBlockedUntil = 0;
 const blockWorkClicks = ms => { workClicksBlockedUntil = Math.max(workClicksBlockedUntil, Date.now() + ms); };
 
-function showPhoto(work, n) {
-  const img = document.createElement('img');
-  img.src = workImage({ img: work.photos[n] }, 'full');
-  img.alt = `${work.title} ${String(n + 1).padStart(2, '0')} / ${String(work.photos.length).padStart(2, '0')}`;
-  modalFrame.replaceChildren(img);
-}
+// ---------- Project page (#work/<slug>) ----------
+// Fixed title / director / year at the top; a film in a framed player (video projects);
+// a row of pictures where one is open and the rest are folded strips; then the write-up,
+// credits, festivals and distribution.
+const projectHead = document.getElementById('projectHead');
+const projectBody = document.getElementById('projectBody');
 
-// Steps the open viewer (photo project or video series) to its next / previous part.
-let modalStep = null;
-
-function openWork(work) {
+function openProject(work, source) {
   if (navigating || Date.now() < workClicksBlockedUntil) return;
-  const isPhoto = work.kind === 'photo';
-  // A video series has episodes; a photography project has its photographs.
-  const parts = isPhoto
-    ? work.photos.map((_, n) => ({ label: String(n + 1).padStart(2, '0'), show: () => showPhoto(work, n) }))
-    : (work.media.episodes || []).map(episode => ({ label: episode.label, show: () => showEmbed(work, episode.id) }));
-  modalFrame.classList.toggle('is-photo', isPhoto);
-  const buttons = parts.map(part => {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.textContent = part.label;
-    return button;
-  });
-  let current = 0;
-  const select = n => {
-    current = n;
-    parts[n].show();
-    buttons.forEach((b, k) => b.classList.toggle('active', k === n));
-  };
-  buttons.forEach((button, n) => button.addEventListener('click', () => select(n)));
-  modalEpisodes.replaceChildren(...buttons);
-  modalEpisodes.hidden = !parts.length;
-  if (parts.length) select(0);
-  else showEmbed(work, work.media.id);
-  modalStep = parts.length > 1 ? step => select((current + step + parts.length) % parts.length) : null;
-  filmModal.hidden = false;
-  filmModal.classList.add('open');
+  navigate(`work/${work.slug}`, source);
 }
 
-document.addEventListener('keydown', event => {
-  if (filmModal.hidden || !modalStep) return;
-  if (event.key === 'ArrowRight') modalStep(1);
-  else if (event.key === 'ArrowLeft') modalStep(-1);
-});
+function projectFrame(work, id) {
+  const iframe = document.createElement('iframe');
+  iframe.src = embedUrl(work.media, id, false);
+  iframe.title = work.title;
+  iframe.allow = 'autoplay; fullscreen; picture-in-picture; encrypted-media';
+  iframe.allowFullscreen = true;
+  return iframe;
+}
+
+function renderProject(work) {
+  projectHead.replaceChildren(el('span', '', work.title), el('span', '', work.director), el('span', '', work.year));
+  const parts = [];
+
+  if (work.kind !== 'photo') {
+    const film = el('section', 'project-film');
+    const frame = el('div', 'project-frame');
+    const episodes = work.media.episodes || [];
+    frame.append(projectFrame(work, episodes.length ? episodes[0].id : work.media.id));
+    film.append(frame);
+    if (episodes.length) {
+      const picker = el('div', 'project-episodes');
+      episodes.forEach((episode, k) => {
+        const b = el('button', k === 0 ? 'active' : '', episode.label);
+        b.type = 'button';
+        b.addEventListener('click', () => {
+          frame.replaceChildren(projectFrame(work, episode.id));
+          picker.querySelectorAll('button').forEach(other => other.classList.toggle('active', other === b));
+        });
+        picker.append(b);
+      });
+      film.append(picker);
+    }
+    parts.push(film);
+  }
+
+  const pictures = work.kind === 'photo' ? work.photos : (work.stills || []);
+  if (pictures.length) {
+    const gallery = el('section', 'project-gallery');
+    gallery.setAttribute('aria-label', work.kind === 'photo' ? 'Photographs' : 'Stills');
+    pictures.forEach((img, k) => {
+      const item = el('button', k === 0 ? 'gallery-item open' : 'gallery-item');
+      item.type = 'button';
+      item.style.backgroundImage = `url("${workImage({ img }, 'full')}")`;
+      item.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}`);
+      item.addEventListener('click', () => {
+        gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
+        // Keep the opened picture in view when the row is wider than the screen.
+        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 380);
+      });
+      gallery.append(item);
+    });
+    parts.push(gallery);
+  }
+
+  const info = el('section', 'project-info');
+  const about = el('div', 'project-about');
+  about.append(el('p', 'project-meta', [work.type, work.medium, work.year].filter(Boolean).join(' · ')));
+  (work.description || '').split(/\n\s*\n/).forEach(text => about.append(el('p', 'project-desc', text)));
+  info.append(about);
+  const side = el('div', 'project-side');
+  const credits = el('dl', 'project-credits');
+  work.credits.forEach(([role, name]) => credits.append(el('dt', '', role), el('dd', '', name)));
+  side.append(el('h3', '', 'Credits'), credits);
+  if (work.festivals && work.festivals.length) {
+    const list = el('ul', 'project-list');
+    work.festivals.forEach(([name, country]) => list.append(el('li', '', `${name} — ${country}`)));
+    side.append(el('h3', '', 'Festivals'), list);
+  }
+  if (work.partners && work.partners.length) {
+    const list = el('ul', 'project-list');
+    work.partners.forEach(partner => {
+      const li = el('li');
+      const a = el('a', '', partner.name);
+      a.href = partner.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      li.append(a);
+      list.append(li);
+    });
+    side.append(el('h3', '', 'Distribution'), list);
+  }
+  info.append(side);
+  parts.push(info);
+
+  projectBody.replaceChildren(...parts);
+}
 
 function closeModal() {
   modalFrame.replaceChildren();
@@ -237,8 +312,8 @@ works.forEach((work, i) => {
   const slide = el('button', 'work-slide');
   slide.type = 'button';
   slide.append(el('span', 'work-slide-sub', workSub(work)), el('span', 'work-slide-title', work.title),
-    el('span', 'work-slide-cta', work.kind === 'photo' ? 'VIEW PROJECT ↗' : 'PLAY FILM ↗'));
-  slide.addEventListener('click', () => openWork(work));
+    el('span', 'work-slide-cta', 'VIEW PROJECT ↗'));
+  slide.addEventListener('click', () => openProject(work, slide));
   slide.dataset.index = i;
   slides.push(slide);
 
@@ -267,7 +342,7 @@ works.forEach((work, i) => {
   work.credits.slice(0, 6).forEach(([role, name]) => credits.append(el('dt', '', role), el('dd', '', name)));
   info.append(el('span', 'grid-info-sub', workSub(work)), el('span', 'grid-info-title', work.title), credits);
   item.append(info);
-  item.addEventListener('click', () => openWork(work));
+  item.addEventListener('click', () => openProject(work, item));
   gridItems.push(item);
 });
 
@@ -827,7 +902,6 @@ function updateWorksInk(i) {
   });
 }
 // Initial page: honour a direct link such as …/tria-prima/#works.
-const initialPage = pageFromHash();
-history.replaceState({ page: initialPage }, '');
-revealPage(initialPage);
-document.title = pageTitle(initialPage);
+const initialRoute = routeFromHash();
+history.replaceState({ route: initialRoute }, '');
+showRoute(initialRoute);
