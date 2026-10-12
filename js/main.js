@@ -648,7 +648,6 @@ function turnToPhotos() {
     home.classList.remove('flipping');
     home.classList.add('photo-mode');
     pauseHero();
-    splitToggle.textContent = '▶';
     splitToggle.setAttribute('aria-label', 'Show film');
     turning = false;
   });
@@ -663,7 +662,6 @@ function turnToFilm() {
     home.classList.remove('flipping');
     home.style.removeProperty('--split');
     stopSlideshow();
-    splitToggle.textContent = '◀';
     splitToggle.setAttribute('aria-label', 'Show photographs');
     turning = false;
   });
