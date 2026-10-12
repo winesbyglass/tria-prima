@@ -871,11 +871,11 @@ splitToggle.addEventListener('click', () => {
 });
 
 // ---------- Contact: founder work photos, full screen ----------
-// While the mouse is in a founder's block (headshot + contact details) their work photo fills the
-// screen, whatever the mouse does there; leaving the block returns to the page. Both founders'
-// details stay exactly where they are on the page (same place, format and size); the other
-// founder's is dimmed. Without a mouse (touch), a tap opens it instead, and the dimmed details
-// or × switch / close.
+// Entering a founder's block (headshot + contact details) shows their work photo across the
+// whole screen; any real mouse movement then returns to the page, and it opens again only when
+// a block is entered again. Both founders' details stay exactly where they are on the page
+// (same place, format and size); the other founder's is dimmed. Without a mouse (touch), a tap
+// opens it instead, and the dimmed details or × switch / close.
 const founderCards = [...document.querySelectorAll('.founder')];
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
@@ -926,28 +926,25 @@ function openFounder(k, byHover = false) {
 }
 
 function closeFounder() {
+  hoverOpen = null;
   founderView.hidden = true;
   founderView.classList.remove('by-hover');
   document.documentElement.classList.remove('lightbox-open');
 }
 
-let hoverBlock = -1;   // block the mouse is in (-1: none)
+const HOVER_SETTLE_MS = 300;   // ignore movement while the photo fades in
+const HOVER_JITTER_PX = 8;     // ...and movements smaller than this
+let hoverOpen = null;          // { x, y, at } while shown by hover
 
 founderCards.forEach((card, k) => {
-  // The block: headshot + contact details (the card holds just those two).
+  // The block: headshot + contact details (the card holds just those two). Entering it opens.
   card.addEventListener('pointerenter', event => {
     if (event.pointerType !== 'mouse') return;
-    hoverBlock = k;
     openFounder(k, true);
-  });
-  // Any movement inside the block keeps (or brings back) its photo.
-  card.addEventListener('pointermove', event => {
-    if (event.pointerType === 'mouse' && founderView.hidden) openFounder(k, true);
+    hoverOpen = { x: event.clientX, y: event.clientY, at: performance.now() };
   });
   card.addEventListener('pointerleave', event => {
-    if (event.pointerType !== 'mouse' || hoverBlock !== k) return;
-    hoverBlock = -1;
-    if (founderView.classList.contains('by-hover')) closeFounder();
+    if (event.pointerType === 'mouse' && founderView.classList.contains('by-hover')) closeFounder();
   });
   // Touch: tap the card to open.
   card.addEventListener('click', event => {
@@ -955,6 +952,14 @@ founderCards.forEach((card, k) => {
     openFounder(k);
   });
 });
+
+// Any real movement returns to the page; it opens again only on entering a block again.
+window.addEventListener('pointermove', event => {
+  if (!hoverOpen || event.pointerType !== 'mouse') return;
+  const moved = Math.hypot(event.clientX - hoverOpen.x, event.clientY - hoverOpen.y);
+  if (performance.now() - hoverOpen.at < HOVER_SETTLE_MS || moved < HOVER_JITTER_PX) return;
+  closeFounder();
+}, { passive: true });
 founderClose.addEventListener('click', closeFounder);
 document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
