@@ -309,6 +309,39 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
   morphView(b.dataset.view, () => { navigating = false; blockWorkClicks(400); });
 }));
 
+// ---------- Film rolls: frames curl round the rolls at the top and bottom of the strip ----------
+workStrip.append(el('span', 'film-roll top'), el('span', 'film-roll bottom'));
+const CURL_MAX = 78;   // degrees at the very edge
+const curlState = new Map();
+
+function curlStrip() {
+  requestAnimationFrame(curlStrip);
+  if (worksPage.hidden || currentView !== 'list') return;
+  const winH = stripWindow.clientHeight;
+  if (!winH) return;
+  // Frame positions from layout + the track's live (possibly mid-transition) offset, so the
+  // curl itself never feeds back into the measurement.
+  const trackY = new DOMMatrixReadOnly(getComputedStyle(stripTrack).transform).f;
+  const zone = Math.min(120, winH * 0.2);
+  thumbs.forEach(thumb => {
+    if (thumb.hidden) return;
+    const cy = trackY + thumb.offsetTop + thumb.offsetHeight / 2;
+    const top = 1 - cy / zone;              // > 0 inside the top zone
+    const bottom = 1 - (winH - cy) / zone;  // > 0 inside the bottom zone
+    let curl = 0;
+    let origin = 'center';
+    let k = 0;
+    if (top > 0) { k = Math.min(1, top); curl = -CURL_MAX * k * k; origin = 'top'; }               // hug the top roll
+    else if (bottom > 0) { k = Math.min(1, bottom); curl = CURL_MAX * k * k; origin = 'bottom'; } // hug the bottom roll
+    const key = `${curl.toFixed(1)}|${origin}`;
+    if (curlState.get(thumb) === key) return;
+    curlState.set(thumb, key);
+    thumb.style.setProperty('--curl', `${curl.toFixed(1)}deg`);
+    thumb.style.setProperty('--curl-origin', origin);
+    thumb.style.setProperty('--shade', (1 - 0.65 * k * k).toFixed(2));
+  });
+}
+requestAnimationFrame(curlStrip);
 // ---------- List view paging: one gesture = one work ----------
 // Wheel, trackpad swipe, keys and touch swipes each turn exactly one full-screen work.
 const PAGE_MS = 750;      // ignore further input while a turn is running
