@@ -185,11 +185,19 @@ html.works-open::-webkit-scrollbar { display:none; }
 /* Opening animates the panel's height from 0 to its content */
 .acc-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows .55s var(--ease); }
 .acc-panel.open { grid-template-rows:1fr; }
-.acc-inner { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(18px,2vw,32px); min-height:0; overflow:hidden; }
+/* Open details fill the right column: one item per row, number + title beside a larger text */
+.acc-inner { display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.process-item { display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:clamp(16px,2vw,36px); padding:clamp(12px,2.2vh,22px) 0; border-top:1px solid rgba(255,255,255,.1); }
+.process-item:first-child { border-top:0; padding-top:4px; }
+.process-item .process-num { grid-column:1; grid-row:1; }
+.process-item .process-title { grid-column:1; grid-row:2; align-self:start; }
+.process-item .process-text { grid-column:2; grid-row:1 / span 2; }
 .acc-panel.open .acc-inner { padding-bottom:clamp(18px,3vh,30px); }
-.process-num { display:block; margin-bottom:10px; font-size:11px; font-weight:700; letter-spacing:.16em; color:rgba(255,255,255,.45); }
-.process-title { margin:0 0 8px; font:400 clamp(16px,1.3vw,20px)/1.2 var(--font); }
-.process-text { margin:0; font-size:clamp(12.5px,.95vw,14px); line-height:1.6; color:rgba(255,255,255,.72); }
+.process-num { display:block; margin-bottom:8px; font-size:12px; font-weight:700; letter-spacing:.16em; color:rgba(255,255,255,.45); }
+.process-title { margin:0; font:400 clamp(20px,min(1.9vw,3.4vh),32px)/1.15 var(--font); }
+.process-text { margin:0; font-size:clamp(15px,min(1.2vw,2.2vh),19px); line-height:1.55; color:rgba(255,255,255,.8); }
+/* While details are open the statement steps aside so everything still fits one screen */
+.process-side.has-open .process-statement { display:none; }
 .process-statement { margin:clamp(28px,5vh,56px) 0 0; font:400 clamp(24px,min(2.4vw,4vh),40px)/1.2 var(--font); letter-spacing:-.01em; }
 
 /* Desktop: the whole Process page fits one screen */
@@ -378,7 +386,9 @@ html.lightbox-open { overflow:hidden; }
   .headshot { width:min(100%,420px); }
   .founder-name { white-space:normal; }
   .process-layout { grid-template-columns:1fr; gap:48px; }
-  .acc-inner { grid-template-columns:1fr; }
+  .process-item { grid-template-columns:1fr; gap:8px; }
+  .process-item .process-text { grid-column:1; grid-row:auto; }
+  .process-side.has-open .process-statement { display:block; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
   .lightbox-nav { top:auto; bottom:52px; translate:none; }

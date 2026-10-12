@@ -881,6 +881,7 @@ accToggles.forEach(toggle => {
       other.setAttribute('aria-expanded', String(open));
       document.getElementById(other.getAttribute('aria-controls')).classList.toggle('open', open);
     });
+    toggle.closest('.process-side').classList.toggle('has-open', opening);
   });
 });
 // ---------- Contact: founder work photos, full screen ----------
