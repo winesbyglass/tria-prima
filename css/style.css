@@ -185,21 +185,30 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-gallery { display:flex; gap:12px; height:min(72vh,680px); margin:clamp(70px,11vh,120px) 0 0; padding:0 clamp(23px,5vw,90px); overflow-x:auto; scrollbar-width:none; }
 .project-gallery::-webkit-scrollbar { display:none; }
 .project-body > .project-gallery:first-child { margin-top:0; }
-.gallery-item { flex:0 0 clamp(60px,7.5vw,128px); height:100%; border:0; padding:0; border-radius:14px; background:#111 center/cover no-repeat; cursor:pointer;
+.project-gallery + .project-film { margin-top:clamp(70px,11vh,120px); }
+.gallery-item { position:relative; overflow:hidden; flex:0 0 clamp(60px,7.5vw,128px); height:100%; border:0; padding:0; border-radius:14px; color:#fff; text-align:left; background:#111 center/cover no-repeat; cursor:pointer;
   filter:brightness(.6); transition:flex-basis .75s var(--ease),filter .45s ease; }
 .gallery-item:hover { filter:brightness(.85); }
 .gallery-item.open { flex-basis:min(60vw,1000px); filter:none; cursor:default; }
-.project-info { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:clamp(30px,6vw,110px); width:min(1180px,78vw); margin:clamp(70px,11vh,120px) auto 0; }
-.project-meta { margin:0 0 22px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); }
-.project-desc { margin:0 0 18px; font:clamp(18px,1.55vw,24px)/1.55 var(--font); color:rgba(255,255,255,.9); }
-.project-side h3 { margin:0 0 14px; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); }
-.project-side h3 ~ h3 { margin-top:36px; }
-.project-credits { display:grid; grid-template-columns:auto 1fr; gap:6px 18px; margin:0; font-size:13px; line-height:1.45; }
-.project-credits dt { color:rgba(255,255,255,.55); }
-.project-credits dd { margin:0; }
-.project-list { margin:0; padding:0; list-style:none; font-size:13px; line-height:1.75; color:rgba(255,255,255,.85); }
-.project-list a { color:#fff; text-underline-offset:4px; }
-/* ---------- Text colour follows the picture behind it ----------
+/* Client / role on each still of a video project, shown while it is the open one */
+.gallery-caption { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr 1fr; gap:24px; padding:60px 9% 30px; pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.5)); opacity:0; transition:opacity .45s ease; }
+.gallery-item.open .gallery-caption { opacity:1; transition-delay:.35s; }
+.gallery-fact { display:flex; flex-direction:column; gap:12px; font-size:14px; line-height:1.4; text-shadow:0 1px 3px rgba(0,0,0,.6); }
+.gallery-fact small { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.7); }
+/* Write-up across the page so it reads without much scrolling:
+   about | credits (flowing into two columns when long) | festivals & distribution */
+.project-info { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr) minmax(0,1fr); gap:clamp(28px,4vw,72px); width:min(1320px,86vw); margin:clamp(70px,11vh,120px) auto 0; align-items:start; }
+.project-info.two-col { grid-template-columns:minmax(0,1.1fr) minmax(0,1.6fr); }
+.project-meta { margin:0 0 20px; font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+.project-desc { margin:0 0 16px; font:clamp(16px,1.3vw,21px)/1.55 var(--font); color:rgba(255,255,255,.9); }
+.project-col h3 { margin:0 0 14px; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.55); }
+.project-col h3 ~ h3 { margin-top:30px; }
+.project-credits.long { columns:2; column-gap:28px; }
+.credit { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:10px; margin-bottom:7px; break-inside:avoid; font-size:12.5px; line-height:1.4; }
+.credit-role { color:rgba(255,255,255,.55); }
+.project-list { margin:0; padding:0; list-style:none; font-size:12.5px; line-height:1.7; color:rgba(255,255,255,.85); }
+.project-list a { color:#fff; text-underline-offset:4px; }/* ---------- Text colour follows the picture behind it ----------
    main.js samples the brightness under each text block and adds .ink-dark on light areas. */
 .topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
 .topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .site-brand.ink-dark { color:#111; }
@@ -253,7 +262,10 @@ html.works-open::-webkit-scrollbar { display:none; }
   .project-gallery { height:56vh; padding:0 16px; gap:8px; }
   .gallery-item { flex-basis:44px; border-radius:10px; }
   .gallery-item.open { flex-basis:74vw; }
-  .project-info { grid-template-columns:1fr; }  /* About text sits along the bottom, over the film */
+  .project-info, .project-info.two-col { grid-template-columns:1fr; }
+  .project-credits.long { columns:1; }
+  .gallery-caption { padding:40px 18px 18px; gap:14px; }
+  .gallery-fact { font-size:12px; gap:8px; }  /* About text sits along the bottom, over the film */
   .home { --aside-h:clamp(150px,21svh,200px); }
   .aside { top:auto; left:0; width:auto; height:var(--aside-h); padding:22px 7vw 18px; justify-content:flex-start; }
   .aside-copy { margin:0; }

@@ -53,11 +53,12 @@ const photoWorks = photoSeries.map(series => {
 // Every individual photograph (the home page slideshow draws from these).
 const allPhotos = photoWorks.flatMap(project => project.photos.map(img => ({ img })));
 
-// Project page details (description, stills, festivals, distribution), copied from the hql portfolio.
+// Project page details (description, role, stills, festivals, distribution), copied from the hql portfolio.
 const projectDetails = {
   "Distant and Known": {
     "description": "Xiang, dressed in a silk qipao, awakens in a hazy banquet hall, having forgotten her name. Dance and song pave her way back home.",
     "medium": "Digital 4K",
+    "role": "Writer-Director / Editor / Colourist",
     "stills": [
       "01-01",
       "01-02",
@@ -76,6 +77,7 @@ const projectDetails = {
   "Signature Payroll": {
     "description": "Brand film shot for Signature Payroll Australia's 2026 relaunch.",
     "medium": "Digital 4K",
+    "role": "Writer-Director / Editor / Colourist",
     "stills": [
       "04-01",
       "04-02",
@@ -87,6 +89,7 @@ const projectDetails = {
   "I Just Wanna Be Liked By You": {
     "description": "Music video for Glen Gold, shot in Sydney.",
     "medium": "Digital 4K",
+    "role": "Writer-Director / Editor / Colourist",
     "stills": [
       "05-01",
       "05-02",
@@ -98,6 +101,7 @@ const projectDetails = {
   "State of No Cause": {
     "description": "In rural Vermont, shortly after a near-fatal fall, an elderly couple faces a \"no-cause\" eviction that threatens to sever their connection to the world. Childless but bound by a deep, reciprocal care for their animals and community, their enduring love is documented through a fragile landline connection and the drawings they make to survive a life without screens.",
     "medium": "Digital 4K / Camcorder HD",
+    "role": "Colourist",
     "stills": [
       "06-01",
       "06-02",
@@ -109,11 +113,13 @@ const projectDetails = {
   },
   "Return to Helsinki": {
     "description": "35mm photography series.",
-    "medium": "35mm"
+    "medium": "35mm",
+    "role": "Photographer"
   },
   "New York c. May 2025": {
     "description": "Super 8mm video. Audio borrowed from Joel Meyerowitz's speech at the 2026 ICP Infinity Awards.",
     "medium": "Super 8mm",
+    "role": "Director / DP / Editor / Colourist",
     "stills": [
       "10-01",
       "10-02",
@@ -126,6 +132,7 @@ const projectDetails = {
   "A Little Regret in Helsinki": {
     "description": "A Chinese girl returns home to Helsinki, with a desire to reassess her feelings about home, perfection, friendship, and regret. A tender dialogue is raised between father and daughter.",
     "medium": "Super 8mm",
+    "role": "Writer-Director / Editor / Colourist",
     "stills": [
       "02-01",
       "02-02",
@@ -195,6 +202,7 @@ const projectDetails = {
   "Early Years": {
     "description": "Early Years is a poignant drama short film that follows a Chinese immigrant father and his daughter, navigating the intricacies of growing up in a foreign country, the challenges of trying to fit in, and the nuanced gestures exchanged between a parent and their child.",
     "medium": "Digital 4K / Camcorder HD",
+    "role": "Writer-Director / Editor / Colourist",
     "stills": [
       "03-01",
       "03-02",
@@ -210,27 +218,33 @@ const projectDetails = {
   },
   "POTE'CAST": {
     "description": "POTE'CAST is a playful series of video podcasts entre potes, hosted by Haohao Qiaoshi Liu.\n\nThe series reached over 200k views within 9 months of its launch, gaining viewership across TikTok, Instagram, Youtube, and Spotify.",
-    "medium": "Digital 4K"
+    "medium": "Digital 4K",
+    "role": "Director / Producer / Editor / Colourist"
   },
   "La Rêverie Festival Trailer": {
     "description": "Festival trailer combining live-action footage and animation.",
-    "medium": "Digital 4K / Animation"
+    "medium": "Digital 4K / Animation",
+    "role": "Director / Editor / Animator"
   },
   "Double Exposure Series": {
     "description": "Photography series shot in Reims and Avignon, France.",
-    "medium": "Photography"
+    "medium": "Photography",
+    "role": "Photographer"
   },
   "Sciences Po Year 2": {
     "description": "35mm photography series.",
-    "medium": "35mm"
+    "medium": "35mm",
+    "role": "Photographer"
   },
   "When Does It All Begin To Matter?": {
     "description": "“When Does It All Begin To Matter?” is a three-part series based on commonly experienced limbo when placed between familiarity and a hard place. Meaning and message is pursued through intersection of written word and cinema.",
-    "medium": "Digital 4K"
+    "medium": "Digital 4K",
+    "role": "Director / Producer / DP / Editor / Colourist"
   },
   "Artoon Network Campaign Video": {
     "description": "Campaign Week video for Artoon Network, created for the Bureau des Arts (BDA) at Sciences Po's Reims campus.",
     "medium": "Digital 4K",
+    "role": "Co-Director / Co-Producer / DP / Editor / Colourist",
     "stills": [
       "12-01",
       "12-02",
@@ -247,6 +261,8 @@ const works = [...motionWorks, ...photoWorks].map(work => {
     ...work,
     ...extra,
     director: lead ? lead[1] : DIRECTOR,
+    // Client, where the hql portfolio names one (shown on the stills of video projects).
+    client: work.client || (work.credits.find(([role]) => role === 'Client') || [])[1] || null,
     slug: work.title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
   };
 });

@@ -198,9 +198,41 @@ function projectFrame(work, id) {
 
 function renderProject(work) {
   projectHead.replaceChildren(el('span', '', work.title), el('span', '', work.director), el('span', '', work.year));
+  const isPhoto = work.kind === 'photo';
   const parts = [];
 
-  if (work.kind !== 'photo') {
+  // Pictures first: one open, the rest folded strips. On video projects every still carries
+  // the client and role, shown while it is the open one.
+  const pictures = isPhoto ? work.photos : (work.stills || []);
+  if (pictures.length) {
+    const gallery = el('section', 'project-gallery');
+    gallery.setAttribute('aria-label', isPhoto ? 'Photographs' : 'Stills');
+    pictures.forEach((img, k) => {
+      const item = el('button', k === 0 ? 'gallery-item open' : 'gallery-item');
+      item.type = 'button';
+      item.style.backgroundImage = `url("${workImage({ img }, 'full')}")`;
+      item.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}`);
+      if (!isPhoto) {
+        const caption = el('span', 'gallery-caption');
+        const client = el('span', 'gallery-fact');
+        client.append(el('small', '', 'Client :'), el('span', '', work.client || '[CLIENT]'));
+        const role = el('span', 'gallery-fact');
+        role.append(el('small', '', 'Role :'), el('span', '', work.role || '[ROLE]'));
+        caption.append(client, role);
+        item.append(caption);
+      }
+      item.addEventListener('click', () => {
+        gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
+        // Keep the opened picture in view when the row is wider than the screen.
+        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 380);
+      });
+      gallery.append(item);
+    });
+    parts.push(gallery);
+  }
+
+  // Then the film, framed with wide margins.
+  if (!isPhoto) {
     const film = el('section', 'project-film');
     const frame = el('div', 'project-frame');
     const episodes = work.media.episodes || [];
@@ -222,38 +254,30 @@ function renderProject(work) {
     parts.push(film);
   }
 
-  const pictures = work.kind === 'photo' ? work.photos : (work.stills || []);
-  if (pictures.length) {
-    const gallery = el('section', 'project-gallery');
-    gallery.setAttribute('aria-label', work.kind === 'photo' ? 'Photographs' : 'Stills');
-    pictures.forEach((img, k) => {
-      const item = el('button', k === 0 ? 'gallery-item open' : 'gallery-item');
-      item.type = 'button';
-      item.style.backgroundImage = `url("${workImage({ img }, 'full')}")`;
-      item.setAttribute('aria-label', `${work.title} ${k + 1} / ${pictures.length}`);
-      item.addEventListener('click', () => {
-        gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
-        // Keep the opened picture in view when the row is wider than the screen.
-        setTimeout(() => item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }), 380);
-      });
-      gallery.append(item);
-    });
-    parts.push(gallery);
-  }
-
+  // The write-up laid out across the page, so it reads without much scrolling:
+  // about | credits (flowing into columns) | festivals & distribution.
   const info = el('section', 'project-info');
   const about = el('div', 'project-about');
   about.append(el('p', 'project-meta', [work.type, work.medium, work.year].filter(Boolean).join(' · ')));
   (work.description || '').split(/\n\s*\n/).forEach(text => about.append(el('p', 'project-desc', text)));
   info.append(about);
-  const side = el('div', 'project-side');
-  const credits = el('dl', 'project-credits');
-  work.credits.forEach(([role, name]) => credits.append(el('dt', '', role), el('dd', '', name)));
-  side.append(el('h3', '', 'Credits'), credits);
+
+  const creditsCol = el('div', 'project-col');
+  const credits = el('div', 'project-credits');
+  credits.classList.toggle('long', work.credits.length > 8);
+  work.credits.forEach(([role, name]) => {
+    const row = el('div', 'credit');
+    row.append(el('span', 'credit-role', role), el('span', 'credit-name', name));
+    credits.append(row);
+  });
+  creditsCol.append(el('h3', '', 'Credits'), credits);
+  info.append(creditsCol);
+
+  const extras = el('div', 'project-col');
   if (work.festivals && work.festivals.length) {
     const list = el('ul', 'project-list');
     work.festivals.forEach(([name, country]) => list.append(el('li', '', `${name} — ${country}`)));
-    side.append(el('h3', '', 'Festivals'), list);
+    extras.append(el('h3', '', 'Festivals'), list);
   }
   if (work.partners && work.partners.length) {
     const list = el('ul', 'project-list');
@@ -266,9 +290,10 @@ function renderProject(work) {
       li.append(a);
       list.append(li);
     });
-    side.append(el('h3', '', 'Distribution'), list);
+    extras.append(el('h3', '', 'Distribution'), list);
   }
-  info.append(side);
+  if (extras.childElementCount) info.append(extras);
+  info.classList.toggle('two-col', !extras.childElementCount);
   parts.push(info);
 
   projectBody.replaceChildren(...parts);
