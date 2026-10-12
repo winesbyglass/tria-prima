@@ -166,8 +166,6 @@ html.works-open::-webkit-scrollbar { display:none; }
 /* ---------- Contact ----------
    Big slogan left, company / location / socials right; below, the two founders side by side.
    Clicking a founder opens their work photo full screen with both founders' details on it. */
-/* Deep navy rather than black */
-.contact-page { background:#0d1b2e; }
 .contact-top { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:clamp(30px,5vw,90px); margin-top:clamp(70px,12vh,130px); align-items:start; }
 .contact-slogan { margin:0; font:800 clamp(48px,6.6vw,118px)/.92 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
 .contact-intro { max-width:34em; margin:0 0 28px; font:clamp(17px,1.45vw,22px)/1.5 var(--font); color:rgba(255,255,255,.88); }
@@ -194,7 +192,7 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-link { display:block; color:#fff; font-size:12px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
 
-/* Full-screen work photo (shown on hover; tap on touch) with both founders' details floating small on it */
+/* Full-screen work photo (hovering a headshot; tap on touch) with both founders' details floating small on it */
 .founder-view { position:fixed; inset:0; z-index:45; background:#000; }
 .founder-view[hidden] { display:none; }
 .founder-view:not([hidden]) { animation:founder-in .45s ease both; }

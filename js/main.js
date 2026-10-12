@@ -871,10 +871,11 @@ splitToggle.addEventListener('click', () => {
 });
 
 // ---------- Contact: founder work photos, full screen ----------
-// Hovering a founder (photo or details) shows their work photo across the whole screen with
-// both founders' details floating small on it, the other founder's dimmed. Moving to the other
-// founder switches the photo; leaving the founders closes it. Without a mouse (touch), a tap
-// opens it instead, and the dimmed details or × switch / close.
+// Hovering a founder's headshot shows their work photo across the whole screen with both
+// founders' details floating small on it, the other founder's dimmed. Any mouse movement then
+// returns to the page (after a short settle, ignoring tiny jitters); it shows again only once the
+// pointer has left that headshot and come back. Without a mouse (touch), a tap opens it instead,
+// and the dimmed details or × switch / close.
 const founderCards = [...document.querySelectorAll('.founder')];
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
@@ -916,23 +917,42 @@ function openFounder(k, byHover = false) {
 }
 
 function closeFounder() {
+  hoverOpen = null;
   founderView.hidden = true;
   founderView.classList.remove('by-hover');
   document.documentElement.classList.remove('lightbox-open');
 }
 
-const foundersArea = document.querySelector('.founders');
+const HOVER_SETTLE_MS = 300;   // ignore movement while the photo fades in
+const HOVER_JITTER_PX = 8;     // ...and movements smaller than this
+let hoverOpen = null;          // { x, y, at } while shown by hover
+let hoverSpent = -1;           // headshot already shown this visit; needs leave + re-enter
+
 founderCards.forEach((card, k) => {
-  card.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') openFounder(k, true); });
-  // Touch: tap to open.
+  const headshot = card.querySelector('.headshot');
+  headshot.addEventListener('pointerenter', event => {
+    if (event.pointerType !== 'mouse' || hoverSpent === k) return;
+    openFounder(k, true);
+    hoverOpen = { x: event.clientX, y: event.clientY, at: performance.now() };
+  });
+  headshot.addEventListener('pointerleave', event => {
+    if (event.pointerType === 'mouse' && hoverSpent === k) hoverSpent = -1;
+  });
+  // Touch: tap the card to open.
   card.addEventListener('click', event => {
     if (event.target.closest('a') || founderView.classList.contains('by-hover')) return;
     openFounder(k);
   });
 });
-foundersArea.addEventListener('pointerleave', event => {
-  if (event.pointerType === 'mouse' && founderView.classList.contains('by-hover')) closeFounder();
-});
+
+window.addEventListener('pointermove', event => {
+  if (!hoverOpen || event.pointerType !== 'mouse') return;
+  const moved = Math.hypot(event.clientX - hoverOpen.x, event.clientY - hoverOpen.y);
+  if (performance.now() - hoverOpen.at < HOVER_SETTLE_MS || moved < HOVER_JITTER_PX) return;
+  hoverSpent = founderTags.findIndex(tag => tag.classList.contains('active'));
+  hoverOpen = null;
+  closeFounder();
+}, { passive: true });
 founderClose.addEventListener('click', closeFounder);
 document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
