@@ -1037,10 +1037,10 @@ tabButtons.forEach((tab, k) => {
   });
 });// ---------- Contact: founder work photos, full screen ----------
 // Entering a founder's block (headshot + contact details) shows their work photo across the
-// whole screen; inside the block each real mouse movement then switches between the page and the
-// photo; leaving the block returns to the page. Both founders' details stay exactly where they are on the page
-// (same place, format and size); only that founder's details show over the photo. Without a
-// mouse (touch), a tap opens it instead and × closes it.
+// whole screen, with that founder's details floating exactly where they are on the page (same
+// place, format and size). The photo stays while the mouse moves; clicking the details (their
+// links work) keeps it, clicking anywhere else returns to the page. Without a mouse (touch), a
+// tap opens it; × or a tap outside the details closes it.
 const founderCards = [...document.querySelectorAll('.founder')];
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
@@ -1095,43 +1095,32 @@ function closeFounder() {
   document.documentElement.classList.remove('lightbox-open');
 }
 
-const HOVER_SETTLE_MS = 300;   // after opening or closing, ignore movement this long
-const HOVER_JITTER_PX = 8;     // ...and movements smaller than this
-let hoverBlock = -1;           // block the mouse is in (-1: none)
-let hoverMark = null;          // { x, y, at } of the last open / close
+let founderSkip = -1;   // block just closed by a click: it won't reopen until the mouse leaves it
 
 founderCards.forEach((card, k) => {
   // The block: headshot + contact details (the card holds just those two). Entering it opens.
   card.addEventListener('pointerenter', event => {
-    if (event.pointerType !== 'mouse') return;
-    hoverBlock = k;
+    if (event.pointerType !== 'mouse' || !founderView.hidden || founderSkip === k) return;
     openFounder(k, true);
-    hoverMark = { x: event.clientX, y: event.clientY, at: performance.now() };
   });
   card.addEventListener('pointerleave', event => {
-    if (event.pointerType !== 'mouse' || hoverBlock !== k) return;
-    hoverBlock = -1;
-    hoverMark = null;
-    if (founderView.classList.contains('by-hover')) closeFounder();
+    // (The photo covering the block also counts as leaving it; only a real exit clears the skip.)
+    if (event.pointerType === 'mouse' && founderView.hidden && founderSkip === k) founderSkip = -1;
   });
   // Touch: tap the card to open.
   card.addEventListener('click', event => {
-    if (event.target.closest('a') || founderView.classList.contains('by-hover')) return;
+    if (event.target.closest('a') || !founderView.hidden) return;
     openFounder(k);
   });
 });
 
-// Inside a block every real movement flips between the work photo and the page: a move while
-// the photo shows returns to the page, the next move brings the photo back.
-window.addEventListener('pointermove', event => {
-  if (event.pointerType !== 'mouse' || hoverBlock < 0 || !hoverMark) return;
-  const moved = Math.hypot(event.clientX - hoverMark.x, event.clientY - hoverMark.y);
-  if (performance.now() - hoverMark.at < HOVER_SETTLE_MS || moved < HOVER_JITTER_PX) return;
-  if (founderView.hidden) openFounder(hoverBlock, true);
-  else closeFounder();
-  hoverMark = { x: event.clientX, y: event.clientY, at: performance.now() };
-}, { passive: true });
-founderClose.addEventListener('click', closeFounder);
+// On the photo: the details keep it open, anywhere else goes back to the page.
+founderView.addEventListener('click', event => {
+  if (event.target.closest('.founder-tag')) return;
+  closeFounder();
+  const under = document.elementFromPoint(event.clientX, event.clientY);
+  founderSkip = under && under.closest('.founder') ? founderCards.indexOf(under.closest('.founder')) : -1;
+});founderClose.addEventListener('click', closeFounder);
 document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
 // The picture is drawn "object-fit: cover" into a tiny canvas; each text block's area is
