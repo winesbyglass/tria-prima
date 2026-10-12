@@ -870,21 +870,30 @@ splitToggle.addEventListener('click', () => {
   else turnToPhotos();
 });
 
-// ---------- Process: headings that open their details ----------
-// One open at a time; clicking the open one closes it. All closed at first.
-const accToggles = [...document.querySelectorAll('.acc-toggle')];
-accToggles.forEach(toggle => {
-  toggle.addEventListener('click', () => {
-    const opening = toggle.getAttribute('aria-expanded') !== 'true';
-    accToggles.forEach(other => {
-      const open = opening && other === toggle;
-      other.setAttribute('aria-expanded', String(open));
-      document.getElementById(other.getAttribute('aria-controls')).classList.toggle('open', open);
-    });
-    toggle.closest('.process-side').classList.toggle('has-open', opening);
+// ---------- Process: two buttons switch the right column ----------
+const processTabs = document.querySelector('.process-tabs');
+const tabButtons = [...processTabs.querySelectorAll('.process-tab')];
+function selectTab(n) {
+  tabButtons.forEach((tab, k) => {
+    const on = k === n;
+    tab.classList.toggle('active', on);
+    tab.setAttribute('aria-selected', String(on));
+    tab.tabIndex = on ? 0 : -1;
+    const panel = document.getElementById(tab.getAttribute('aria-controls'));
+    panel.hidden = !on;
+    panel.classList.toggle('active', on);
   });
-});
-// ---------- Contact: founder work photos, full screen ----------
+  processTabs.dataset.at = n;
+}
+tabButtons.forEach((tab, k) => {
+  tab.addEventListener('click', () => { if (!tab.classList.contains('active')) selectTab(k); });
+  tab.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    const n = (k + (event.key === 'ArrowRight' ? 1 : -1) + tabButtons.length) % tabButtons.length;
+    selectTab(n);
+    tabButtons[n].focus();
+  });
+});// ---------- Contact: founder work photos, full screen ----------
 // Entering a founder's block (headshot + contact details) shows their work photo across the
 // whole screen; inside the block each real mouse movement then switches between the page and the
 // photo; leaving the block returns to the page. Both founders' details stay exactly where they are on the page

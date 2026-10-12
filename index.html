@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=67">
+  <link rel="stylesheet" href="css/style.css?v=68">
 </head>
 <body>
   <main class="app">
@@ -69,33 +69,30 @@
           <h2 class="process-heading" id="process-title">How we collaborate</h2>
           <p class="process-intro">From the first idea to the final frame, we shape every story with intention, curiosity, and craft.</p>
           <p class="process-summary">We are rethinking how films get made, and who gets to make them. Lean, collaborative teams with transparent budgets bring the right people to every project, from the first draft to final delivery. Through screenings, workshops and hands-on sessions, we open up the craft and share the tools and techniques that are too often kept behind closed doors.</p>
+          <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
         </div>
 
         <div class="process-side">
-          <!-- Click a heading to show its details; one open at a time, all closed at first -->
-          <div class="process-acc">
-            <section class="acc-item">
-              <h3 class="acc-heading"><button class="acc-toggle" type="button" aria-expanded="false" aria-controls="accServices">Production services<span class="acc-icon" aria-hidden="true"></span></button></h3>
-              <div class="acc-panel" id="accServices" role="region" aria-label="Production services">
-                <div class="acc-inner">
-                  <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Creative Production</h4><p class="process-text">From script and concept through to the shoot, we take narrative, music video and commercial film projects from the first idea to the final frame.</p></article>
-                  <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Brand Marketing</h4><p class="process-text">We build a marketing plan from scratch around your goals, then stay accountable as your partner over the long term.</p></article>
-                  <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Post-Production</h4><p class="process-text">In-house editing, colour grading and graphics, so every project is finished with the same care it was shot with.</p></article>
-                </div>
-              </div>
+          <!-- Two buttons switch between the sections; Production services is shown first -->
+          <div class="process-tabs" role="tablist" aria-label="What we do">
+            <span class="tab-glow" aria-hidden="true"></span>
+            <button class="process-tab active" type="button" role="tab" id="tabServices" aria-selected="true" aria-controls="panelServices">Production services</button>
+            <button class="process-tab" type="button" role="tab" id="tabTraining" aria-selected="false" aria-controls="panelTraining" tabindex="-1">Technical training</button>
+          </div>
+          <div class="process-panels">
+            <section class="process-panel active" id="panelServices" role="tabpanel" aria-labelledby="tabServices">
+              <h3 class="panel-heading">Production services</h3>
+              <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Creative Production</h4><p class="process-text">From script and concept through to the shoot, we take narrative, music video and commercial film projects from the first idea to the final frame.</p></article>
+              <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Brand Marketing</h4><p class="process-text">We build a marketing plan from scratch around your goals, then stay accountable as your partner over the long term.</p></article>
+              <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Post-Production</h4><p class="process-text">In-house editing, colour grading and graphics, so every project is finished with the same care it was shot with.</p></article>
             </section>
-            <section class="acc-item">
-              <h3 class="acc-heading"><button class="acc-toggle" type="button" aria-expanded="false" aria-controls="accTraining">Technical training<span class="acc-icon" aria-hidden="true"></span></button></h3>
-              <div class="acc-panel" id="accTraining" role="region" aria-label="Technical training">
-                <div class="acc-inner">
-                  <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Monthly Screenings</h4><p class="process-text">A monthly programme of short film screenings, run with local community organisations, giving emerging filmmakers a room and an audience.</p></article>
-                  <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Workshops</h4><p class="process-text">Hands-on workshops on the craft, from camera and lighting to editing and colour, open to anyone who wants to learn.</p></article>
-                  <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Community</h4><p class="process-text">An active filmmaking community, locally and online, where people meet, collaborate and support each other's work.</p></article>
-                </div>
-              </div>
+            <section class="process-panel" id="panelTraining" role="tabpanel" aria-labelledby="tabTraining" hidden>
+              <h3 class="panel-heading">Technical training</h3>
+              <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Monthly Screenings</h4><p class="process-text">A monthly programme of short film screenings, run with local community organisations, giving emerging filmmakers a room and an audience.</p></article>
+              <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Workshops</h4><p class="process-text">Hands-on workshops on the craft, from camera and lighting to editing and colour, open to anyone who wants to learn.</p></article>
+              <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Community</h4><p class="process-text">An active filmmaking community, locally and online, where people meet, collaborate and support each other's work.</p></article>
             </section>
           </div>
-          <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
         </div>
       </div>
     </section>
@@ -167,6 +164,6 @@
   </div>
 
   <script src="js/works.js?v=8"></script>
-  <script src="js/main.js?v=53"></script>
+  <script src="js/main.js?v=54"></script>
 </body>
 </html>
