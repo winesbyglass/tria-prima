@@ -53,7 +53,7 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 /* A fine glowing hairline, brightest in the middle and fading out at both ends */
 .split::before { content:""; position:absolute; top:0; bottom:0; left:0; width:1px; transform:translateX(-50%);
   background:linear-gradient(180deg,transparent 0,rgba(255,255,255,.8) 22%,#fff 50%,rgba(255,255,255,.8) 78%,transparent 100%);
-  box-shadow:0 0 0 .5px rgba(0,0,0,.35),0 0 8px rgba(255,255,255,.5),0 0 22px rgba(255,255,255,.18); }
+  box-shadow:0 0 0 .5px rgba(0,0,0,.35),0 0 8px rgba(255,255,255,.5),0 0 22px rgba(255,255,255,.18); transition:opacity .4s ease; }
 /* Soft page shadow on the revealed side while turning */
 .split::after { content:""; position:absolute; top:0; bottom:0; left:0; width:70px; background:linear-gradient(90deg,rgba(0,0,0,.45),transparent); opacity:0; transition:opacity .3s ease; }
 .home.flipping .split::after { opacity:1; }
@@ -66,7 +66,8 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .split-toggle svg { width:16px; height:16px; transition:transform .5s var(--ease); }
 .split-toggle:hover,.split-toggle:focus-visible { background:#fff; color:#111; border-color:#fff; scale:1.08; }
 /* Parked at the far left: keep the line and button on screen, chevron points back right */
-.home.photo-mode .split::before { transform:none; }
+/* Parked at the far left the line is hidden; only the button remains */
+.home.photo-mode .split::before { transform:none; opacity:0; }
 .home.photo-mode .split-toggle { transform:translate(0,-50%); }
 .home.photo-mode .split-toggle svg { transform:rotate(180deg); }
 
@@ -171,6 +172,9 @@ html.works-open::-webkit-scrollbar { display:none; }
    margins; a row of pictures, one open and the others folded into strips; then the write-up
    and credits. */
 .project-page { padding:0 0 140px; background:#000; color:#fff; }
+/* Dark fade behind the fixed bar and title, so content scrolling up passes beneath them */
+.project-page::before { content:""; position:fixed; top:0; left:0; right:0; height:clamp(120px,17vh,170px); z-index:19; pointer-events:none;
+  background:linear-gradient(180deg,rgba(0,0,0,.96) 0%,rgba(0,0,0,.85) 45%,rgba(0,0,0,.45) 75%,transparent 100%); }
 .project-page .site-bar { position:fixed; top:34px; left:clamp(23px,5vw,90px); right:clamp(23px,5vw,90px); z-index:20; }
 .project-head { position:fixed; top:30px; left:50%; transform:translateX(-50%); z-index:20; display:flex; flex-direction:column; align-items:center; gap:4px; max-width:36vw;
   font-size:11px; letter-spacing:.12em; line-height:1.35; text-transform:uppercase; text-align:center; pointer-events:none; text-shadow:0 1px 3px rgba(0,0,0,.6); }
