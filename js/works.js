@@ -268,5 +268,5 @@ const works = [...motionWorks, ...photoWorks].map(work => {
 });
 
 function workImage(work, size) {
-  return `assets/works/${size}/${work.img}.jpg?v=4`; // bump when the images are re-exported
+  return `assets/works/${size}/${work.img}.jpg?v=5`; // bump when the images are re-exported
 }
