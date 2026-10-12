@@ -72,6 +72,9 @@ function revealPage(target) {
   if (target === 'works') fillRemainingSlides();
   // Process always opens on Production services.
   if (target === 'process') selectTab(0);
+  // Contact never opens straight onto a founder's photo; other pages never show one.
+  if (target === 'contact') armFounders();
+  else if (!founderView.hidden) closeFounder();
   // On the home page only one of film / slideshow runs, depending on the page-turn state.
   if (target === 'home' && !home.classList.contains('photo-mode')) playHero();
   else pauseHero();
@@ -1014,10 +1017,11 @@ tabButtons.forEach((tab, k) => {
 });// ---------- Contact: founder work photos, full screen ----------
 // Entering a founder's block (headshot + contact details) shows their work photo across the
 // whole screen, with that founder's details floating exactly where they are on the page (same
-// place, format and size). The photo stays while the mouse moves; clicking the details (their
-// links work) keeps it, clicking anywhere else returns to the page. Without a mouse (touch), a
-// tap opens it; × or a tap outside the details closes it.
+// place, format and size). The photo stays while the mouse is on the details (their links work);
+// moving anywhere else, or clicking outside the details, returns to the page. Just passing over a
+// block doesn't open it. Without a mouse (touch), a tap opens it; × or a tap outside closes it.
 const founderCards = [...document.querySelectorAll('.founder')];
+const contactPage = document.getElementById('contact');
 const founderView = el('div', 'founder-view');
 founderView.hidden = true;
 founderView.setAttribute('role', 'dialog');
@@ -1071,31 +1075,87 @@ function closeFounder() {
   document.documentElement.classList.remove('lightbox-open');
 }
 
-let founderSkip = -1;   // block just closed by a click: it won't reopen until the mouse leaves it
+const HOVER_INTENT_MS = 150;   // the mouse must rest in a block this long to open it (passing over doesn't)
+const HOVER_SETTLE_MS = 300;   // after opening, ignore small movements inside the block this long
+const HOVER_JITTER_PX = 8;     // ...and movements smaller than this
+let founderSkip = -1;   // block that won't open until the mouse has left it
+let founderOpen = -1;   // block whose photo is showing
+let founderMark = null; // { x, y, at } where the photo opened
+let founderTimer = 0;
+let lastPointer = null; // last mouse position, to know what the page appears under
+
+window.addEventListener('pointermove', event => {
+  if (event.pointerType === 'mouse') lastPointer = { x: event.clientX, y: event.clientY };
+}, { passive: true });
+
+const founderUnder = (x, y) => {
+  const under = document.elementFromPoint(x, y);
+  const card = under && under.closest('.founder');
+  return card ? founderCards.indexOf(card) : -1;
+};
+
+// The Contact page appearing under a resting mouse is not "entering" a block: the block under
+// the pointer only opens once the mouse has left it and come back.
+function armFounders() {
+  clearTimeout(founderTimer);
+  closeFounder();
+  founderSkip = lastPointer ? founderUnder(lastPointer.x, lastPointer.y) : -1;
+}
 
 founderCards.forEach((card, k) => {
-  // The block: headshot + contact details (the card holds just those two). Entering it opens.
+  // The block: headshot + contact details (the card holds just those two). Resting in it opens.
   card.addEventListener('pointerenter', event => {
     if (event.pointerType !== 'mouse' || !founderView.hidden || founderSkip === k) return;
-    openFounder(k, true);
+    clearTimeout(founderTimer);
+    founderTimer = setTimeout(() => {
+      if (!founderView.hidden || contactPage.hidden) return;
+      founderOpen = k;
+      openFounder(k, true);
+      const at = lastPointer || { x: event.clientX, y: event.clientY };
+      founderMark = { x: at.x, y: at.y, at: performance.now() };
+    }, HOVER_INTENT_MS);
   });
   card.addEventListener('pointerleave', event => {
-    // (The photo covering the block also counts as leaving it; only a real exit clears the skip.)
-    if (event.pointerType === 'mouse' && founderView.hidden && founderSkip === k) founderSkip = -1;
+    if (event.pointerType !== 'mouse') return;
+    // (The photo covering the block also counts as leaving it; only a real exit counts.)
+    if (founderView.hidden) {
+      clearTimeout(founderTimer);
+      if (founderSkip === k) founderSkip = -1;
+    }
   });
   // Touch: tap the card to open.
   card.addEventListener('click', event => {
     if (event.target.closest('a') || !founderView.hidden) return;
+    founderOpen = k;
     openFounder(k);
   });
 });
 
-// On the photo: the details keep it open, anywhere else goes back to the page.
+// Back to the page from the photo; the block under the pointer then waits for a fresh entry.
+function leaveFounder(x, y) {
+  closeFounder();
+  founderMark = null;
+  founderOpen = -1;
+  founderSkip = founderUnder(x, y);
+}
+
+// On the photo the mouse may rest on the details; moving anywhere else returns to the page
+// (straight away once it is outside the block).
+founderView.addEventListener('pointermove', event => {
+  if (event.pointerType !== 'mouse' || !founderView.classList.contains('by-hover')) return;
+  if (event.target.closest('.founder-tag')) return;
+  const r = founderOpen >= 0 ? founderCards[founderOpen].getBoundingClientRect() : null;
+  const inBlock = r && event.clientX >= r.left && event.clientX <= r.right && event.clientY >= r.top && event.clientY <= r.bottom;
+  if (inBlock && founderMark) {
+    const moved = Math.hypot(event.clientX - founderMark.x, event.clientY - founderMark.y);
+    if (performance.now() - founderMark.at < HOVER_SETTLE_MS || moved < HOVER_JITTER_PX) return;
+  }
+  leaveFounder(event.clientX, event.clientY);
+});
+// A click outside the details also returns (touch, or a click before any movement).
 founderView.addEventListener('click', event => {
   if (event.target.closest('.founder-tag')) return;
-  closeFounder();
-  const under = document.elementFromPoint(event.clientX, event.clientY);
-  founderSkip = under && under.closest('.founder') ? founderCards.indexOf(under.closest('.founder')) : -1;
+  leaveFounder(event.clientX, event.clientY);
 });founderClose.addEventListener('click', closeFounder);
 document.addEventListener('keydown', event => { if (!founderView.hidden && event.key === 'Escape') closeFounder(); });
 // ---------- Text colour follows the picture behind it ----------
