@@ -756,7 +756,11 @@ function turnSection(step, fresh) {
   tops.forEach((top, k) => { if (top <= y + 2) at = k; });
   if (step > 0) {
     const bottom = tops[at] + sections[at].offsetHeight;
-    if (at === sections.length - 1 || bottom > y + innerHeight + 2) return false;
+    if (at === sections.length - 1 || bottom > y + innerHeight + 2) {
+      // Just arrived at the section's top: hold it there for one screen; only a fresh
+      // gesture (not the tail of the one that turned here) starts scrolling it.
+      return y <= tops[at] + 2 && !fresh;
+    }
   } else if (at === 0) {
     // The first screen never scrolls on its own: scrolling up there just settles at the top.
     if (y > 2 && fresh && Date.now() >= pageLockUntil) {
