@@ -223,10 +223,9 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-view-photo.placeholder { background:linear-gradient(160deg,#2b2b2b,#111); }
 .founder-view-photo.placeholder::after { content:attr(data-label); position:absolute; top:50%; left:0; right:0; transform:translateY(-50%); text-align:center; font-size:11px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.3); }
 /* Floating copies of the details, laid by main.js exactly over the ones on the page */
-.founder-tag { position:absolute; margin:0; cursor:pointer; opacity:.35; text-align:center; text-shadow:0 1px 5px rgba(0,0,0,.65); transition:opacity .4s ease; }
-.founder-tag.active { opacity:1; cursor:default; }
-.founder-tag:hover { opacity:.75; }
-.founder-tag.active:hover { opacity:1; }/* ---------- Project page (#work/<slug>) ----------
+/* Only the shown founder's details appear over their photo */
+.founder-tag { position:absolute; margin:0; text-align:center; text-shadow:0 1px 5px rgba(0,0,0,.65); }
+.founder-tag:not(.active) { display:none; }/* ---------- Project page (#work/<slug>) ----------
    Black page; title / director / year fixed at the top centre; the film framed with wide
    margins; a row of pictures, one open and the others folded into strips; then the write-up
    and credits. */
