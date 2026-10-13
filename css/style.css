@@ -434,6 +434,8 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: no film strip of thumbnails; the works fill the width */
   .works-page { --strip-w:0px; }
   .work-strip { display:none; }
+  /* No hover on phones: VIEW PROJECT and its arrow always show */
+  .work-slide-cta { opacity:1; }
   .site-brand { font-size:16px; letter-spacing:.14em; }
   .works-page .site-bar { top:10px; right:calc(var(--strip-w) + 10px); }
   .works-filter { top:auto; bottom:64px; transform:none; }
