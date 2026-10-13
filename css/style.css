@@ -407,7 +407,8 @@ html.lightbox-open { overflow:hidden; }
   .project-film, .project-info { width:auto; margin-left:16px; margin-right:16px; }
   /* Phones: no folding; every picture at full width, side by side, one swipe each */
   .project-page { touch-action:pan-x pan-y pinch-zoom; }
-  .project-gallery { height:auto; padding:0 16px; gap:10px; scroll-snap-type:x mandatory; scroll-padding:0 16px; overscroll-behavior-x:contain; }
+  /* One picture fills the width edge to edge (still a rounded rectangle); its neighbours stay out of sight */
+  .project-gallery { height:auto; padding:0; gap:12px; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
   .gallery-item, .gallery-item.open { flex:0 0 100%; height:auto; aspect-ratio:4/5; max-height:62svh; border-radius:10px; scroll-snap-align:center; scroll-snap-stop:always; }
   .gallery-item .gallery-caption { opacity:1; }
   .gallery-swipe { display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:14px; }
