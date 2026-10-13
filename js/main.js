@@ -105,9 +105,11 @@ function playHero() {
 }
 function pauseHero() { heroVideo.pause(); }
 
-// Some browsers hold autoplay until the first interaction; retry then.
-['pointerdown', 'touchstart', 'keydown'].forEach(type => {
-  document.addEventListener(type, () => { if (filmShowing() && heroVideo.paused) playHero(); }, { once: true, passive: true });
+// Some browsers hold autoplay (iOS Low Power Mode, data saver, in-app browsers) until the
+// visitor touches the page: any touch, tap, swipe or key then starts the film. These stay
+// on, so a later touch still works if an earlier one didn't get through.
+['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'].forEach(type => {
+  document.addEventListener(type, () => { if (filmShowing() && heroVideo.paused) playHero(); }, { passive: true, capture: true });
 });
 document.addEventListener('visibilitychange', () => { if (!document.hidden && filmShowing()) playHero(); });
 

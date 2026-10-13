@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=104">
+  <link rel="stylesheet" href="css/style.css?v=105">
 </head>
 <body>
   <main class="app">
@@ -18,6 +18,8 @@
           <source src="assets/hero-desktop.mp4?v=2" type="video/mp4" media="(min-width: 801px)">
           <source src="assets/hero-phone.mp4?v=2" type="video/mp4">
         </video>
+        <!-- Phones: the reel's first frame shows until it plays (e.g. when Low Power Mode holds autoplay) -->
+        <script>if (matchMedia('(max-width: 800px)').matches) document.getElementById('heroVideo').poster = 'assets/hero-phone-poster.jpg?v=1';</script>
         <!-- Photo slideshow revealed by the page-turn divider; filled from the Photography works -->
         <div class="photo-stage" id="photoStage" aria-hidden="true"></div>
         <div class="topline">
@@ -166,6 +168,6 @@
   </div>
 
   <script src="js/works.js?v=14"></script>
-  <script src="js/main.js?v=86"></script>
+  <script src="js/main.js?v=87"></script>
 </body>
 </html>
