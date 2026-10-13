@@ -33,7 +33,6 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 
 /* The site menu (same as every page) at top right, level with the TRIA PRIMA title */
 .navigation { position:absolute; top:calc(4.2% + 2px + (clamp(23px,2.7vw,44px) * 1.1 - 27px) / 2); right:4.2%; z-index:7; }
-.navigation button { text-shadow:0 1px 3px rgba(0,0,0,.6); }
 
 /* About: transparent, same footprint (right sixth), text over the film */
 .aside { position:absolute; top:0; right:0; bottom:0; width:var(--aside-w); z-index:4; color:#fff; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(18px,1.8vw,40px); }
@@ -84,7 +83,6 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
    so a slightly-off click never lands on the full-screen work underneath. */
 /* On Works the site bar floats over the full-screen work, left of the thumbnail strip */
 .works-page .site-bar { position:fixed; top:16px; left:clamp(18px,2vw,32px); right:calc(var(--strip-w) + 18px); z-index:12; padding:6px 0; }
-.works-page .site-brand, .works-page .site-nav button { text-shadow:0 1px 3px rgba(0,0,0,.6); }
 .works-filter { position:fixed; left:clamp(18px,2vw,32px); top:50%; transform:translateY(-50%); z-index:12; display:flex; flex-direction:column; align-items:flex-start; gap:0; padding:14px 20px 14px 14px; margin-left:-14px; }
 .works-view { position:fixed; left:clamp(18px,2vw,32px); bottom:clamp(18px,4vh,36px); z-index:12; display:flex; gap:6px; padding:14px 20px 14px 14px; margin:0 0 -14px -14px; }
 .works-filter button, .works-view button { display:flex; align-items:center; gap:7px; padding:5px 6px 5px 0; color:rgba(255,255,255,.5); transition:color .3s ease; }
@@ -159,6 +157,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 .site-nav { display:flex; align-items:center; gap:clamp(18px,2vw,30px); }
 .site-nav button { border:0; background:none; padding:8px 0; color:rgba(255,255,255,.5); font-size:11px; font-weight:700; letter-spacing:.14em; cursor:pointer; transition:color .3s ease; }
 .site-nav button.current, .site-nav button:hover, .site-nav button:focus-visible { color:#fff; }
+/* Drop shadow on the menu and TRIA PRIMA on every page, so they read over any picture */
+.site-nav button, .site-brand { text-shadow:0 1px 3px rgba(0,0,0,.7),0 0 10px rgba(0,0,0,.35); }
 .page-kicker { margin:13vh 0 18px; font-size:11px; letter-spacing:.3em; color:#b8afa3; }
 .page-title { font:400 clamp(68px,12vw,175px)/.9 var(--font); margin:0 0 65px; }
 
