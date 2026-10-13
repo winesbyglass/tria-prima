@@ -458,6 +458,8 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: no film strip of thumbnails; the works fill the width */
   .works-page { --strip-w:0px; }
   .work-strip { display:none; }
+  /* No strip to clear on phones: TOP sits at the right edge */
+  .to-top { right:16px; }
   /* No hover on phones: VIEW PROJECT / EXPLORE WORKS and their arrows always show */
   .work-slide-cta, .film-link span { opacity:1; }
   .site-brand { font-size:16px; letter-spacing:.14em; }
