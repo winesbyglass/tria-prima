@@ -8,6 +8,9 @@ const filmModal = document.getElementById('filmModal');
 const modalFrame = document.getElementById('modalFrame');
 let navigating = false;
 
+// Phones: a work may use another cover picture / text colour there (works.js "phone").
+if (window.matchMedia('(max-width: 800px)').matches) works.forEach(work => { if (work.phone) Object.assign(work, work.phone); });
+
 // ---------- Site bar on every page except home ----------
 // TRIA PRIMA at top left (back to home) and HOME plus one link per .page at top right. Built
 // from the page sections themselves, so a page added later gets the same bar and is linked.
@@ -124,6 +127,11 @@ function revealPage(target) {
   updateWorksSnap();
   window.scrollTo({ top: 0, behavior: 'instant' });
   updateToTop();
+  // Phones: Works always opens in the List view.
+  if (target === 'works' && currentView !== 'list' && window.matchMedia('(max-width: 800px)').matches) {
+    setView('list');
+    worksReturnScroll = null;
+  }
   if (target === 'works') fillRemainingSlides();
   // Process always opens on Production services.
   if (target === 'process') selectTab(0);
