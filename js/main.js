@@ -325,6 +325,28 @@ function renderProject(work) {
       const t = Math.min(1, Math.max(0, ((event.clientX - r.left) / r.width - 0.1) / 0.8));
       gallery.scrollLeft = t * overflow;
     });
+    // Phones: a tap while the row is still gliding into place only stops the glide (the
+    // browser sends no click), so a short, still touch counts as a tap on the picture itself.
+    let tap = null;
+    let tappedAt = 0;
+    gallery.addEventListener('touchstart', event => {
+      if (event.touches.length === 1) tap = { x: event.touches[0].clientX, y: event.touches[0].clientY, at: Date.now() };
+    }, { passive: true });
+    gallery.addEventListener('touchend', event => {
+      if (!tap || !phoneHome.matches) return;
+      const t = event.changedTouches[0];
+      const still = Math.hypot(t.clientX - tap.x, t.clientY - tap.y) < 10 && Date.now() - tap.at < 500;
+      tap = null;
+      const item = event.target.closest && event.target.closest('.gallery-item');
+      if (!still || !item) return;
+      event.preventDefault(); // no click after it as well
+      tappedAt = Date.now();
+      openLightbox(pictures, [...gallery.children].indexOf(item), work.title);
+    });
+    gallery.addEventListener('click', event => {
+      if (Date.now() - tappedAt < 600) event.stopPropagation();
+    }, true);
+
     // Phones: the pictures sit side by side at full width and a swipe moves between them;
     // a counter and a faint SWIPE underneath say so.
     const wrap = el('div', 'gallery-wrap');
@@ -853,7 +875,7 @@ function turnWork(step) {
   let at = 0;
   tops.forEach((top, k) => { if (Math.abs(top - window.scrollY) < Math.abs(tops[at] - window.scrollY)) at = k; });
   const next = Math.min(visible.length - 1, Math.max(0, at + step));
-  pageLockUntil = Date.now() + PAGE_MS;
+  pageLockUntil = Date.now() + (window.matchMedia('(max-width: 800px)').matches ? 480 : PAGE_MS);
   if (next !== at) animateScroll(tops[next]);
 }
 
@@ -861,7 +883,8 @@ function turnWork(step) {
 function animateScroll(to) {
   const from = window.scrollY;
   const start = performance.now();
-  const ms = PAGE_MS - 100;
+  // Phones turn faster than the desktop.
+  const ms = window.matchMedia('(max-width: 800px)').matches ? 420 : PAGE_MS - 100;
   const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const root = document.documentElement;
   root.classList.remove('works-snap');
