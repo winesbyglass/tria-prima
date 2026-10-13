@@ -273,7 +273,14 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-body { padding-top:clamp(120px,16vh,160px); }
 .project-film { width:min(1180px,78vw); margin:0 auto; }
 .project-frame { aspect-ratio:16/9; border-radius:14px; overflow:hidden; background:#0b0b0b; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+.project-frame { position:relative; }
 .project-frame iframe { width:100%; height:100%; border:0; display:block; }
+/* Cover picture over a player without one of its own; a frosted play button in the middle */
+.project-poster { position:absolute; inset:0; z-index:1; border:0; padding:0; background:#111 center/cover no-repeat; cursor:pointer; }
+.project-play { position:absolute; left:50%; top:50%; width:76px; height:76px; margin:-38px 0 0 -38px; border:1px solid rgba(255,255,255,.7); border-radius:50%;
+  background:rgba(0,0,0,.28); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); transition:background-color .3s ease,scale .3s var(--ease); }
+.project-play::after { content:""; position:absolute; left:50%; top:50%; margin:-11px 0 0 -7px; border-style:solid; border-width:11px 0 11px 18px; border-color:transparent transparent transparent #fff; }
+.project-poster:hover .project-play, .project-poster:focus-visible .project-play { background:rgba(0,0,0,.5); scale:1.08; }
 .project-episodes { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin-top:20px; }
 .project-episodes button { border:1px solid rgba(255,255,255,.4); background:transparent; color:rgba(255,255,255,.7); padding:9px 15px; font-size:10px; font-weight:700; letter-spacing:.16em; cursor:pointer; transition:background-color .3s ease,color .3s ease,border-color .3s ease; }
 .project-episodes button.active, .project-episodes button:hover { background:#fff; color:#111; border-color:#fff; }

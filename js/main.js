@@ -269,7 +269,17 @@ function renderProject(work) {
     const frame = el('div', 'project-frame');
     const episodes = work.media.episodes || [];
     frame.append(projectFrame(work, episodes.length ? episodes[0].id : work.media.id));
-    film.append(frame);
+    // A cover picture over players that have none of their own (Google Drive); clicking it
+    // uncovers the player underneath.
+    if (work.poster) {
+      const poster = el('button', 'project-poster');
+      poster.type = 'button';
+      poster.setAttribute('aria-label', `Play ${work.title}`);
+      poster.style.backgroundImage = `url("${workImage({ img: work.poster }, 'full')}")`;
+      poster.append(el('span', 'project-play'));
+      poster.addEventListener('click', () => poster.remove());
+      frame.append(poster);
+    }    film.append(frame);
     if (episodes.length) {
       const picker = el('div', 'project-episodes');
       episodes.forEach((episode, k) => {
@@ -1160,6 +1170,8 @@ const worksOverlays = [...document.querySelectorAll('#works .site-brand, #works 
 let activeIndex = 0;
 
 function sampleSlideInk(i, img) {
+  // ink: 'light' keeps a work's text white whatever its picture.
+  if (works[i].ink === 'light') return;
   const slide = slides[i];
   const sb = slide.getBoundingClientRect();
   if (!sb.width) return;

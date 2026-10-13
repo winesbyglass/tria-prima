@@ -3,6 +3,7 @@
 // Works data, copied from the hql portfolio (video projects + three photography series).
 // img: file name in assets/works/{full,mid,thumb}/
 // media.type: "vimeo" | "youtube" | "youtube-series" | "gdrive" (Google Drive file id) | "photo"
+// poster: cover picture over the project page player; ink: 'light' keeps the Works text white
 const DIRECTOR = 'Haohao Qiaoshi Liu';
 
 const motionWorks = [
@@ -21,7 +22,7 @@ const motionWorks = [
   { title: 'Early Years', type: 'Narrative Short Film', year: '2024', img: '03-04', media: { type: 'vimeo', id: '1016622750' },
     credits: [['Writer / Director / Editor', DIRECTOR], ['Producer', 'Andrew Tuoriniemi'], ['1st Assistant Director', 'Saimi Räty'], ['2nd Assistant Director', 'Lukas Jokilehto'], ['Personal Assistant to Director', 'Taotao Huang'], ['Clapper', 'Holly Hefan Xiao'], ['Casting Director', DIRECTOR], ['Assistant Casting Director', 'Michael Yang'], ['Sound', 'Mikko Tripakis / Michael Yang'], ['Original Score', 'Mikko Aaltio / Michael Yang / Mikko Tripakis / Eddy Zhang'], ['Director of Photography', DIRECTOR], ['Camera Operator', 'Kristian Presnal'], ['Camcorder Operators', 'Andrew Tuoriniemi / Cindia Ma'], ['Wardrobe Stylist', 'Carmen Roux'], ['Moodboard', 'Carmen Roux'], ['Behind the Scenes', 'Holly Hefan Xiao / Carmen Roux'], ['Concept Poster Design', 'Lea Alda Copat'], ['Head of Logistics', 'Jun Liu']] },
   // Film: Google Drive file (festival cut). Description still a placeholder.
-  { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2024', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
+  { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2024', img: '17-01', poster: '17-01', ink: 'light', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
     credits: [['Writer-Director', 'Jalsa Amidah Drinkard'], ['Producer', 'Jalsa Amidah Drinkard']] },
   { title: "POTE'CAST", type: 'Podcast Video Series', year: '2023–2024', img: '07-01', media: { type: 'youtube-series', episodes: [
     { id: 'WmM7TZO3HDc', label: 'EPISODE 01' }, { id: 'Vi3096sogVQ', label: 'EPISODE 02' }, { id: '2-0PuID-h1Q', label: 'EPISODE 03' }] },
