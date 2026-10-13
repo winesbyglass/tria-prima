@@ -1278,6 +1278,8 @@ let founderSkip = -1;   // block the page appeared under: it waits for the mouse
 let lastPointer = null; // last mouse position, to know what the page appears under
 
 function showFounder(k) {
+  // Phones: no full-screen work photo.
+  if (k >= 0 && window.matchMedia('(max-width: 800px)').matches) return;
   founderOn = k;
   contactPage.classList.toggle('founder-on', k >= 0);
   founderCards.forEach((card, n) => card.classList.toggle('on', n === k));

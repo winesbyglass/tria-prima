@@ -237,6 +237,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 .founder-info { align-self:stretch; padding-top:18px; text-align:center; }
 /* The details use one format and size on the page and over the full-screen photo, so they never move */
 .founder-name { margin:0; font:400 clamp(18px,1.75vw,28px)/1.05 var(--font); letter-spacing:.02em; text-transform:uppercase; white-space:nowrap; }
+/* A line break used on phones only */
+.phone-break { display:none; }
 .founder-role { margin:10px 0 6px; font-size:11px; font-weight:700; letter-spacing:.1em; line-height:1.5; text-transform:uppercase; color:rgba(255,255,255,.5); }
 .founder-link { display:block; color:#fff; font-size:10px; font-weight:700; letter-spacing:.06em; line-height:1.7; text-transform:uppercase; text-decoration:none; transition:color .3s ease; }
 .founder-link:hover, .founder-link:focus-visible { color:rgb(191,136,96); }
@@ -422,7 +424,9 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: the three columns stack: the company details, then each founder (photo + details) */
   .contact-page { padding-top:18px; }
   .contact-layout { grid-template-columns:minmax(0,1fr); gap:56px; margin-top:22px; }
-  .founder { width:100%; justify-self:stretch; }
+  .founder { width:100%; justify-self:stretch; cursor:default; }
+  .headshot { cursor:default; }
+  .phone-break { display:inline; }
   .headshot { width:min(72%,300px); }
   .founder-name { white-space:normal; }
   .process-layout { grid-template-columns:1fr; gap:48px; }
