@@ -130,6 +130,8 @@ function revealPage(target) {
   // Contact never opens straight onto a founder's photo; other pages never show one.
   if (target === 'contact') armFounders();
   else if (founderOn >= 0) closeFounder();
+  // The home page always opens on Motion (the film), whatever was showing before.
+  if (target === 'home') resetToFilm();
   // On the home page only one of film / slideshow runs, depending on the page-turn state.
   if (target === 'home' && !home.classList.contains('photo-mode')) playHero();
   else pauseHero();
@@ -300,8 +302,8 @@ function renderProject(work) {
         item.append(caption);
       }
       item.addEventListener('click', () => {
-        // Photo projects: clicking the open picture (on phones, any picture) shows it full screen.
-        if (isPhoto && (item.classList.contains('open') || phoneHome.matches)) { openLightbox(work.photos, k, work.title); return; }
+        // Clicking the open picture (on phones, any picture) shows it whole, full screen.
+        if (item.classList.contains('open') || phoneHome.matches) { openLightbox(pictures, k, work.title); return; }
         gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
       });
       gallery.append(item);
@@ -1128,6 +1130,15 @@ home.addEventListener('touchend', event => {
   if (dx < 0 && !home.classList.contains('photo-mode')) turnToPhotos();
   else if (dx > 0 && home.classList.contains('photo-mode')) turnToFilm();
 });
+
+// Straight back to the film, no turn (used whenever the home page is opened).
+function resetToFilm() {
+  if (turning || !home.classList.contains('photo-mode')) return;
+  home.classList.remove('photo-mode', 'flipping', 'returning');
+  home.style.removeProperty('--split');
+  swipeDots.dataset.at = '0';
+  splitToggle.setAttribute('aria-label', 'Show photographs');
+}
 
 splitToggle.addEventListener('click', () => {
   if (turning) return;
