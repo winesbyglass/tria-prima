@@ -6,9 +6,6 @@
 const DIRECTOR = 'Haohao Qiaoshi Liu';
 
 const motionWorks = [
-  // Placeholders in [brackets] until the details arrive. Film: Google Drive file (festival cut).
-  { title: 'The 180 End', type: '[TYPE]', year: '[YEAR]', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
-    credits: [['Director', '[DIRECTOR]']] },
   { title: 'Distant and Known', type: 'Narrative Short Film', year: '2026', img: '01-01', media: { type: 'vimeo', id: '1116019493' },
     credits: [['Director', DIRECTOR], ['Screenwriter', DIRECTOR], ['Producer', DIRECTOR], ['Co-Producers', 'Anna Mayo / Kennie Zhou'], ['Casting', 'Nicole Hanzi Zhang / Anna Ting Möller / Matthew Yifeng'], ['Cinematographer', 'Myles Caba'], ['Editor', DIRECTOR], ['Music', 'Mikko Aaltio'], ['Sound', 'Carol Yan Li'], ['Production Designer', 'Julia Sy'], ['Art Assistants', 'Alice Zhang / Ester Elise Poussot'], ['Gaffer', 'Neha Fernandes'], ['Sound Recordist', 'Wes Manginsay'], ['1st AD', 'Adeline Blue'], ['2nd AD', 'Natalie Rudzinski'], ['Script Supervisor', 'Olya Sukonrat'], ['Trinity Operator', 'Solomon Sylvester'], ['1st AC', 'Omar Garcia'], ['2nd AC', 'Lorelei Essman-Freeman'], ['G&E', 'Yaw Agyapong'], ['Hair & Makeup', 'Lareina Chen'], ['Costume Designers', 'Julia Sy / Ester Elise Poussot'], ['Dance Choreographer', 'Chloe Tsoi'], ['Dance Coach', 'Alexandra Ling'], ['BTS Photographer', 'Ethan Chan'], ['Poster Design', 'Lea Alda Copat'], ['Song Lyrics', 'Taotao Huang / Chengkangjie “Eric” Huang'], ['In Association With', 'Accent Sisters'], ['Distribution', 'Inwave Films']] },
   { title: 'Signature Payroll', type: 'Commercial Film', year: '2026', img: '04-01', media: { type: 'vimeo', id: '1227710649' },
@@ -26,6 +23,9 @@ const motionWorks = [
   { title: "POTE'CAST", type: 'Podcast Video Series', year: '2023–2024', img: '07-01', media: { type: 'youtube-series', episodes: [
     { id: 'WmM7TZO3HDc', label: 'EPISODE 01' }, { id: 'Vi3096sogVQ', label: 'EPISODE 02' }, { id: '2-0PuID-h1Q', label: 'EPISODE 03' }] },
     credits: [['Director', DIRECTOR], ['Producer', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR]] },
+  // Placeholders in [brackets] until the details arrive. Film: Google Drive file (festival cut).
+  { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2023', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
+    credits: [['Director', '[DIRECTOR]']] },
   { title: 'La Rêverie Festival Trailer', type: 'Trailer', year: '2023', img: '08-01', media: { type: 'youtube', id: 'ykr8qHLEXoE' },
     credits: [['Director', DIRECTOR], ['Editor', DIRECTOR], ['Animator', DIRECTOR]] },
   { title: 'When Does It All Begin To Matter?', type: 'Video Series', year: '2022', img: '16-01', media: { type: 'youtube-series', episodes: [

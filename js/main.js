@@ -290,7 +290,7 @@ function renderProject(work) {
   // about | credits (flowing into columns) | festivals & distribution.
   const info = el('section', 'project-info');
   const about = el('div', 'project-about');
-  about.append(el('p', 'project-meta', [work.type, work.medium, work.year].filter(Boolean).join(' · ')));
+  about.append(el('p', 'project-meta', [work.type, work.medium, work.duration, work.year].filter(Boolean).join(' · ')));
   (work.description || '').split(/\n\s*\n/).forEach(text => about.append(el('p', 'project-desc', text)));
   info.append(about);
 
