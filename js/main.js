@@ -171,6 +171,8 @@ const modalEpisodes = document.getElementById('modalEpisodes');
 
 function embedUrl(media, id, autoplay = true) {
   const auto = autoplay ? 1 : 0;
+  // Google Drive's player (the file must be shared with anyone who has the link; no autoplay).
+  if (media.type === 'gdrive') return `https://drive.google.com/file/d/${id}/preview`;
   if (media.type === 'vimeo') return `https://player.vimeo.com/video/${id}?autoplay=${auto}&title=0&byline=0&portrait=0&color=000000`;
   return `https://www.youtube.com/embed/${id}?rel=0&autoplay=${auto}${media.start ? `&start=${media.start}` : ''}`;
 }

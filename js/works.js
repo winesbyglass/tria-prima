@@ -2,10 +2,13 @@
 
 // Works data, copied from the hql portfolio (video projects + three photography series).
 // img: file name in assets/works/{full,mid,thumb}/
-// media.type: "vimeo" | "youtube" | "youtube-series" | "photo"
+// media.type: "vimeo" | "youtube" | "youtube-series" | "gdrive" (Google Drive file id) | "photo"
 const DIRECTOR = 'Haohao Qiaoshi Liu';
 
 const motionWorks = [
+  // Placeholders in [brackets] until the details arrive. Film: Google Drive file (festival cut).
+  { title: 'The 180 End', type: '[TYPE]', year: '[YEAR]', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
+    credits: [['Director', '[DIRECTOR]']] },
   { title: 'Distant and Known', type: 'Narrative Short Film', year: '2026', img: '01-01', media: { type: 'vimeo', id: '1116019493' },
     credits: [['Director', DIRECTOR], ['Screenwriter', DIRECTOR], ['Producer', DIRECTOR], ['Co-Producers', 'Anna Mayo / Kennie Zhou'], ['Casting', 'Nicole Hanzi Zhang / Anna Ting Möller / Matthew Yifeng'], ['Cinematographer', 'Myles Caba'], ['Editor', DIRECTOR], ['Music', 'Mikko Aaltio'], ['Sound', 'Carol Yan Li'], ['Production Designer', 'Julia Sy'], ['Art Assistants', 'Alice Zhang / Ester Elise Poussot'], ['Gaffer', 'Neha Fernandes'], ['Sound Recordist', 'Wes Manginsay'], ['1st AD', 'Adeline Blue'], ['2nd AD', 'Natalie Rudzinski'], ['Script Supervisor', 'Olya Sukonrat'], ['Trinity Operator', 'Solomon Sylvester'], ['1st AC', 'Omar Garcia'], ['2nd AC', 'Lorelei Essman-Freeman'], ['G&E', 'Yaw Agyapong'], ['Hair & Makeup', 'Lareina Chen'], ['Costume Designers', 'Julia Sy / Ester Elise Poussot'], ['Dance Choreographer', 'Chloe Tsoi'], ['Dance Coach', 'Alexandra Ling'], ['BTS Photographer', 'Ethan Chan'], ['Poster Design', 'Lea Alda Copat'], ['Song Lyrics', 'Taotao Huang / Chengkangjie “Eric” Huang'], ['In Association With', 'Accent Sisters'], ['Distribution', 'Inwave Films']] },
   { title: 'Signature Payroll', type: 'Commercial Film', year: '2026', img: '04-01', media: { type: 'vimeo', id: '1227710649' },
@@ -55,6 +58,14 @@ const allPhotos = photoWorks.flatMap(project => project.photos.map(img => ({ img
 
 // Project page details (description, role, stills, festivals, distribution), copied from the hql portfolio.
 const projectDetails = {
+  "The 180 End": {
+    "description": "[DESCRIPTION]",
+    "medium": "[MEDIUM]",
+    "role": "[ROLE]",
+    "stills": [
+      "17-01"
+    ]
+  },
   "Distant and Known": {
     "description": "Xiang, dressed in a silk qipao, awakens in a hazy banquet hall, having forgotten her name. Dance and song pave her way back home.",
     "medium": "Digital 4K",
