@@ -127,6 +127,11 @@ function revealPage(target) {
   updateWorksSnap();
   window.scrollTo({ top: 0, behavior: 'instant' });
   updateToTop();
+  // Works always comes back on ALL WORK.
+  if (target === 'works' && currentFilter !== 'all') {
+    applyFilter('all');
+    worksReturnScroll = null;
+  }
   // Phones: Works always opens in the List view.
   if (target === 'works' && currentView !== 'list' && window.matchMedia('(max-width: 800px)').matches) {
     setView('list');
