@@ -408,8 +408,10 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: no folding; every picture at full width, side by side, one swipe each */
   .project-page { touch-action:pan-x pan-y pinch-zoom; }
   /* One picture fills the width edge to edge (still a rounded rectangle); its neighbours stay out of sight */
-  .project-gallery { height:auto; padding:0; gap:12px; scroll-snap-type:x mandatory; overscroll-behavior-x:contain; }
-  .gallery-item, .gallery-item.open { flex:0 0 100%; height:auto; aspect-ratio:4/5; max-height:62svh; border-radius:10px; scroll-snap-align:center; scroll-snap-stop:always; }
+  .project-gallery { height:auto; padding:0; gap:12px; overflow:hidden; touch-action:pan-y pinch-zoom; }
+  .gallery-item, .gallery-item.open { flex:0 0 100%; height:auto; aspect-ratio:4/5; max-height:62svh; border-radius:10px;
+    transform:translateX(calc(var(--at,0) * (-100% - 12px) + var(--drag,0px))); transition:transform .3s cubic-bezier(.22,.7,.2,1); }
+  .project-gallery.dragging .gallery-item { transition:none; }
   .gallery-item .gallery-caption { opacity:1; }
   .gallery-swipe { display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:14px; }
   .gallery-count { font-size:10px; font-weight:700; letter-spacing:.2em; color:#fff; font-variant-numeric:tabular-nums; }

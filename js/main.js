@@ -330,50 +330,72 @@ function renderProject(work) {
       const t = Math.min(1, Math.max(0, ((event.clientX - r.left) / r.width - 0.1) / 0.8));
       gallery.scrollLeft = t * overflow;
     });
-    // Phones: a tap while the row is still gliding into place only stops the glide (the
-    // browser sends no click), so a short, still touch counts as a tap on the picture itself.
-    let tap = null;
+    // Phones: the pictures sit side by side at full width; the row is moved by the site itself
+    // (not the browser's scrolling), so it follows the finger, turns one picture per swipe in
+    // .3s, and a tap always opens the picture, even mid-turn. A counter and a faint SWIPE
+    // underneath say so.
+    const wrap = el('div', 'gallery-wrap');
+    wrap.append(gallery);
+    let at = 0;
+    let swipeBar = null;
+    let count = null;
+    const total = String(pictures.length).padStart(2, '0');
+    const showAt = () => {
+      gallery.style.setProperty('--at', at);
+      if (count) count.textContent = `${String(at + 1).padStart(2, '0')} / ${total}`;
+    };
+    if (pictures.length > 1) {
+      count = el('span', 'gallery-count');
+      swipeBar = el('div', 'gallery-swipe');
+      swipeBar.append(count, el('span', 'gallery-hint', 'Swipe'));
+      wrap.append(swipeBar);
+    }
+    showAt();
+
+    let touch = null;
     let tappedAt = 0;
     gallery.addEventListener('touchstart', event => {
-      if (event.touches.length === 1) tap = { x: event.touches[0].clientX, y: event.touches[0].clientY, at: Date.now() };
+      if (!phoneHome.matches || event.touches.length !== 1) return;
+      touch = { x: event.touches[0].clientX, y: event.touches[0].clientY, t: Date.now(), sideways: null };
     }, { passive: true });
-    gallery.addEventListener('touchend', event => {
-      if (!tap || !phoneHome.matches) return;
+    gallery.addEventListener('touchmove', event => {
+      if (!touch) return;
+      const dx = event.touches[0].clientX - touch.x;
+      const dy = event.touches[0].clientY - touch.y;
+      if (touch.sideways === null && Math.hypot(dx, dy) > 8) touch.sideways = Math.abs(dx) > Math.abs(dy);
+      if (!touch.sideways) return; // up / down: the page scrolls as usual
+      event.preventDefault();
+      // Follow the finger, with some give past the first and last picture.
+      const edge = (at === 0 && dx > 0) || (at === pictures.length - 1 && dx < 0);
+      gallery.classList.add('dragging');
+      gallery.style.setProperty('--drag', `${edge ? dx / 3 : dx}px`);
+    }, { passive: false });
+    const endTouch = event => {
+      if (!touch) return;
       const t = event.changedTouches[0];
-      const still = Math.hypot(t.clientX - tap.x, t.clientY - tap.y) < 10 && Date.now() - tap.at < 500;
-      tap = null;
-      const item = event.target.closest && event.target.closest('.gallery-item');
-      if (!still || !item) return;
-      event.preventDefault(); // no click after it as well
-      tappedAt = Date.now();
-      openLightbox(pictures, [...gallery.children].indexOf(item), work.title);
-    });
+      const dx = t.clientX - touch.x;
+      const still = Math.hypot(dx, t.clientY - touch.y) < 10 && Date.now() - touch.t < 500;
+      const sideways = touch.sideways;
+      touch = null;
+      gallery.classList.remove('dragging');
+      gallery.style.setProperty('--drag', '0px');
+      if (event.type === 'touchend' && still) {
+        event.preventDefault(); // no click after it as well
+        tappedAt = Date.now();
+        openLightbox(pictures, at, work.title);
+        return;
+      }
+      if (sideways && Math.abs(dx) > 40) {
+        at = Math.min(pictures.length - 1, Math.max(0, at + (dx < 0 ? 1 : -1)));
+        if (swipeBar) swipeBar.classList.add('hint-done');
+      }
+      showAt();
+    };
+    gallery.addEventListener('touchend', endTouch);
+    gallery.addEventListener('touchcancel', endTouch);
     gallery.addEventListener('click', event => {
       if (Date.now() - tappedAt < 600) event.stopPropagation();
     }, true);
-
-    // Phones: the pictures sit side by side at full width and a swipe moves between them;
-    // a counter and a faint SWIPE underneath say so.
-    const wrap = el('div', 'gallery-wrap');
-    wrap.append(gallery);
-    if (pictures.length > 1) {
-      const count = el('span', 'gallery-count');
-      const total = String(pictures.length).padStart(2, '0');
-      const showCount = () => {
-        const step = gallery.firstElementChild.offsetWidth + parseFloat(getComputedStyle(gallery).columnGap || 0);
-        const n = Math.min(pictures.length, Math.round(gallery.scrollLeft / (step || 1)) + 1);
-        count.textContent = `${String(n).padStart(2, '0')} / ${total}`;
-      };
-      showCount();
-      const hint = el('span', 'gallery-hint', 'Swipe');
-      const swipeBar = el('div', 'gallery-swipe');
-      swipeBar.append(count, hint);
-      gallery.addEventListener('scroll', () => {
-        showCount();
-        if (gallery.scrollLeft > 20) swipeBar.classList.add('hint-done');
-      }, { passive: true });
-      wrap.append(swipeBar);
-    }
     parts.push(wrap);
   }
 
