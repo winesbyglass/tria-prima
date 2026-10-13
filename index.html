@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=85">
+  <link rel="stylesheet" href="css/style.css?v=86">
 </head>
 <body>
   <main class="app">
@@ -26,6 +26,11 @@
           <h1 class="brand">TRIA PRIMA</h1>
         </div>
         <button type="button" class="film-link" data-target="works" aria-label="Explore featured film in Works"><span>EXPLORE WORKS ↗</span></button>
+        <nav class="navigation" aria-label="Main navigation">
+          <button class="nav-link" type="button" data-target="works">Works</button>
+          <button class="nav-link" type="button" data-target="process">Process</button>
+          <button class="nav-link" type="button" data-target="contact">Contact</button>
+        </nav>
       </div>
       <aside class="aside" id="about" aria-label="About Tria Prima">
         <div class="aside-copy">
@@ -33,13 +38,6 @@
           <p>Tria Prima is a film and media production company. We craft compelling stories through authentic visuals, meaningful collaborations, and a passion for cinematic excellence.</p>
         </div>
       </aside>
-      <!-- Same menu as every other page, top right; HOME is the current one -->
-      <nav class="navigation site-nav" aria-label="Site">
-        <button type="button" class="current" aria-current="page" data-home>HOME</button>
-        <button type="button" data-target="works">WORKS</button>
-        <button type="button" data-target="process">PROCESS</button>
-        <button type="button" data-target="contact">CONTACT</button>
-      </nav>
       <!-- 3D divider: click to turn the page between the film and the photo slideshow -->
       <div class="split" id="split">
         <button class="split-toggle" id="splitToggle" type="button" aria-label="Show photographs"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg></button>
@@ -166,6 +164,6 @@
   </div>
 
   <script src="js/works.js?v=8"></script>
-  <script src="js/main.js?v=68"></script>
+  <script src="js/main.js?v=69"></script>
 </body>
 </html>

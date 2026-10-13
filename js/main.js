@@ -1132,7 +1132,6 @@ function relRect(el, box) {
 // Home: sample the film frame (or the photo on show) a few times a second.
 const homeInkTargets = [
   [document.querySelector('.topline'), document.querySelector('.brand')],
-  [document.querySelector('.navigation'), document.querySelector('.navigation')],
   [aboutPanel, aboutPanel.querySelector('.aside-copy')]
 ];
 
