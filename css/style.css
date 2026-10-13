@@ -222,7 +222,7 @@ html.works-open::-webkit-scrollbar { display:none; }
    only the block opens the work photo. The photo takes the column width, capped so the page fits one screen. */
 .founder { display:flex; flex-direction:column; align-items:center; justify-self:center; width:max-content; max-width:100%; cursor:pointer; }
 /* Headshots are always on show (4:5, half-length); the placeholder holds initials until a photo is dropped in */
-.headshot { width:min(calc((100vw - 2 * var(--pad) - 2 * var(--gap)) / 3.15), calc((100svh - 330px) * .8)); aspect-ratio:4/5; border:0; padding:0; border-radius:10px; overflow:hidden; cursor:pointer; color:#fff;
+.headshot { width:min(calc((100vw - 2 * var(--pad) - 2 * var(--gap)) / 3.15 * .8), calc((100svh - 330px) * .8 * .8)); aspect-ratio:4/5; border:0; padding:0; border-radius:10px; overflow:hidden; cursor:pointer; color:#fff;
   display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; background:linear-gradient(160deg,#2b2b2b,#141414); }
 /* The headshot itself stays still on hover; hovering only brings up the work photo */
 .headshot img { width:100%; height:100%; object-fit:cover; display:block; }
