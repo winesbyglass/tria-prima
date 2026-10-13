@@ -20,12 +20,12 @@ const motionWorks = [
     credits: [['Writer / Script', DIRECTOR], ['Producers', 'Haohao Qiaoshi Liu / Wertti Majamaa / Kauri Seppälä'], ['DOP', DIRECTOR], ['Editor', DIRECTOR], ['Music', 'Eddy Zhang'], ['Sound Design', DIRECTOR], ['Production Design', DIRECTOR], ['Distribution', 'AFF Distribution']] },
   { title: 'Early Years', type: 'Narrative Short Film', year: '2024', img: '03-04', media: { type: 'vimeo', id: '1016622750' },
     credits: [['Writer / Director / Editor', DIRECTOR], ['Producer', 'Andrew Tuoriniemi'], ['1st Assistant Director', 'Saimi Räty'], ['2nd Assistant Director', 'Lukas Jokilehto'], ['Personal Assistant to Director', 'Taotao Huang'], ['Clapper', 'Holly Hefan Xiao'], ['Casting Director', DIRECTOR], ['Assistant Casting Director', 'Michael Yang'], ['Sound', 'Mikko Tripakis / Michael Yang'], ['Original Score', 'Mikko Aaltio / Michael Yang / Mikko Tripakis / Eddy Zhang'], ['Director of Photography', DIRECTOR], ['Camera Operator', 'Kristian Presnal'], ['Camcorder Operators', 'Andrew Tuoriniemi / Cindia Ma'], ['Wardrobe Stylist', 'Carmen Roux'], ['Moodboard', 'Carmen Roux'], ['Behind the Scenes', 'Holly Hefan Xiao / Carmen Roux'], ['Concept Poster Design', 'Lea Alda Copat'], ['Head of Logistics', 'Jun Liu']] },
+  // Placeholders in [brackets] until the details arrive. Film: Google Drive file (festival cut).
+  { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2024', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
+    credits: [['Director', '[DIRECTOR]']] },
   { title: "POTE'CAST", type: 'Podcast Video Series', year: '2023–2024', img: '07-01', media: { type: 'youtube-series', episodes: [
     { id: 'WmM7TZO3HDc', label: 'EPISODE 01' }, { id: 'Vi3096sogVQ', label: 'EPISODE 02' }, { id: '2-0PuID-h1Q', label: 'EPISODE 03' }] },
     credits: [['Director', DIRECTOR], ['Producer', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR]] },
-  // Placeholders in [brackets] until the details arrive. Film: Google Drive file (festival cut).
-  { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2023', img: '17-01', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
-    credits: [['Director', '[DIRECTOR]']] },
   { title: 'La Rêverie Festival Trailer', type: 'Trailer', year: '2023', img: '08-01', media: { type: 'youtube', id: 'ykr8qHLEXoE' },
     credits: [['Director', DIRECTOR], ['Editor', DIRECTOR], ['Animator', DIRECTOR]] },
   { title: 'When Does It All Begin To Matter?', type: 'Video Series', year: '2022', img: '16-01', media: { type: 'youtube-series', episodes: [
