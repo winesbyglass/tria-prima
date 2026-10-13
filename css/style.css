@@ -30,6 +30,8 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .film-link { position:absolute; top:20%; bottom:29%; left:20%; right:20%; border:0; background:transparent; color:var(--white); cursor:pointer; z-index:1; }
 .film-link span { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); opacity:0; border:1px solid rgba(255,255,255,.9); border-radius:99px; padding:14px 23px; letter-spacing:.2em; font-size:10px; white-space:nowrap; transition:opacity .4s var(--ease); }
 .film-link:hover span, .film-link:focus-visible span { opacity:1; }
+.film-link span { display:inline-flex; align-items:center; gap:8px; }
+.film-link svg { width:9px; height:9px; flex:none; }
 
 /* Text menu stacked in the bottom-left corner; always white (it doesn't follow the picture) */
 .navigation { position:absolute; bottom:6%; left:4.5%; z-index:5; display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
@@ -434,8 +436,8 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: no film strip of thumbnails; the works fill the width */
   .works-page { --strip-w:0px; }
   .work-strip { display:none; }
-  /* No hover on phones: VIEW PROJECT and its arrow always show */
-  .work-slide-cta { opacity:1; }
+  /* No hover on phones: VIEW PROJECT / EXPLORE WORKS and their arrows always show */
+  .work-slide-cta, .film-link span { opacity:1; }
   .site-brand { font-size:16px; letter-spacing:.14em; }
   .works-page .site-bar { top:10px; right:calc(var(--strip-w) + 10px); }
   .works-filter { top:auto; bottom:64px; transform:none; }
