@@ -942,17 +942,13 @@ window.addEventListener('keydown', event => {
   if (Date.now() < pageLockUntil || turnSection(down ? 1 : -1, true)) event.preventDefault();
 });
 // List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
-// swapping the view underneath.
+// swapping the view underneath. Phones have no strip, so there each work flies between its
+// full-screen slide and its grid square instead.
 function morphView(view, onDone) {
-  // Phones have no thumbnail strip to fly from: just switch.
-  if (window.matchMedia('(max-width: 800px)').matches) {
-    setView(view);
-    onDone();
-    return;
-  }
+  const listNodes = window.matchMedia('(max-width: 800px)').matches ? slides : thumbs;
   const toGrid = view === 'grid';
   const visible = works.map((_, i) => i).filter(i => !gridItems[i].hidden);
-  const rectOf = (i, grid) => (grid ? gridItems[i] : thumbs[i]).getBoundingClientRect();
+  const rectOf = (i, grid) => (grid ? gridItems[i] : listNodes[i]).getBoundingClientRect();
   const from = new Map(visible.map(i => [i, rectOf(i, !toGrid)]));
 
   stripTrack.style.transition = 'none';
@@ -962,7 +958,7 @@ function morphView(view, onDone) {
 
   const onScreen = r => r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
   const targets = visible.map(i => [i, rectOf(i, toGrid)]).filter(([i, r]) => onScreen(r) || onScreen(from.get(i)));
-  const finals = targets.map(([i]) => (toGrid ? gridItems[i] : thumbs[i]));
+  const finals = targets.map(([i]) => (toGrid ? gridItems[i] : listNodes[i]));
   finals.forEach(node => { node.style.visibility = 'hidden'; });
 
   const layer = el('div', 'morph-layer');
