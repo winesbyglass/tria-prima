@@ -468,6 +468,11 @@ html.lightbox-open { overflow:hidden; }
 .site-menu-list button { padding:4px 0; border:0; background:none; color:rgba(255,255,255,.45); font:400 clamp(34px,10vw,56px)/1 var(--font); letter-spacing:.04em; cursor:pointer; transition:color .3s ease; }
 .site-menu-list button.current, .site-menu-list button:hover, .site-menu-list button:focus-visible { color:#fff; }
 @media (max-width:800px) {
+  /* Sideways swipes never leave the page (no browser back / forward gesture). On the home page
+     a sideways swipe only turns between Motion and Photo; every other page moves up and down only. */
+  html, body { overscroll-behavior-x:none; }
+  .home { touch-action:pinch-zoom; }
+  .page { touch-action:pan-y pinch-zoom; }
   .swipe-dots { display:flex; }
   .menu-toggle { display:grid; }
   .site-nav { display:none; }

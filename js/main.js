@@ -1093,6 +1093,13 @@ home.addEventListener('touchstart', event => {
   if (!phoneHome.matches || event.touches.length !== 1) return;
   swipeStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
 }, { passive: true });
+// A sideways drag on the home page belongs to the Motion / Photo turn, never to the browser.
+home.addEventListener('touchmove', event => {
+  if (!swipeStart || event.touches.length !== 1) return;
+  const dx = event.touches[0].clientX - swipeStart.x;
+  const dy = event.touches[0].clientY - swipeStart.y;
+  if (Math.abs(dx) > Math.abs(dy)) event.preventDefault();
+}, { passive: false });
 home.addEventListener('touchend', event => {
   if (!swipeStart) return;
   const dx = event.changedTouches[0].clientX - swipeStart.x;
