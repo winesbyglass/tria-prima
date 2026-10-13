@@ -1325,6 +1325,8 @@ document.addEventListener('keydown', event => { if (founderOn >= 0 && event.key 
 // ---------- Text colour follows the picture behind it ----------
 // The picture is drawn "object-fit: cover" into a tiny canvas; each text block's area is
 // averaged and gets .ink-dark (black text) when the picture there is light.
+// Switched off: all text stays white everywhere, whatever the picture.
+const ADAPTIVE_INK = false;
 const inkCanvas = document.createElement('canvas');
 const inkCtx = inkCanvas.getContext('2d', { willReadFrequently: true });
 const LIGHT = 0.6;
@@ -1374,7 +1376,7 @@ const homeInkTargets = [
 ];
 
 function updateHomeInk() {
-  if (home.hidden || home.classList.contains('flipping')) return;
+  if (!ADAPTIVE_INK || home.hidden || home.classList.contains('flipping')) return;
   const box = document.querySelector('.hero').getBoundingClientRect();
   let px = null;
   if (home.classList.contains('photo-mode')) {
@@ -1397,7 +1399,7 @@ let activeIndex = 0;
 
 function sampleSlideInk(i, img) {
   // ink: 'light' keeps a work's text white whatever its picture.
-  if (works[i].ink === 'light') return;
+  if (!ADAPTIVE_INK || works[i].ink === 'light') return;
   const slide = slides[i];
   const sb = slide.getBoundingClientRect();
   if (!sb.width) return;
@@ -1470,6 +1472,7 @@ function fillRemainingSlides() {
 // The fixed labels (Back, filters, List/Grid) follow the slide on screen; on the grid they sit on black.
 function updateWorksInk(i) {
   activeIndex = i;
+  if (!ADAPTIVE_INK) return;
   const px = currentView === 'list' ? slidePixels[i] : null;
   worksOverlays.forEach(el => {
     // The slide on screen starts at the top-left of the viewport.
