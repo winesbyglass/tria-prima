@@ -31,10 +31,9 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 .film-link span { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); opacity:0; border:1px solid rgba(255,255,255,.9); border-radius:99px; padding:14px 23px; letter-spacing:.2em; font-size:10px; white-space:nowrap; transition:opacity .4s var(--ease); }
 .film-link:hover span, .film-link:focus-visible span { opacity:1; }
 
-/* Text menu stacked in the bottom-left corner */
-.navigation { position:absolute; bottom:6%; left:4.5%; z-index:5; display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
-.nav-link { border:0; background:none; padding:4px 0; color:#fff; font-size:clamp(13px,1vw,16px); font-weight:700; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; transition:color .35s ease; }
-.nav-link:hover,.nav-link:focus-visible { color:rgb(191,136,96); }
+/* The site menu (same as every page) at top right, level with the TRIA PRIMA title */
+.navigation { position:absolute; top:calc(4.2% + 2px + (clamp(23px,2.7vw,44px) * 1.1 - 27px) / 2); right:4.2%; z-index:7; }
+.navigation button { text-shadow:0 1px 3px rgba(0,0,0,.6); }
 
 /* About: transparent, same footprint (right sixth), text over the film */
 .aside { position:absolute; top:0; right:0; bottom:0; width:var(--aside-w); z-index:4; color:#fff; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(18px,1.8vw,40px); }
@@ -339,15 +338,14 @@ html.lightbox-open { overflow:hidden; }
 .lightbox-close { position:absolute; top:18px; right:24px; border:0; background:none; color:#fff; font-size:34px; line-height:1; cursor:pointer; }
 .lightbox-count { position:absolute; bottom:20px; left:0; right:0; margin:0; text-align:center; font-size:11px; font-weight:700; letter-spacing:.2em; color:rgba(255,255,255,.7); }/* ---------- Text colour follows the picture behind it ----------
    main.js samples the brightness under each text block and adds .ink-dark on light areas. */
-.topline .logo-placeholder, .brand, .nav-link, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
-.topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .navigation.ink-dark .nav-link, .aside.ink-dark, .work-slide.ink-dark, .site-brand.ink-dark { color:#111; }
+.topline .logo-placeholder, .brand, .aside, .aside-copy p, .work-slide, .works-filter button, .works-view button { transition:color .4s ease; }
+.topline.ink-dark .logo-placeholder, .topline.ink-dark .brand, .aside.ink-dark, .work-slide.ink-dark, .site-brand.ink-dark { color:#111; }
 .aside.ink-dark .aside-copy p { color:rgba(0,0,0,.82); }
 .aside.ink-dark .aside-copy, .work-slide.ink-dark .work-slide-sub, .work-slide.ink-dark .work-slide-title, .site-brand.ink-dark,
 .site-nav.ink-dark button, .works-filter.ink-dark button, .works-view.ink-dark button { text-shadow:0 1px 3px rgba(255,255,255,.55); }
 .site-nav.ink-dark button, .works-filter.ink-dark button, .works-view.ink-dark button { color:rgba(0,0,0,.5); }
 .site-nav.ink-dark button.current, .works-filter.ink-dark button.active, .works-view.ink-dark button.active,
 .site-nav.ink-dark button:hover, .works-filter.ink-dark button:hover, .works-view.ink-dark button:hover { color:#111; }
-.navigation.ink-dark .nav-link:hover { color:rgb(191,136,96); }
 
 /* ---------- Page change: widescreen letterbox ----------
    Black bars close from top and bottom like a film frame, the destination's name shows in the
@@ -424,7 +422,8 @@ html.lightbox-open { overflow:hidden; }
   .logo-placeholder { width:40px; }
   .logo-placeholder svg { width:39px; height:37px; }
   .logo-placeholder span { font-size:5px; }
-  .navigation { left:6%; bottom:calc(var(--aside-h) + 22px); }
+  /* Phones: the menu sits centred under the title and logo */
+  .navigation { top:calc(4.2% + 64px); left:6%; right:6%; justify-content:center; }
   /* Page turn runs bottom → top: divider is horizontal above the About text */
   .photo-stage { clip-path:inset(var(--split,100%) 0 0 0); }
   .split { left:0; right:0; top:var(--split,calc(100% - var(--aside-h))); bottom:auto; width:auto; height:0; }
