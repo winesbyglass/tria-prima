@@ -420,7 +420,7 @@ html.lightbox-open { overflow:hidden; }
   /* Phones: the three columns stack: the company details, then each founder (photo + details) */
   .contact-layout { grid-template-columns:minmax(0,1fr); gap:56px; }
   .founder { width:100%; justify-self:stretch; }
-  .headshot { width:min(100%,420px); }
+  .headshot { width:min(72%,300px); }
   .founder-name { white-space:normal; }
   .process-layout { grid-template-columns:1fr; gap:48px; }
   .process-item { grid-template-columns:1fr; gap:8px; }
