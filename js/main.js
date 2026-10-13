@@ -300,8 +300,8 @@ function renderProject(work) {
         item.append(caption);
       }
       item.addEventListener('click', () => {
-        // Photo projects: clicking the open picture shows it full screen.
-        if (isPhoto && item.classList.contains('open')) { openLightbox(work.photos, k, work.title); return; }
+        // Photo projects: clicking the open picture (on phones, any picture) shows it full screen.
+        if (isPhoto && (item.classList.contains('open') || phoneHome.matches)) { openLightbox(work.photos, k, work.title); return; }
         gallery.querySelectorAll('.gallery-item').forEach(other => other.classList.toggle('open', other === item));
       });
       gallery.append(item);
@@ -315,7 +315,29 @@ function renderProject(work) {
       const t = Math.min(1, Math.max(0, ((event.clientX - r.left) / r.width - 0.1) / 0.8));
       gallery.scrollLeft = t * overflow;
     });
-    parts.push(gallery);
+    // Phones: the pictures sit side by side at full width and a swipe moves between them;
+    // a counter and a faint SWIPE underneath say so.
+    const wrap = el('div', 'gallery-wrap');
+    wrap.append(gallery);
+    if (pictures.length > 1) {
+      const count = el('span', 'gallery-count');
+      const total = String(pictures.length).padStart(2, '0');
+      const showCount = () => {
+        const step = gallery.firstElementChild.offsetWidth + parseFloat(getComputedStyle(gallery).columnGap || 0);
+        const n = Math.min(pictures.length, Math.round(gallery.scrollLeft / (step || 1)) + 1);
+        count.textContent = `${String(n).padStart(2, '0')} / ${total}`;
+      };
+      showCount();
+      const hint = el('span', 'gallery-hint', 'Swipe');
+      const swipeBar = el('div', 'gallery-swipe');
+      swipeBar.append(count, hint);
+      gallery.addEventListener('scroll', () => {
+        showCount();
+        if (gallery.scrollLeft > 20) swipeBar.classList.add('hint-done');
+      }, { passive: true });
+      wrap.append(swipeBar);
+    }
+    parts.push(wrap);
   }
 
   // Then the film, framed with wide margins.
