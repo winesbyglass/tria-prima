@@ -433,7 +433,9 @@ html.lightbox-open { overflow:hidden; }
   .process-tab { padding:8px 12px; }
   .preview-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
   .lightbox-img { max-width:100vw; max-height:calc(100vh - 140px); border-radius:0; }
-  .lightbox-nav { top:auto; bottom:52px; translate:none; }
+  /* Phones: no arrows, a sideways swipe changes the photograph */
+  .lightbox-nav { display:none; }
+  .lightbox { touch-action:pinch-zoom; }
   .gallery-caption { padding:40px 18px 18px; gap:14px; }
   .gallery-fact { font-size:12px; gap:8px; }
   /* Phones: just the film (or photographs), the title and the menu button: no About text,

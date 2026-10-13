@@ -500,7 +500,29 @@ function closeLightbox() {
 lightbox.querySelector('.prev').addEventListener('click', () => showLightbox(lightboxAt - 1));
 lightbox.querySelector('.next').addEventListener('click', () => showLightbox(lightboxAt + 1));
 lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-lightbox.addEventListener('click', event => { if (event.target === lightbox) closeLightbox(); });
+// Phones: no arrows; a left / right swipe changes the photograph.
+let lightboxTouch = null;
+lightbox.addEventListener('touchstart', event => {
+  if (event.touches.length === 1) lightboxTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+}, { passive: true });
+lightbox.addEventListener('touchmove', event => {
+  if (!lightboxTouch || event.touches.length !== 1) return;
+  if (Math.abs(event.touches[0].clientX - lightboxTouch.x) > Math.abs(event.touches[0].clientY - lightboxTouch.y)) event.preventDefault();
+}, { passive: false });
+lightbox.addEventListener('touchend', event => {
+  if (!lightboxTouch) return;
+  const dx = event.changedTouches[0].clientX - lightboxTouch.x;
+  const dy = event.changedTouches[0].clientY - lightboxTouch.y;
+  lightboxTouch = null;
+  if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+  lightboxSwiped = Date.now();
+  showLightbox(lightboxAt + (dx < 0 ? 1 : -1));
+});
+let lightboxSwiped = 0;
+lightbox.addEventListener('click', event => {
+  // (A swipe that ends on the backdrop is not a tap on it.)
+  if (event.target === lightbox && Date.now() - lightboxSwiped > 400) closeLightbox();
+});
 document.addEventListener('keydown', event => {
   if (lightbox.hidden) return;
   if (event.key === 'Escape') closeLightbox();
