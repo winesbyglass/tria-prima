@@ -1011,7 +1011,7 @@ function restSplit() {
   if (phoneHome.matches) return h.width;
   return aboutPanel.getBoundingClientRect().left - h.left;
 }
-const turnMs = () => (phoneHome.matches ? 1100 : TURN_MS);
+const turnMs = () => (phoneHome.matches ? 600 : TURN_MS);
 
 function animateSplit(from, to, done) {
   const start = performance.now();
@@ -1058,15 +1058,15 @@ function turnToFilm() {
   });
 }
 
-// Phones: two dots at the bottom show which of the two is on (film / photographs), with a
-// faint "SWIPE" that fades once the visitor has swiped (or after a few seconds). A left swipe
+// Phones: MOTION / PHOTO at the bottom name the two (film / photographs) and light the one on,
+// with a faint "SWIPE" that fades once the visitor has swiped (or after a few seconds). A left swipe
 // turns to the photographs, a right swipe back to the film; the dots can be tapped too.
 const swipeDots = el('div', 'swipe-dots');
 swipeDots.dataset.at = '0';
-['Film', 'Photographs'].forEach((label, k) => {
-  const dot = el('button', 'swipe-dot');
+[['Motion', 'film'], ['Photo', 'photographs']].forEach(([label, what], k) => {
+  const dot = el('button', 'swipe-dot', label);
   dot.type = 'button';
-  dot.setAttribute('aria-label', `Show ${label.toLowerCase()}`);
+  dot.setAttribute('aria-label', `Show ${what}`);
   dot.addEventListener('click', () => {
     if (turning) return;
     if (k === 1 && !home.classList.contains('photo-mode')) turnToPhotos();

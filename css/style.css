@@ -438,14 +438,14 @@ html.lightbox-open { overflow:hidden; }
   .work-grid { grid-template-columns:repeat(2,minmax(0,1fr)); padding:70px 16px 120px; }
 }
 /* Phone-only pieces, hidden on desktop: the swipe dots, the menu button, the full-screen menu */
-/* Two dots (film / photographs) low in the middle; the current one is a short bar. A faint
-   SWIPE beside them fades away once the visitor has swiped. */
-.swipe-dots { display:none; position:absolute; left:50%; bottom:calc(5% + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:7; align-items:center; gap:8px; }
-.swipe-dot { width:6px; height:6px; padding:0; border:0; border-radius:3px; background:rgba(255,255,255,.45); box-shadow:0 0 4px rgba(0,0,0,.45); cursor:pointer; transition:width .4s var(--ease),background-color .4s ease; }
-.swipe-dot::before { content:""; position:absolute; inset:-12px -6px; }
-.swipe-dot { position:relative; }
-.swipe-dots[data-at="0"] .swipe-dot:nth-child(1), .swipe-dots[data-at="1"] .swipe-dot:nth-child(2) { width:20px; background:#fff; }
-.swipe-hint { position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%); font-size:9px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.6);
+/* MOTION / PHOTO low in the middle: the one on show is white with a short bar under it.
+   A faint SWIPE beside them fades away once the visitor has swiped. */
+.swipe-dots { display:none; position:absolute; left:50%; bottom:calc(5% + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:7; align-items:center; gap:18px; }
+.swipe-dot { position:relative; padding:8px 0; border:0; background:none; color:rgba(255,255,255,.5); font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase;
+  text-shadow:0 1px 3px rgba(0,0,0,.65); cursor:pointer; transition:color .4s ease; }
+.swipe-dot::after { content:""; position:absolute; left:50%; bottom:0; width:0; height:1.5px; margin-left:-.1em; background:#fff; box-shadow:0 0 4px rgba(0,0,0,.45); transform:translateX(-50%); transition:width .4s var(--ease); }
+.swipe-dots[data-at="0"] .swipe-dot:nth-child(1), .swipe-dots[data-at="1"] .swipe-dot:nth-child(2) { color:#fff; }
+.swipe-dots[data-at="0"] .swipe-dot:nth-child(1)::after, .swipe-dots[data-at="1"] .swipe-dot:nth-child(2)::after { width:18px; }.swipe-hint { position:absolute; left:50%; bottom:calc(100% + 6px); transform:translateX(-50%); font-size:8px; font-weight:700; letter-spacing:.3em; text-transform:uppercase; color:rgba(255,255,255,.6);
   text-shadow:0 1px 3px rgba(0,0,0,.6); white-space:nowrap; animation:swipe-nudge 2.4s ease-in-out infinite; transition:opacity .6s ease; }
 .swipe-dots.hint-done .swipe-hint { opacity:0; }
 @keyframes swipe-nudge { 0%,60%,100% { translate:0 0; } 30% { translate:-4px 0; } }
