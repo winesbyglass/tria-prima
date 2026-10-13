@@ -69,7 +69,7 @@ button:focus-visible, a:focus-visible { outline:2px solid #efc390; outline-offse
 /* Parked at the far left the line is hidden; only the button remains */
 .home.photo-mode .split::before { transform:none; opacity:0; }
 .home.photo-mode .split-toggle { transform:translate(0,-50%); }
-.home.photo-mode .split-toggle svg { transform:rotate(180deg); }
+.home.photo-mode .split-toggle svg, .home.returning .split-toggle svg { transform:rotate(180deg); }
 
 /* ---------- Inner pages ---------- */
 .page { min-height:100svh; padding:34px clamp(23px,5vw,90px) 80px; background:#111315; display:none; }
@@ -434,7 +434,7 @@ html.lightbox-open { overflow:hidden; }
   .split-toggle { left:auto; right:7vw; top:0; transform:translateY(-50%); }
   .split-toggle svg { transform:rotate(90deg); }
   .home.photo-mode .split-toggle { transform:translateY(0); }
-  .home.photo-mode .split-toggle svg { transform:rotate(270deg); }
+  .home.photo-mode .split-toggle svg, .home.returning .split-toggle svg { transform:rotate(270deg); }
 
   .works-page { --strip-w:56px; }
   .site-brand { font-size:16px; letter-spacing:.14em; }

@@ -975,9 +975,10 @@ function turnToFilm() {
   turning = true;
   playHero();
   home.classList.remove('photo-mode');
-  home.classList.add('flipping');
+  // The arrow keeps pointing right while the divider travels; it turns back once it stops.
+  home.classList.add('flipping', 'returning');
   animateSplit(0, restSplit(), () => {
-    home.classList.remove('flipping');
+    home.classList.remove('flipping', 'returning');
     home.style.removeProperty('--split');
     stopSlideshow();
     splitToggle.setAttribute('aria-label', 'Show photographs');
