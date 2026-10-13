@@ -105,7 +105,8 @@ html.works-open::-webkit-scrollbar { display:none; }
 .work-slide { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100svh; scroll-snap-align:start; border:0; padding:0 calc(var(--strip-w) + 6vw) 0 6vw; color:#fff; cursor:pointer; background:#000 center/cover no-repeat; text-align:center; }
 .work-slide-sub { font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; text-shadow:0 1px 4px rgba(0,0,0,.6); }
 .work-slide-title { margin-top:12px; font:400 clamp(38px,5.4vw,88px)/1 var(--font); letter-spacing:-.02em; text-shadow:0 2px 16px rgba(0,0,0,.45); }
-.work-slide-cta { margin-top:22px; font-size:10px; letter-spacing:.2em; opacity:0; transition:opacity .4s ease; }
+.work-slide-cta { display:inline-flex; align-items:center; gap:8px; margin-top:22px; font-size:10px; letter-spacing:.2em; opacity:0; transition:opacity .4s ease; }
+.work-slide-cta svg { width:9px; height:9px; flex:none; }
 .work-slide:hover .work-slide-cta, .work-slide:focus-visible .work-slide-cta { opacity:1; }
 
 /* Thumbnail strip on the right, follows the work on screen, styled as a strip of film with
@@ -430,7 +431,9 @@ html.lightbox-open { overflow:hidden; }
   .logo-placeholder svg { width:39px; height:37px; }
   .logo-placeholder span { font-size:5px; }
 
-  .works-page { --strip-w:56px; }
+  /* Phones: no film strip of thumbnails; the works fill the width */
+  .works-page { --strip-w:0px; }
+  .work-strip { display:none; }
   .site-brand { font-size:16px; letter-spacing:.14em; }
   .works-page .site-bar { top:10px; right:calc(var(--strip-w) + 10px); }
   .works-filter { top:auto; bottom:64px; transform:none; }

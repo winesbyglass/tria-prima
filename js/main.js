@@ -513,8 +513,10 @@ const gridItems = [];
 works.forEach((work, i) => {
   const slide = el('button', 'work-slide');
   slide.type = 'button';
-  slide.append(el('span', 'work-slide-sub', workSub(work)), el('span', 'work-slide-title', work.title),
-    el('span', 'work-slide-cta', 'VIEW PROJECT ↗'));
+  // A plain drawn arrow (the ↗ character turns into an emoji-style icon on some phones).
+  const cta = el('span', 'work-slide-cta', 'VIEW PROJECT');
+  cta.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M2 8 8 2M3.5 2H8v4.5"/></svg>');
+  slide.append(el('span', 'work-slide-sub', workSub(work)), el('span', 'work-slide-title', work.title), cta);
   slide.addEventListener('click', () => openProject(work, slide));
   slide.dataset.index = i;
   slides.push(slide);
@@ -920,6 +922,12 @@ window.addEventListener('keydown', event => {
 // List <-> Grid morph: every visible work flies between its strip thumbnail and its grid square,
 // swapping the view underneath.
 function morphView(view, onDone) {
+  // Phones have no thumbnail strip to fly from: just switch.
+  if (window.matchMedia('(max-width: 800px)').matches) {
+    setView(view);
+    onDone();
+    return;
+  }
   const toGrid = view === 'grid';
   const visible = works.map((_, i) => i).filter(i => !gridItems[i].hidden);
   const rectOf = (i, grid) => (grid ? gridItems[i] : thumbs[i]).getBoundingClientRect();
