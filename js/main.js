@@ -36,10 +36,65 @@ pages.forEach(page => {
     if (id === lit) link.setAttribute('aria-current', 'page');
     nav.append(link);
   });
-  bar.append(brand, nav);
+  bar.append(brand, nav, menuButton());
   page.prepend(bar);
 });
 
+// ---------- Phones: a three-line menu button on every page opens a full-screen menu ----------
+function menuButton() {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'menu-toggle';
+  button.setAttribute('aria-label', 'Menu');
+  button.setAttribute('aria-haspopup', 'dialog');
+  button.innerHTML = '<span></span><span></span><span></span>';
+  button.addEventListener('click', openMenu);
+  return button;
+}
+document.querySelector('.topline').append(menuButton());
+
+const siteMenu = document.createElement('div');
+siteMenu.className = 'site-menu';
+siteMenu.hidden = true;
+siteMenu.setAttribute('role', 'dialog');
+siteMenu.setAttribute('aria-modal', 'true');
+siteMenu.setAttribute('aria-label', 'Menu');
+const menuClose = document.createElement('button');
+menuClose.type = 'button';
+menuClose.className = 'site-menu-close';
+menuClose.setAttribute('aria-label', 'Close menu');
+menuClose.innerHTML = '<span></span><span></span>';
+menuClose.addEventListener('click', closeMenu);
+const menuList = document.createElement('nav');
+menuList.className = 'site-menu-list';
+menuList.setAttribute('aria-label', 'Site');
+['home', ...navPages].forEach(id => {
+  const link = document.createElement('button');
+  link.type = 'button';
+  link.textContent = id.toUpperCase();
+  link.dataset.menu = id;
+  if (id === 'home') link.dataset.home = '';
+  else link.dataset.target = id;
+  link.addEventListener('click', closeMenu);
+  menuList.append(link);
+});
+siteMenu.append(menuClose, menuList);
+document.body.append(siteMenu);
+
+function openMenu() {
+  // The page on show is the lit one (a project page lights WORKS).
+  const page = pages.find(p => !p.hidden);
+  const lit = page ? page.dataset.navCurrent || page.id : 'home';
+  menuList.querySelectorAll('button').forEach(b => b.classList.toggle('current', b.dataset.menu === lit));
+  siteMenu.hidden = false;
+  document.documentElement.classList.add('lightbox-open');
+  menuClose.focus({ preventScroll: true });
+}
+function closeMenu() {
+  siteMenu.hidden = true;
+  document.documentElement.classList.remove('lightbox-open');
+}
+document.addEventListener('keydown', event => { if (!siteMenu.hidden && event.key === 'Escape') closeMenu(); });
 // ---------- Hero background film (muted MP4 autoplay) ----------
 function playHero() {
   heroVideo.muted = true;
@@ -918,7 +973,7 @@ toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smoot
 const splitToggle = document.getElementById('splitToggle');
 const photoStage = document.getElementById('photoStage');
 const aboutPanel = document.getElementById('about');
-const verticalTurn = window.matchMedia('(max-width: 800px)');
+const phoneHome = window.matchMedia('(max-width: 800px)');
 const SLIDE_MS = 3000;
 const TURN_MS = 2000;
 let slideTimer = null;
@@ -949,18 +1004,21 @@ function stopSlideshow() {
   slideTimer = null;
 }
 
-// Resting divider position: the About edge (left edge on desktop, top edge on mobile).
+// Resting divider position: the About edge on desktop; on phones (no About, no divider) the
+// right edge, so a swipe brings the photographs in from the right.
 function restSplit() {
-  const a = aboutPanel.getBoundingClientRect();
   const h = home.getBoundingClientRect();
-  return verticalTurn.matches ? a.top - h.top : a.left - h.left;
+  if (phoneHome.matches) return h.width;
+  return aboutPanel.getBoundingClientRect().left - h.left;
 }
+const turnMs = () => (phoneHome.matches ? 1100 : TURN_MS);
 
 function animateSplit(from, to, done) {
   const start = performance.now();
+  const ms = turnMs();
   const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const step = now => {
-    const t = Math.min(1, (now - start) / TURN_MS);
+    const t = Math.min(1, (now - start) / ms);
     home.style.setProperty('--split', `${from + (to - from) * ease(t)}px`);
     if (t < 1) requestAnimationFrame(step);
     else done();
@@ -973,6 +1031,7 @@ function turnToPhotos() {
   const from = restSplit();
   home.style.setProperty('--split', `${from}px`);
   home.classList.add('flipping');
+  swipeDots.dataset.at = '1';
   startSlideshow();
   animateSplit(from, 0, () => {
     home.classList.remove('flipping');
@@ -989,6 +1048,7 @@ function turnToFilm() {
   home.classList.remove('photo-mode');
   // The arrow keeps pointing right while the divider travels; it turns back once it stops.
   home.classList.add('flipping', 'returning');
+  swipeDots.dataset.at = '0';
   animateSplit(0, restSplit(), () => {
     home.classList.remove('flipping', 'returning');
     home.style.removeProperty('--split');
@@ -997,6 +1057,44 @@ function turnToFilm() {
     turning = false;
   });
 }
+
+// Phones: two dots at the bottom show which of the two is on (film / photographs), with a
+// faint "SWIPE" that fades once the visitor has swiped (or after a few seconds). A left swipe
+// turns to the photographs, a right swipe back to the film; the dots can be tapped too.
+const swipeDots = el('div', 'swipe-dots');
+swipeDots.dataset.at = '0';
+['Film', 'Photographs'].forEach((label, k) => {
+  const dot = el('button', 'swipe-dot');
+  dot.type = 'button';
+  dot.setAttribute('aria-label', `Show ${label.toLowerCase()}`);
+  dot.addEventListener('click', () => {
+    if (turning) return;
+    if (k === 1 && !home.classList.contains('photo-mode')) turnToPhotos();
+    if (k === 0 && home.classList.contains('photo-mode')) turnToFilm();
+  });
+  swipeDots.append(dot);
+});
+const swipeHint = el('span', 'swipe-hint', 'Swipe');
+swipeDots.append(swipeHint);
+home.append(swipeDots);
+const hideSwipeHint = () => swipeDots.classList.add('hint-done');
+setTimeout(hideSwipeHint, 6000);
+
+let swipeStart = null;
+home.addEventListener('touchstart', event => {
+  if (!phoneHome.matches || event.touches.length !== 1) return;
+  swipeStart = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+}, { passive: true });
+home.addEventListener('touchend', event => {
+  if (!swipeStart) return;
+  const dx = event.changedTouches[0].clientX - swipeStart.x;
+  const dy = event.changedTouches[0].clientY - swipeStart.y;
+  swipeStart = null;
+  if (turning || Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  hideSwipeHint();
+  if (dx < 0 && !home.classList.contains('photo-mode')) turnToPhotos();
+  else if (dx > 0 && home.classList.contains('photo-mode')) turnToFilm();
+});
 
 splitToggle.addEventListener('click', () => {
   if (turning) return;
