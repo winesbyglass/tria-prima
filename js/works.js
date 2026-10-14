@@ -68,6 +68,11 @@ const projectDetails = {
     "medium": "[MEDIUM]",
     "role": "[ROLE]",
     "stills": [
+      "18-02",
+      "18-03",
+      "18-04",
+      "18-05",
+      "18-06",
       "18-01"
     ]
   },
@@ -76,7 +81,13 @@ const projectDetails = {
     "medium": "Digital 4K",
     "role": "Writer-Director / Producer",
     "stills": [
-      "17-01"
+      "17-01",
+      "17-02",
+      "17-03",
+      "17-04",
+      "17-05",
+      "17-06",
+      "17-07"
     ],
     "festivals": [
       [
