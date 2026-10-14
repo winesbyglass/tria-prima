@@ -18,6 +18,9 @@ const motionWorks = [
     credits: [['Filmmakers', 'Malik Clyde Terrab / Brandon Mioduszewski'], ['Colourist', DIRECTOR]] },
   { title: 'New York c. May 2025', type: 'Super 8mm Video', year: '2026', img: '10-01', media: { type: 'vimeo', id: '1228072459' },
     credits: [['Director', DIRECTOR], ['DP', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR], ['Audio', 'Joel Meyerowitz — 2026 ICP Infinity Awards speech']] },
+  // No film link yet (media "pending"); credits and write-up still placeholders.
+  { title: 'A Day in Eden', type: 'Drama / Magical Realism', duration: '16:29', year: '2026', img: '18-01', media: { type: 'pending' },
+    credits: [['Director', '[DIRECTOR]']] },
   { title: 'A Little Regret in Helsinki', type: 'Documentary Short Film', year: '2025', img: '02-01', media: { type: 'vimeo', id: '1110984253' },
     credits: [['Writer / Script', DIRECTOR], ['Producers', 'Haohao Qiaoshi Liu / Wertti Majamaa / Kauri Seppälä'], ['DOP', DIRECTOR], ['Editor', DIRECTOR], ['Music', 'Eddy Zhang'], ['Sound Design', DIRECTOR], ['Production Design', DIRECTOR], ['Distribution', 'AFF Distribution']] },
   { title: 'Early Years', type: 'Narrative Short Film', year: '2024', img: '03-04', phone: { img: '03-02', ink: 'light' }, media: { type: 'vimeo', id: '1016622750' },
@@ -25,9 +28,6 @@ const motionWorks = [
   // Film: Google Drive file (festival cut). Description still a placeholder.
   { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2024', img: '17-01', poster: '17-01', ink: 'light', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
     credits: [['Writer-Director', 'Jalsa Amidah Drinkard'], ['Producer', 'Jalsa Amidah Drinkard']] },
-  // No film link yet (media "pending"); year, credits and write-up still placeholders.
-  { title: 'A Day in Eden', type: 'Drama / Magical Realism', duration: '16:29', year: '[YEAR]', img: '18-01', media: { type: 'pending' },
-    credits: [['Director', '[DIRECTOR]']] },
   { title: "POTE'CAST", type: 'Podcast Video Series', year: '2023–2024', img: '07-01', media: { type: 'youtube-series', episodes: [
     { id: 'WmM7TZO3HDc', label: 'EPISODE 01' }, { id: 'Vi3096sogVQ', label: 'EPISODE 02' }, { id: '2-0PuID-h1Q', label: 'EPISODE 03' }] },
     credits: [['Director', DIRECTOR], ['Producer', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR]] },
