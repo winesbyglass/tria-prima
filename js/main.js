@@ -759,9 +759,10 @@ document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('clic
 }));
 
 // ALL WORK / MOTION / PHOTOGRAPHY, animated like the List <-> Grid morph (same timing, easing
-// and stagger). Grid: works that stay glide to their new squares, works that go shrink away,
-// works that arrive grow in. List: the work on screen steps back and fades, uncovering the
-// first work of the new selection, whose title rises in; the strip's frames fade in one by one.
+// and stagger). Grid: the squares on screen always shrink away one after another, then the new
+// selection's squares grow in one after another, so every switch looks the same whichever works
+// the two selections share. List: the work on screen steps back and fades, uncovering the first
+// work of the new selection, whose title rises in; the strip's frames fade in one by one.
 function filterWorks(filter, onDone) {
   const duration = 750;
   const stagger = 18;
@@ -769,29 +770,30 @@ function filterWorks(filter, onDone) {
   const layer = el('div', 'morph-layer');
   const box = r => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
   const shrink = r => ({ left: r.left + r.width * 0.15, top: r.top + r.height * 0.15, width: r.width * 0.7, height: r.height * 0.7 });
-  const onScreen = r => r && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+  const onScreen = r => r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
   const shown = () => works.map((_, i) => i).filter(i => !gridItems[i].hidden);
   const hidden = [];
   let count = 0;
 
   if (currentView === 'grid') {
-    const before = new Map(shown().map(i => [i, gridItems[i].getBoundingClientRect()]));
+    const half = duration / 2;
+    const outgoing = shown().map(i => [i, gridItems[i].getBoundingClientRect()]).filter(([, r]) => onScreen(r));
     applyFilter(filter);
-    const after = new Map(shown().map(i => [i, gridItems[i].getBoundingClientRect()]));
-    new Set([...before.keys(), ...after.keys()]).forEach(i => {
-      const from = before.get(i);
-      const to = after.get(i);
-      if (!onScreen(from) && !onScreen(to)) return;
+    const incoming = shown().map(i => [i, gridItems[i].getBoundingClientRect()]).filter(([, r]) => onScreen(r));
+    const fly = (i, frames, delay, ms) => {
       const flyer = el('span');
       flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
       layer.append(flyer);
-      const frames = from && to ? [{ ...box(from), opacity: 1 }, { ...box(to), opacity: 1 }]
-        : to ? [{ ...box(shrink(to)), opacity: 0 }, { ...box(to), opacity: 1 }]
-        : [{ ...box(from), opacity: 1 }, { ...box(shrink(from)), opacity: 0 }];
-      flyer.animate(frames, { duration, delay: count++ * stagger, easing, fill: 'both' });
+      flyer.animate(frames, { duration: ms, delay, easing, fill: 'both' });
+    };
+    outgoing.forEach(([i, r], n) => fly(i, [{ ...box(r), opacity: 1 }, { ...box(shrink(r)), opacity: 0 }], n * stagger, half));
+    const start = half * 0.6 + outgoing.length * stagger;
+    incoming.forEach(([i, r], n) => {
+      fly(i, [{ ...box(shrink(r)), opacity: 0 }, { ...box(r), opacity: 1 }], start + n * stagger, half + 150);
+      gridItems[i].style.visibility = 'hidden';
+      hidden.push(gridItems[i]);
     });
-    after.forEach((_, i) => { gridItems[i].style.visibility = 'hidden'; hidden.push(gridItems[i]); });
-  } else {
+    count = Math.ceil((start + incoming.length * stagger + half + 150 - duration) / stagger);  } else {
     // The work on screen, copied (picture and title) so it can step back over the new list.
     const old = slides[activeIndex].cloneNode(true);
     old.style.cssText += ';position:absolute;inset:0;width:100%;height:100%;';
@@ -801,7 +803,7 @@ function filterWorks(filter, onDone) {
       { duration, easing, fill: 'both' });
     const first = slides.find(slide => !slide.hidden);
     if (first) {
-      first.querySelectorAll('.work-slide-sub, .work-slide-title, .work-slide-cta').forEach((text, k) => {
+      first.querySelectorAll('.work-slide-sub, .work-slide-title').forEach((text, k) => {
         text.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
           { duration: duration * 0.7, delay: duration * 0.35 + k * 60, easing, fill: 'backwards' });
       });
