@@ -2,7 +2,7 @@
 
 // Works data, copied from the hql portfolio (video projects + three photography series).
 // img: file name in assets/works/{full,mid,thumb}/
-// media.type: "vimeo" | "youtube" | "youtube-series" | "gdrive" (Google Drive file id) | "photo"
+// media.type: "vimeo" | "youtube" | "youtube-series" | "gdrive" (Google Drive file id) | "pending" (no link yet) | "photo"
 // poster: cover picture over the project page player; ink: 'light' keeps the Works text white
 // phone: overrides used on phones only (e.g. another cover picture)
 const DIRECTOR = 'Haohao Qiaoshi Liu';
@@ -25,6 +25,9 @@ const motionWorks = [
   // Film: Google Drive file (festival cut). Description still a placeholder.
   { title: 'The 180 End', type: 'Drama', duration: '36:08', year: '2024', img: '17-01', poster: '17-01', ink: 'light', media: { type: 'gdrive', id: '1Pyc6bfPCjBtH0d7mtleyYgshkzV9w2X9' },
     credits: [['Writer-Director', 'Jalsa Amidah Drinkard'], ['Producer', 'Jalsa Amidah Drinkard']] },
+  // No film link yet (media "pending"); year, credits and write-up still placeholders.
+  { title: 'A Day in Eden', type: 'Drama / Magical Realism', duration: '16:29', year: '[YEAR]', img: '18-01', media: { type: 'pending' },
+    credits: [['Director', '[DIRECTOR]']] },
   { title: "POTE'CAST", type: 'Podcast Video Series', year: '2023–2024', img: '07-01', media: { type: 'youtube-series', episodes: [
     { id: 'WmM7TZO3HDc', label: 'EPISODE 01' }, { id: 'Vi3096sogVQ', label: 'EPISODE 02' }, { id: '2-0PuID-h1Q', label: 'EPISODE 03' }] },
     credits: [['Director', DIRECTOR], ['Producer', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR]] },
@@ -60,6 +63,14 @@ const allPhotos = photoWorks.flatMap(project => project.photos.map(img => ({ img
 
 // Project page details (description, role, stills, festivals, distribution), copied from the hql portfolio.
 const projectDetails = {
+  "A Day in Eden": {
+    "description": "[DESCRIPTION]",
+    "medium": "[MEDIUM]",
+    "role": "[ROLE]",
+    "stills": [
+      "18-01"
+    ]
+  },
   "The 180 End": {
     "description": "[DESCRIPTION]",
     "medium": "Digital 4K",

@@ -406,7 +406,15 @@ function renderProject(work) {
     const film = el('section', 'project-film');
     const frame = el('div', 'project-frame');
     const episodes = work.media.episodes || [];
-    frame.append(projectFrame(work, episodes.length ? episodes[0].id : work.media.id));
+    if (work.media.type === 'pending') {
+      // No film link yet: the cover picture with a quiet note instead of a player.
+      const waiting = el('div', 'project-pending');
+      waiting.style.backgroundImage = `url("${workImage(work, 'full')}")`;
+      waiting.append(el('span', '', 'Film coming soon'));
+      frame.append(waiting);
+    } else {
+      frame.append(projectFrame(work, episodes.length ? episodes[0].id : work.media.id));
+    }
     // A cover picture over players that have none of their own (Google Drive); clicking it
     // uncovers the player underneath.
     if (work.poster) {
