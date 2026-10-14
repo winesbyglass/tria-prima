@@ -81,8 +81,8 @@ const projectDetails = {
     "medium": "Digital 4K",
     "role": "Writer-Director / Producer",
     "stills": [
-      "17-01",
       "17-02",
+      "17-01",
       "17-03",
       "17-04",
       "17-05",
