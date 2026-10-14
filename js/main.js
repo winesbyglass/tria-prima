@@ -140,6 +140,12 @@ function revealPage(target) {
     worksReturnScroll = null;
   }
   if (target === 'works') fillRemainingSlides();
+  // Works always opens on its first work (also when coming back from a project).
+  if (target === 'works') {
+    stripParked = false;
+    const first = works.findIndex((_, i) => !slides[i].hidden);
+    if (first >= 0) setActiveThumb(first);
+  }
   // Process always opens on Production services.
   if (target === 'process') selectTab(0);
   // Contact never opens straight onto a founder's photo; other pages never show one.
@@ -160,7 +166,7 @@ const PAGES = ['home', ...navPages];
 const pageOfRoute = route => (route.startsWith('work/') ? 'project' : route);
 const workOfRoute = route => works.find(work => `work/${work.slug}` === route);
 let currentRoute = null;
-let worksReturnScroll = null;   // where to put the Works list back after visiting a project
+let worksReturnScroll = null;   // (unused: Works always opens on its first work)
 
 function routeTitle(route) {
   const work = workOfRoute(route);
@@ -191,7 +197,6 @@ function showRoute(route) {
 function navigate(route, source, fromHistory = false) {
   if (navigating || (!PAGES.includes(route) && !workOfRoute(route)) || route === currentRoute) return;
   navigating = true;
-  if (currentRoute === 'works' && pageOfRoute(route) === 'project') worksReturnScroll = window.scrollY;
   if (!fromHistory) history.pushState({ route }, '', route === 'home' ? location.pathname : `#${route}`);
   letterboxWipe(route, () => showRoute(route), () => {
     navigating = false;
