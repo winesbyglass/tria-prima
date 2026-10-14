@@ -753,8 +753,71 @@ function updateWorksSnap() {
 
 document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => {
   blockWorkClicks(400);
-  applyFilter(b.dataset.filter);
+  if (navigating || b.dataset.filter === currentFilter) return;
+  navigating = true;
+  filterWorks(b.dataset.filter, () => { navigating = false; blockWorkClicks(400); });
 }));
+
+// ALL WORK / MOTION / PHOTOGRAPHY, animated like the List <-> Grid morph (same timing, easing
+// and stagger). Grid: works that stay glide to their new squares, works that go shrink away,
+// works that arrive grow in. List: the work on screen steps back and fades, uncovering the
+// first work of the new selection, whose title rises in; the strip's frames fade in one by one.
+function filterWorks(filter, onDone) {
+  const duration = 750;
+  const stagger = 18;
+  const easing = 'cubic-bezier(.62,0,.23,1)';
+  const layer = el('div', 'morph-layer');
+  const box = r => ({ left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  const shrink = r => ({ left: r.left + r.width * 0.15, top: r.top + r.height * 0.15, width: r.width * 0.7, height: r.height * 0.7 });
+  const onScreen = r => r && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+  const shown = () => works.map((_, i) => i).filter(i => !gridItems[i].hidden);
+  const hidden = [];
+  let count = 0;
+
+  if (currentView === 'grid') {
+    const before = new Map(shown().map(i => [i, gridItems[i].getBoundingClientRect()]));
+    applyFilter(filter);
+    const after = new Map(shown().map(i => [i, gridItems[i].getBoundingClientRect()]));
+    new Set([...before.keys(), ...after.keys()]).forEach(i => {
+      const from = before.get(i);
+      const to = after.get(i);
+      if (!onScreen(from) && !onScreen(to)) return;
+      const flyer = el('span');
+      flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
+      layer.append(flyer);
+      const frames = from && to ? [{ ...box(from), opacity: 1 }, { ...box(to), opacity: 1 }]
+        : to ? [{ ...box(shrink(to)), opacity: 0 }, { ...box(to), opacity: 1 }]
+        : [{ ...box(from), opacity: 1 }, { ...box(shrink(from)), opacity: 0 }];
+      flyer.animate(frames, { duration, delay: count++ * stagger, easing, fill: 'both' });
+    });
+    after.forEach((_, i) => { gridItems[i].style.visibility = 'hidden'; hidden.push(gridItems[i]); });
+  } else {
+    // The work on screen, copied (picture and title) so it can step back over the new list.
+    const old = slides[activeIndex].cloneNode(true);
+    old.style.cssText += ';position:absolute;inset:0;width:100%;height:100%;';
+    layer.append(old);
+    applyFilter(filter);
+    old.animate([{ transform: 'scale(1)', opacity: 1, borderRadius: '0px' }, { transform: 'scale(.86)', opacity: 0, borderRadius: '14px' }],
+      { duration, easing, fill: 'both' });
+    const first = slides.find(slide => !slide.hidden);
+    if (first) {
+      first.querySelectorAll('.work-slide-sub, .work-slide-title, .work-slide-cta').forEach((text, k) => {
+        text.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
+          { duration: duration * 0.7, delay: duration * 0.35 + k * 60, easing, fill: 'backwards' });
+      });
+    }
+    thumbs.filter(thumb => !thumb.hidden).forEach(thumb => {
+      thumb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 0.6, delay: 150 + count++ * stagger, easing: 'ease', fill: 'backwards' });
+    });
+  }
+  document.body.append(layer);
+  // Timer rather than animation promises, which can stall in a background tab.
+  setTimeout(() => {
+    hidden.forEach(node => { node.style.visibility = ''; });
+    layer.remove();
+    onDone();
+  }, duration + count * stagger + 60);
+}
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => {
   blockWorkClicks(400);
   if (navigating || b.dataset.view === currentView) return;
