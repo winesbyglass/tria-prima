@@ -494,7 +494,8 @@ function renderProject(work) {
   info.classList.toggle('two-col', !extras.childElementCount);
   parts.push(info);
 
-  // Photo projects: every photograph as a small preview; each opens full screen.
+  // Photo projects: every photograph as a small preview, right under the folded photographs
+  // (before the write-up); each opens full screen.
   if (isPhoto) {
     const previews = el('section', 'project-previews');
     previews.append(el('h3', '', `All photographs (${work.photos.length})`));
@@ -513,7 +514,7 @@ function renderProject(work) {
       grid.append(b);
     });
     previews.append(grid);
-    parts.push(previews);
+    parts.splice(parts.indexOf(info), 0, previews);
   }
 
   // Each part is a section of its own: one wheel notch turns from one to the next.

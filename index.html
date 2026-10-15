@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=108">
+  <link rel="stylesheet" href="css/style.css?v=109">
 </head>
 <body>
   <main class="app">
@@ -31,7 +31,7 @@
         </div>
         <button type="button" class="film-link" data-target="works" aria-label="Explore featured film in Works"><span>EXPLORE WORKS<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M2 8 8 2M3.5 2H8v4.5"/></svg></span></button>
         <nav class="navigation" aria-label="Main navigation">
-          <button class="nav-link" type="button" data-target="works">Works</button>
+          <button class="nav-link" type="button" data-target="works">Featured</button>
           <button class="nav-link" type="button" data-target="work-with-us">Work with us</button>
           <button class="nav-link" type="button" data-target="contact">Contact</button>
         </nav>
@@ -50,8 +50,8 @@
 
     <!-- Every .page section gets the site bar (TRIA PRIMA + HOME / page links) from main.js;
          a new page only needs <section class="page" id="…" hidden> to join the navigation. -->
-    <section class="page works-page" id="works" aria-label="Works" hidden>
-      <h2 class="visually-hidden">Works</h2>
+    <section class="page works-page" id="works" data-label="Featured" aria-label="Featured" hidden>
+      <h2 class="visually-hidden">Featured</h2>
       <nav class="works-filter" aria-label="Filter works">
         <button type="button" data-filter="all" class="active">ALL WORK</button>
         <button type="button" data-filter="motion">MOTION <small id="countMotion"></small></button>
@@ -67,13 +67,14 @@
       <aside class="work-strip" id="workStrip" aria-label="All works"></aside>
     </section>
 
-    <!-- Work with us: About us + the company intro, then two banners that open in place
-         (one at a time, both closed at first), then the statement. -->
+    <!-- Work with us: left, About us + the company intro + the statement; right, two banners that
+         open in place (one at a time, both closed at first). -->
     <section class="page process-page" id="work-with-us" data-label="Work with us" aria-labelledby="process-title" hidden>
       <div class="process-layout">
         <div class="process-lead">
           <h2 class="process-heading" id="process-title">About us</h2>
           <p class="process-about">Tria Prima is a New York-based film and media production company specializing in end-to-end project development and post-production services. We also aim to host monthly short film screenings and workshops in collaboration with local community organizations. Through these initiatives, we hope to support emerging filmmakers, encourage creative collaboration, and build an active filmmaking community locally and online.</p>
+          <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
         </div>
 
         <div class="banners">
@@ -97,8 +98,6 @@
             </div>
           </section>
         </div>
-
-        <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
       </div>
     </section>
     <section class="page contact-page" id="contact" aria-labelledby="contact-title" hidden>
@@ -166,6 +165,6 @@
   </div>
 
   <script src="js/works.js?v=19"></script>
-  <script src="js/main.js?v=93"></script>
+  <script src="js/main.js?v=94"></script>
 </body>
 </html>

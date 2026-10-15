@@ -173,20 +173,19 @@ html.works-open::-webkit-scrollbar { display:none; }
 .page-description { max-width:740px; color:#c5c0b9; font:clamp(23px,3vw,42px)/1.45 var(--font); }
 .email { color:white; font:clamp(24px,4.4vw,62px) var(--font); overflow-wrap:anywhere; text-decoration-thickness:1px; text-underline-offset:8px; }
 /* ---------- Work with us ----------
-   One column on black: ABOUT US and the company intro, then two full-width banners divided by
-   white lines with a soft glow; a banner opens its text underneath (one at a time), then the
-   closing statement. */
+   Two columns on black: left, ABOUT US, the company intro and the closing statement; right, two
+   banners divided by white lines with a soft glow, each opening its text underneath (one at a time). */
 .process-page { background:#000; }
-.process-layout { display:flex; flex-direction:column; margin-top:clamp(40px,8vh,100px); }
+.process-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:clamp(36px,6vw,110px); margin-top:clamp(40px,8vh,100px); align-items:start; }
 .process-heading { margin:0 0 clamp(18px,3vh,32px); font:800 clamp(40px,min(4.6vw,8.5vh),88px)/.92 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
 .process-about { max-width:46em; margin:0; font-size:clamp(15px,min(1.2vw,2.2vh),19px); line-height:1.6; color:rgba(255,255,255,.85); }
 
-.banners { margin-top:clamp(40px,7vh,80px); }
+.banners { margin-top:0; }
 .banner { position:relative; }
 .banner::before, .banners::after { content:""; display:block; height:1px; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,255,255,.2); }
 .banner-heading { margin:0; }
-.banner-toggle { display:block; width:100%; padding:clamp(22px,4vh,44px) 0; border:0; background:none; color:#fff; cursor:pointer; text-align:left;
-  font:800 clamp(34px,min(5.6vw,10vh),104px)/.95 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
+.banner-toggle { display:block; width:100%; padding:clamp(20px,3.6vh,40px) 0; border:0; background:none; color:#fff; cursor:pointer; text-align:left;
+  font:800 clamp(30px,min(3.6vw,8vh),68px)/.95 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
 /* Opening animates the panel's height from 0 to its content */
 .banner-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows .6s var(--ease); }
 .banner.open .banner-panel { grid-template-rows:1fr; }
@@ -428,6 +427,7 @@ html.lightbox-open { overflow:hidden; }
   .phone-break { display:inline; }
   .headshot { width:min(72%,300px); }
   .founder-name { white-space:normal; }
+  .process-layout { grid-template-columns:minmax(0,1fr); gap:44px; }
   .process-item { grid-template-columns:1fr; gap:8px; }
   .process-item .process-text { grid-column:1; grid-row:auto; }
 
