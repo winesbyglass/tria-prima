@@ -16,6 +16,8 @@ if (window.matchMedia('(max-width: 800px)').matches) works.forEach(work => { if 
 // from the page sections themselves, so a page added later gets the same bar and is linked.
 // data-nav="none" keeps a page out of the links; data-nav-current names the link it lights.
 const navPages = pages.filter(page => page.dataset.nav !== 'none').map(page => page.id);
+// A page's name in the menus: its data-label, else its id.
+const pageLabel = id => ((document.getElementById(id) || {}).dataset || {}).label || id;
 pages.forEach(page => {
   const lit = page.dataset.navCurrent || page.id;
   const bar = document.createElement('header');
@@ -32,7 +34,7 @@ pages.forEach(page => {
   ['home', ...navPages].forEach(id => {
     const link = document.createElement('button');
     link.type = 'button';
-    link.textContent = id.toUpperCase();
+    link.textContent = pageLabel(id).toUpperCase();
     if (id === 'home') link.dataset.home = '';
     else link.dataset.target = id;
     link.classList.toggle('current', id === lit);
@@ -74,7 +76,7 @@ menuList.setAttribute('aria-label', 'Site');
 ['home', ...navPages].forEach(id => {
   const link = document.createElement('button');
   link.type = 'button';
-  link.textContent = id.toUpperCase();
+  link.textContent = pageLabel(id).toUpperCase();
   link.dataset.menu = id;
   if (id === 'home') link.dataset.home = '';
   else link.dataset.target = id;
@@ -146,8 +148,8 @@ function revealPage(target) {
     const first = works.findIndex((_, i) => !slides[i].hidden);
     if (first >= 0) setActiveThumb(first);
   }
-  // Process always opens on Production services.
-  if (target === 'process') selectTab(0);
+  // Work with us always opens with both banners closed.
+  if (target === 'work-with-us') openBanner(-1);
   // Contact never opens straight onto a founder's photo; other pages never show one.
   if (target === 'contact') armFounders();
   else if (founderOn >= 0) closeFounder();
@@ -171,11 +173,14 @@ let worksReturnScroll = null;   // (unused: Works always opens on its first work
 function routeTitle(route) {
   const work = workOfRoute(route);
   if (work) return `TRIA PRIMA — ${work.title}`;
-  return `TRIA PRIMA — ${route === 'home' ? 'Film & Media' : route[0].toUpperCase() + route.slice(1)}`;
+  if (route === 'home') return 'TRIA PRIMA — Film & Media';
+  const label = pageLabel(route);
+  return `TRIA PRIMA — ${label[0].toUpperCase() + label.slice(1)}`;
 }
 
 function routeFromHash() {
-  const hash = decodeURIComponent(location.hash.slice(1));
+  let hash = decodeURIComponent(location.hash.slice(1));
+  if (hash === 'process') hash = 'work-with-us'; // the page's old address
   if (workOfRoute(hash)) return hash;
   return PAGES.includes(hash) ? hash : 'home';
 }
@@ -213,7 +218,7 @@ const LB_MS = 1150;
 function routeLabel(route) {
   const work = workOfRoute(route);
   if (work) return work.title;
-  return route === 'home' ? 'TRIA PRIMA' : route;
+  return route === 'home' ? 'TRIA PRIMA' : pageLabel(route);
 }
 
 function letterboxWipe(route, onCovered, onDone) {
@@ -1306,29 +1311,18 @@ splitToggle.addEventListener('click', () => {
   else turnToPhotos();
 });
 
-// ---------- Process: two buttons switch the right column ----------
-const processTabs = document.querySelector('.process-tabs');
-const tabButtons = [...processTabs.querySelectorAll('.process-tab')];
-function selectTab(n) {
-  tabButtons.forEach((tab, k) => {
-    const on = k === n;
-    tab.classList.toggle('active', on);
-    tab.setAttribute('aria-selected', String(on));
-    tab.tabIndex = on ? 0 : -1;
-    const panel = document.getElementById(tab.getAttribute('aria-controls'));
-    panel.hidden = !on;
-    panel.classList.toggle('active', on);
+// ---------- Work with us: two banners that open in place ----------
+// Clicking a banner opens its text underneath; clicking it again closes it. One open at a time.
+const bannerToggles = [...document.querySelectorAll('.banner-toggle')];
+function openBanner(n) {
+  bannerToggles.forEach((toggle, k) => {
+    const open = k === n;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.closest('.banner').classList.toggle('open', open);
   });
-  processTabs.dataset.at = n;
 }
-tabButtons.forEach((tab, k) => {
-  tab.addEventListener('click', () => { if (!tab.classList.contains('active')) selectTab(k); });
-  tab.addEventListener('keydown', event => {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    const n = (k + (event.key === 'ArrowRight' ? 1 : -1) + tabButtons.length) % tabButtons.length;
-    selectTab(n);
-    tabButtons[n].focus();
-  });
+bannerToggles.forEach((toggle, k) => {
+  toggle.addEventListener('click', () => openBanner(toggle.getAttribute('aria-expanded') === 'true' ? -1 : k));
 });
 // ---------- Contact: founder work photos, full screen ----------
 // As on accordion.net.au/contact: while the mouse is over a founder's block (headshot + contact

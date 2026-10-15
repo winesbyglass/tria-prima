@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#111315">
   <meta name="description" content="Tria Prima is a film and media production company.">
   <title>TRIA PRIMA — Film & Media</title>
-  <link rel="stylesheet" href="css/style.css?v=107">
+  <link rel="stylesheet" href="css/style.css?v=108">
 </head>
 <body>
   <main class="app">
@@ -32,7 +32,7 @@
         <button type="button" class="film-link" data-target="works" aria-label="Explore featured film in Works"><span>EXPLORE WORKS<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M2 8 8 2M3.5 2H8v4.5"/></svg></span></button>
         <nav class="navigation" aria-label="Main navigation">
           <button class="nav-link" type="button" data-target="works">Works</button>
-          <button class="nav-link" type="button" data-target="process">Process</button>
+          <button class="nav-link" type="button" data-target="work-with-us">Work with us</button>
           <button class="nav-link" type="button" data-target="contact">Contact</button>
         </nav>
       </div>
@@ -67,40 +67,40 @@
       <aside class="work-strip" id="workStrip" aria-label="All works"></aside>
     </section>
 
-    <section class="page process-page" id="process" aria-labelledby="process-title" hidden>
+    <!-- Work with us: About us + the company intro, then two banners that open in place
+         (one at a time, both closed at first), then the statement. -->
+    <section class="page process-page" id="work-with-us" data-label="Work with us" aria-labelledby="process-title" hidden>
       <div class="process-layout">
         <div class="process-lead">
-          <h2 class="process-heading" id="process-title">How we collaborate</h2>
-          <p class="process-intro">From the first idea to the final frame, we shape every story with intention, curiosity, and craft.</p>
-          <p class="process-summary">We are rethinking how films get made, and who gets to make them. Lean, collaborative teams with transparent budgets bring the right people to every project, from the first draft to final delivery. Through screenings, workshops and hands-on sessions, we open up the craft and share the tools and techniques that are too often kept behind closed doors.</p>
-          <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
+          <h2 class="process-heading" id="process-title">About us</h2>
+          <p class="process-about">Tria Prima is a New York-based film and media production company specializing in end-to-end project development and post-production services. We also aim to host monthly short film screenings and workshops in collaboration with local community organizations. Through these initiatives, we hope to support emerging filmmakers, encourage creative collaboration, and build an active filmmaking community locally and online.</p>
         </div>
 
-        <div class="process-side">
-          <!-- Two buttons switch between the sections; Production services is shown first -->
-          <div class="process-tabs" role="tablist" aria-label="What we do">
-            <span class="tab-glow" aria-hidden="true"></span>
-            <button class="process-tab active" type="button" role="tab" id="tabServices" aria-selected="true" aria-controls="panelServices" aria-label="Production services">01</button>
-            <button class="process-tab" type="button" role="tab" id="tabTraining" aria-selected="false" aria-controls="panelTraining" aria-label="Technical training" tabindex="-1">02</button>
-          </div>
-          <div class="process-panels">
-            <section class="process-panel active" id="panelServices" role="tabpanel" aria-labelledby="tabServices">
-              <h3 class="panel-heading">Production services</h3>
-              <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Creative Production</h4><p class="process-text">From script and concept through to the shoot, we take narrative, music video and commercial film projects from the first idea to the final frame.</p></article>
-              <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Brand Marketing</h4><p class="process-text">We build a marketing plan from scratch around your goals, then stay accountable as your partner over the long term.</p></article>
-              <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Post-Production</h4><p class="process-text">In-house editing, colour grading and graphics, so every project is finished with the same care it was shot with.</p></article>
-            </section>
-            <section class="process-panel" id="panelTraining" role="tabpanel" aria-labelledby="tabTraining" hidden>
-              <h3 class="panel-heading">Technical training</h3>
-              <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Monthly Screenings</h4><p class="process-text">A monthly programme of short film screenings, run with local community organisations, giving emerging filmmakers a room and an audience.</p></article>
-              <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Workshops</h4><p class="process-text">Hands-on workshops on the craft, from camera and lighting to editing and colour, open to anyone who wants to learn.</p></article>
-              <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Community</h4><p class="process-text">An active filmmaking community, locally and online, where people meet, collaborate and support each other's work.</p></article>
-            </section>
-          </div>
+        <div class="banners">
+          <section class="banner">
+            <h3 class="banner-heading"><button class="banner-toggle" type="button" aria-expanded="false" aria-controls="bannerApproach">Our approach</button></h3>
+            <div class="banner-panel" id="bannerApproach" role="region" aria-label="Our approach">
+              <div class="banner-inner">
+                <p class="process-intro">From the first idea to the final frame, we shape every story with intention, curiosity, and craft.</p>
+                <p class="process-summary">We are rethinking how films get made, and who gets to make them. Lean, collaborative teams with transparent budgets bring the right people to every project, from the first draft to final delivery. Through screenings, workshops and hands-on sessions, we open up the craft and share the tools and techniques that are too often kept behind closed doors.</p>
+              </div>
+            </div>
+          </section>
+          <section class="banner">
+            <h3 class="banner-heading"><button class="banner-toggle" type="button" aria-expanded="false" aria-controls="bannerCollaborate">How we collaborate</button></h3>
+            <div class="banner-panel" id="bannerCollaborate" role="region" aria-label="How we collaborate">
+              <div class="banner-inner">
+                <article class="process-item"><span class="process-num">01</span><h4 class="process-title">Creative Production</h4><p class="process-text">From script and concept through to the shoot, we take narrative, music video and commercial film projects from the first idea to the final frame.</p></article>
+                <article class="process-item"><span class="process-num">02</span><h4 class="process-title">Brand Marketing</h4><p class="process-text">We build a marketing plan from scratch around your goals, then stay accountable as your partner over the long term.</p></article>
+                <article class="process-item"><span class="process-num">03</span><h4 class="process-title">Post-Production</h4><p class="process-text">In-house editing, colour grading and graphics, so every project is finished with the same care it was shot with.</p></article>
+              </div>
+            </div>
+          </section>
         </div>
+
+        <p class="process-statement">Gatekeeping only starves the industry. We're here to innovate it.</p>
       </div>
     </section>
-
     <section class="page contact-page" id="contact" aria-labelledby="contact-title" hidden>
       <!-- Three columns: slogan + company details | founder | founder -->
       <div class="contact-layout">
@@ -108,8 +108,6 @@
         <!-- Placeholder slogan -->
         <h2 class="contact-slogan" id="contact-title">Let's make something</h2>
         <div class="contact-about">
-          <!-- Placeholder copy -->
-          <p class="contact-intro">Tria Prima is a New York-based film and media production company specializing in end-to-end project development and post-production services. We also aim to host monthly short film screenings and workshops in collaboration with local community organizations. Through these initiatives, we hope to support emerging filmmakers, encourage creative collaboration, and build an active filmmaking community locally and online.</p>
           <p class="contact-location">New York, USA</p>
           <p class="contact-general">Have a project in mind? We'd love to hear about it. <a href="mailto:hello@example.com">hello@example.com</a></p>
           <!-- Placeholder profiles -->
@@ -168,6 +166,6 @@
   </div>
 
   <script src="js/works.js?v=19"></script>
-  <script src="js/main.js?v=92"></script>
+  <script src="js/main.js?v=93"></script>
 </body>
 </html>
