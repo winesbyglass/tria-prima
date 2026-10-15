@@ -640,6 +640,8 @@ const gridItems = [];
 works.forEach((work, i) => {
   const slide = el('button', 'work-slide');
   slide.type = 'button';
+  // pos: where the cover is cropped (works.js "phone" overrides), e.g. '30% 50%'.
+  if (work.pos) slide.style.backgroundPosition = work.pos;
   // A plain drawn arrow (the ↗ character turns into an emoji-style icon on some phones).
   const cta = el('span', 'work-slide-cta', 'VIEW PROJECT');
   cta.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" aria-hidden="true"><path d="M2 8 8 2M3.5 2H8v4.5"/></svg>');
@@ -668,6 +670,7 @@ works.forEach((work, i) => {
   const item = el('button', 'grid-item');
   item.type = 'button';
   item.style.backgroundImage = `url("${workImage(work, 'mid')}")`;
+  if (work.pos) item.style.backgroundPosition = work.pos;
   const info = el('span', 'grid-info');
   info.append(el('span', 'grid-info-sub', workSub(work)), el('span', 'grid-info-title', work.title));
   item.append(info);
