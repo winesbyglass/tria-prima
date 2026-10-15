@@ -198,7 +198,6 @@ html.works-open::-webkit-scrollbar { display:none; }
 .banner.open .ring-open { opacity:0; }
 .banner.open .ring-close { opacity:1; }
 .banner.open .ring-down { transform:scaleY(0); }
-.banner-toggle:hover .ring-words { animation-duration:7s; }
 /* Opening animates the panel's height from 0 to its content */
 .banner-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows .6s var(--ease); }
 .banner.open .banner-panel { grid-template-rows:1fr; }
