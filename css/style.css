@@ -180,12 +180,25 @@ html.works-open::-webkit-scrollbar { display:none; }
 .process-heading { margin:0 0 clamp(18px,3vh,32px); font:800 clamp(40px,min(4.6vw,8.5vh),88px)/.92 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
 .process-about { max-width:46em; margin:0; font-size:clamp(15px,min(1.2vw,2.2vh),19px); line-height:1.6; color:rgba(255,255,255,.85); }
 
-.banners { margin-top:0; }
+/* The banners sit centred against the left column */
+.banners { margin-top:0; align-self:center; }
 .banner { position:relative; }
 .banner::before, .banners::after { content:""; display:block; height:1px; background:#fff; box-shadow:0 0 8px rgba(255,255,255,.55),0 0 22px rgba(255,255,255,.2); }
 .banner-heading { margin:0; }
-.banner-toggle { display:block; width:100%; padding:clamp(20px,3.6vh,40px) 0; border:0; background:none; color:#fff; cursor:pointer; text-align:left;
-  font:800 clamp(30px,min(3.6vw,8vh),68px)/.95 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
+.banner-toggle { display:flex; align-items:center; justify-content:space-between; gap:20px; width:100%; padding:clamp(18px,3vh,34px) 0; border:0; background:none; color:#fff; cursor:pointer; text-align:left;
+  font:800 clamp(24px,min(2.6vw,6vh),48px)/.95 var(--font); letter-spacing:-.02em; text-transform:uppercase; }
+/* The hint: a small ring of words turning slowly round a plus (a minus once open) */
+.banner-ring { flex:none; width:clamp(54px,4.6vw,72px); aspect-ratio:1; }
+.banner-ring svg { display:block; width:100%; height:100%; overflow:visible; }
+.banner-ring text { font:600 8.6px var(--font); letter-spacing:.24em; text-transform:uppercase; fill:rgba(255,255,255,.72); transition:opacity .4s ease; }
+.ring-words { transform-box:view-box; transform-origin:50% 50%; animation:ring-turn 18s linear infinite; }
+@keyframes ring-turn { to { transform:rotate(360deg); } }
+.ring-mark { stroke:#fff; stroke-width:1.4; stroke-linecap:round; transform-box:view-box; transform-origin:50% 50%; transition:transform .45s var(--ease); }
+.ring-close { opacity:0; }
+.banner.open .ring-open { opacity:0; }
+.banner.open .ring-close { opacity:1; }
+.banner.open .ring-down { transform:scaleY(0); }
+.banner-toggle:hover .ring-words { animation-duration:7s; }
 /* Opening animates the panel's height from 0 to its content */
 .banner-panel { display:grid; grid-template-rows:0fr; transition:grid-template-rows .6s var(--ease); }
 .banner.open .banner-panel { grid-template-rows:1fr; }
@@ -327,7 +340,13 @@ html.works-open::-webkit-scrollbar { display:none; }
 .project-page .gallery-item.open { cursor:pointer; }
 .gallery-wrap > .project-gallery { margin-top:0; }
 .gallery-swipe { display:none; }
-.project-section > .gallery-wrap, .project-section > .project-gallery, .project-section > .project-film, .project-section > .project-info, .project-section > .project-previews { margin-top:0; }
+/* Photo projects: all the thumbnails and the write-up share one screen */
+.project-pair { display:flex; flex-direction:column; gap:clamp(28px,5vh,52px); }
+.project-pair > * { margin-top:0; }
+.project-pair .preview-grid { grid-template-columns:repeat(auto-fill,minmax(88px,1fr)); gap:8px; }
+/* Works filter (list view): the picture that steps back */
+.filter-picture { position:absolute; inset:0; background:#000 center/cover no-repeat; }
+.project-section > .project-pair, .project-section > .gallery-wrap, .project-section > .project-gallery, .project-section > .project-film, .project-section > .project-info, .project-section > .project-previews { margin-top:0; }
 @media (min-width:801px) {
   .project-page { padding-bottom:0; }
   .project-body { padding-top:0; }

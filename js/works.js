@@ -18,9 +18,9 @@ const motionWorks = [
     credits: [['Filmmakers', 'Malik Clyde Terrab / Brandon Mioduszewski'], ['Colourist', DIRECTOR]] },
   { title: 'New York c. May 2025', type: 'Super 8mm Video', year: '2026', img: '10-01', media: { type: 'vimeo', id: '1228072459' },
     credits: [['Director', DIRECTOR], ['DP', DIRECTOR], ['Editor', DIRECTOR], ['Colourist', DIRECTOR], ['Audio', 'Joel Meyerowitz — 2026 ICP Infinity Awards speech']] },
-  // No film link yet (media "pending"); credits and write-up still placeholders.
+  // No film link yet (media "pending"); medium still a placeholder.
   { title: 'A Day in Eden', type: 'Drama / Magical Realism', duration: '16:29', year: '2026', img: '18-01', media: { type: 'pending' },
-    credits: [['Director', '[DIRECTOR]']] },
+    credits: [['Starring', 'Khalif Cotton as Lewis / Blanca Del Loco as Mimi'], ['Writer / Director / Editor', 'Jalsa Amidah Drinkard'], ['Director of Photography', 'Rose Knopper'], ['AD', 'Oliver Schneider / Luke Gardiner'], ['G&E', 'Joshua Kim'], ['Producers', 'Anna Mayo / Jalsa Amidah Drinkard'], ['Production Designer', 'Julia Sy'], ['Sound Designer', 'Alicia Qian'], ['Boom Op', 'Sophia Wilson'], ['Composer', 'Oliver Grannis']] },
   { title: 'A Little Regret in Helsinki', type: 'Documentary Short Film', year: '2025', img: '02-01', media: { type: 'vimeo', id: '1110984253' },
     credits: [['Writer / Script', DIRECTOR], ['Producers', 'Haohao Qiaoshi Liu / Wertti Majamaa / Kauri Seppälä'], ['DOP', DIRECTOR], ['Editor', DIRECTOR], ['Music', 'Eddy Zhang'], ['Sound Design', DIRECTOR], ['Production Design', DIRECTOR], ['Distribution', 'AFF Distribution']] },
   { title: 'Early Years', type: 'Narrative Short Film', year: '2024', img: '03-04', phone: { img: '03-02', ink: 'light' }, media: { type: 'vimeo', id: '1016622750' },
@@ -58,15 +58,20 @@ const photoWorks = photoSeries.map(series => {
   };
 });
 
-// Every individual photograph (the home page slideshow draws from these).
-const allPhotos = photoWorks.flatMap(project => project.photos.map(img => ({ img })));
+// The home page slideshow, in this order, round and round.
+const homePhotos = [
+  // Return to Helsinki
+  '09-01', '09-06', '09-13', '09-14', '09-16', '09-22', '09-02', '09-09', '09-11', '09-18',
+  // Sciences Po Year 2
+  '11-11', '11-12', '11-13'
+];
 
 // Project page details (description, role, stills, festivals, distribution), copied from the hql portfolio.
 const projectDetails = {
   "A Day in Eden": {
-    "description": "[DESCRIPTION]",
+    "description": "On Easter Sunday, a Catholic man visits a fortune teller to find out if his dead gay son is in heaven or hell. In this day-long odyssey across New York City, Lewis pieces together who his estranged child truly was and confronts his failures as both a father and a believer.",
     "medium": "[MEDIUM]",
-    "role": "[ROLE]",
+    "role": "Writer / Director / Editor",
     "stills": [
       "18-02",
       "18-03",

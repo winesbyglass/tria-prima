@@ -514,7 +514,10 @@ function renderProject(work) {
       grid.append(b);
     });
     previews.append(grid);
-    parts.splice(parts.indexOf(info), 0, previews);
+    // ...sharing one screen with the write-up.
+    const pair = el('div', 'project-pair');
+    pair.append(previews, info);
+    parts.splice(parts.indexOf(info), 1, pair);
   }
 
   // Each part is a section of its own: one wheel notch turns from one to the next.
@@ -812,21 +815,15 @@ function filterWorks(filter, onDone) {
       gridItems[i].style.visibility = 'hidden';
       hidden.push(gridItems[i]);
     });
-    count = Math.ceil((start + incoming.length * stagger + half + 150 - duration) / stagger);  } else {
-    // The work on screen, copied (picture and title) so it can step back over the new list.
-    const old = slides[activeIndex].cloneNode(true);
-    old.style.cssText += ';position:absolute;inset:0;width:100%;height:100%;';
+    count = Math.ceil((start + incoming.length * stagger + half + 150 - duration) / stagger);
+  } else {
+    // Just the picture on screen steps back and fades over the new selection's first work; the
+    // titles themselves are never animated, so they don't jump.
+    const old = el('div', 'filter-picture');
+    old.style.backgroundImage = slides[activeIndex].style.backgroundImage;
     layer.append(old);
     applyFilter(filter);
-    old.animate([{ transform: 'scale(1)', opacity: 1, borderRadius: '0px' }, { transform: 'scale(.86)', opacity: 0, borderRadius: '14px' }],
-      { duration, easing, fill: 'both' });
-    const first = slides.find(slide => !slide.hidden);
-    if (first) {
-      first.querySelectorAll('.work-slide-sub, .work-slide-title').forEach((text, k) => {
-        text.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }],
-          { duration: duration * 0.7, delay: duration * 0.35 + k * 60, easing, fill: 'backwards' });
-      });
-    }
+    old.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.86)', opacity: 0 }], { duration, easing, fill: 'both' });
     thumbs.filter(thumb => !thumb.hidden).forEach(thumb => {
       thumb.animate([{ opacity: 0 }, { opacity: 1 }], { duration: duration * 0.6, delay: 150 + count++ * stagger, easing: 'ease', fill: 'backwards' });
     });
@@ -1171,12 +1168,13 @@ const phoneHome = window.matchMedia('(max-width: 800px)');
 const SLIDE_MS = 3000;
 const TURN_MS = 2000;
 let slideTimer = null;
-let slideOrder = [];
 let turning = false;
 
+// The slideshow plays homePhotos (works.js) in order, round and round.
+let slideAt = -1;
 function nextPhoto() {
-  if (!slideOrder.length) slideOrder = allPhotos.map((_, i) => i).sort(() => Math.random() - 0.5);
-  const work = allPhotos[slideOrder.pop()];
+  slideAt = (slideAt + 1) % homePhotos.length;
+  const work = { img: homePhotos[slideAt] };
   const img = new Image();
   img.alt = '';
   img.src = workImage(work, 'full');
@@ -1315,6 +1313,16 @@ splitToggle.addEventListener('click', () => {
 // ---------- Work with us: two banners that open in place ----------
 // Clicking a banner opens its text underneath; clicking it again closes it. One open at a time.
 const bannerToggles = [...document.querySelectorAll('.banner-toggle')];
+// Each banner carries a small, slowly turning ring of words at its right ("click to open", then
+// "click to close") around a plus that turns into a minus: a quiet hint that it opens.
+bannerToggles.forEach((toggle, k) => {
+  const ring = `ring${k}`;
+  toggle.insertAdjacentHTML('beforeend', `<span class="banner-ring" aria-hidden="true"><svg viewBox="0 0 100 100">
+    <defs><path id="${ring}" d="M50 50 m-38 0 a38 38 0 1 1 76 0 a38 38 0 1 1 -76 0"/></defs>
+    <g class="ring-words"><text class="ring-open"><textPath href="#${ring}">click to open · click to open · click to open ·</textPath></text>
+    <text class="ring-close"><textPath href="#${ring}">click to close · click to close · click to close ·</textPath></text></g>
+    <path class="ring-mark ring-across" d="M41 50h18"/><path class="ring-mark ring-down" d="M50 41v18"/></svg></span>`);
+});
 function openBanner(n) {
   bannerToggles.forEach((toggle, k) => {
     const open = k === n;
