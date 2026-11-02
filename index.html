@@ -23,9 +23,19 @@
         <script>if (matchMedia('(max-width: 800px)').matches) document.getElementById('heroVideo').poster = 'assets/hero-phone-poster.jpg?v=1';</script>
         <!-- Photo slideshow revealed by the page-turn divider; filled from the Photography works -->
         <div class="photo-stage" id="photoStage" aria-hidden="true"></div>
-        <div class="topline">
-          <button class="logo-placeholder" type="button" aria-label="Tria Prima, return home" data-home>
-            <img src="assets/tria-prima-logo-transparent.PNG" alt="Tria Prima logo" style="width:64px;height:64px;object-fit:contain;display:block;">
+               <div class="topline" style="position:relative;">
+          <button
+            class="logo-placeholder"
+            type="button"
+            aria-label="Tria Prima, return home"
+            data-home
+            style="position:absolute; top:20px; left:20px; padding:0; background:none; border:none; width:auto; height:auto;"
+          >
+            <img
+              src="assets/tria-prima-logo-transparent.PNG"
+              alt="Tria Prima logo"
+              style="width:320px; height:auto; object-fit:contain; display:block;"
+            >
           </button>
           <h1 class="brand">TRIA PRIMA</h1>
         </div>
