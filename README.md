@@ -1,4 +1,4 @@
-# TRIA PRIMA — Film & Media (v1, homepage)
+# TRIA PRIMA - Film & Media (v1, homepage)
 
 Live: https://winesbyglass.github.io/tria-prima/
 
