@@ -803,6 +803,8 @@ function filterWorks(filter, onDone) {
     const fly = (i, frames, delay, ms) => {
       const flyer = el('span');
       flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
+      // Same crop as the grid square or slide it turns into (works.js "pos"), so it doesn't shift sideways on landing.
+      if (works[i].pos) flyer.style.backgroundPosition = works[i].pos;
       layer.append(flyer);
       flyer.animate(frames, { duration: ms, delay, easing, fill: 'both' });
     };
@@ -1131,6 +1133,8 @@ function morphView(view, onDone) {
   targets.forEach(([i, to], n) => {
     const flyer = el('span');
     flyer.style.backgroundImage = `url("${workImage(works[i], 'mid')}")`;
+    // Same crop as the grid square or slide it turns into (works.js "pos"), so it doesn't shift sideways on landing.
+    if (works[i].pos) flyer.style.backgroundPosition = works[i].pos;
     layer.append(flyer);
     flyer.animate([box(from.get(i)), box(to)],
       { duration, delay: n * stagger, easing: 'cubic-bezier(.62,0,.23,1)', fill: 'both' });
