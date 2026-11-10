@@ -672,18 +672,19 @@ works.forEach((work, i) => {
   gridItems.push(item);
 });
 
-// Grid images: preload once the page has settled, fade each square in as it arrives.
+// Grid images: preload once the page has settled, fade each square in as it arrives. This does
+// not wait for the window 'load' event alone: a stalled request can hold that back for a long
+// time, and then every square stayed invisible (black) after the grid had flown in.
 function preloadGrid() {
   works.forEach((work, i) => {
     const img = new Image();
     img.onload = img.onerror = () => gridItems[i].classList.add('loaded');
     img.src = workImage(work, 'mid');
   });
-  // Never leave a square invisible if a load event is missed.
-  setTimeout(() => gridItems.forEach(item => item.classList.add('loaded')), 4000);
 }
-if (document.readyState === 'complete') setTimeout(preloadGrid, 800);
-else window.addEventListener('load', () => setTimeout(preloadGrid, 800), { once: true });
+setTimeout(preloadGrid, 800);
+// Never leave a square invisible: whatever has or hasn't arrived, show them all after 5 seconds.
+setTimeout(() => gridItems.forEach(item => item.classList.add('loaded')), 5000);
 workList.append(...slides);
 const stripTrack = el('div', 'strip-track');
 const stripWindow = el('div', 'strip-window');
