@@ -22,12 +22,6 @@ pages.forEach(page => {
   const lit = page.dataset.navCurrent || page.id;
   const bar = document.createElement('header');
   bar.className = 'site-bar';
-  const brand = document.createElement('button');
-  brand.type = 'button';
-  brand.className = 'site-brand';
-  brand.textContent = 'TRIA PRIMA';
-  brand.setAttribute('aria-label', 'TRIA PRIMA, home');
-  brand.dataset.home = '';
   const nav = document.createElement('nav');
   nav.className = 'site-nav';
   nav.setAttribute('aria-label', 'Site');
@@ -41,7 +35,7 @@ pages.forEach(page => {
     if (id === lit) link.setAttribute('aria-current', 'page');
     nav.append(link);
   });
-  bar.append(brand, nav, menuButton());
+  bar.append(nav, menuButton());
   page.prepend(bar);
 });
 
@@ -1455,7 +1449,7 @@ function relRect(el, box) {
 
 // Home: sample the film frame (or the photo on show) a few times a second.
 const homeInkTargets = [
-  [document.querySelector('.topline'), document.querySelector('.brand')],
+  [document.querySelector('.brand-lockup'), document.querySelector('.brand-lockup')],
   [aboutPanel, aboutPanel.querySelector('.aside-copy')]
 ];
 
@@ -1478,7 +1472,7 @@ setInterval(updateHomeInk, 700);
 // thumbnails are not stuck behind 26 big downloads), then get sampled for text colour.
 const slidePixels = [];
 const slideRequested = [];
-const worksOverlays = [...document.querySelectorAll('#works .site-brand, #works .site-nav, .works-filter, .works-view')];
+const worksOverlays = [...document.querySelectorAll('.brand-lockup, #works .site-nav, .works-filter, .works-view')];
 let activeIndex = 0;
 
 function sampleSlideInk(i, img) {
